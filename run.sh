@@ -8,4 +8,4 @@ cd bootsector
 cd ..
 
 # Run in QEMU
-qemu-system-x86_64 bin/bootsect.bin
+qemu-system-x86_64 -fda bin/bootsect.bin
