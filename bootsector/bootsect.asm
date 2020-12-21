@@ -26,36 +26,36 @@ mov dh, 5
 mov dl, [boot_drive]
 call disk_load
 
-; START TMP CODE
-; Read the contents at address 0x9000
-mov bx, [0x9000]
-call print_hex_word
+; Move to 32 bit protected mode
+call use_32bpm
 
-; Read the contents at address 0x9000 + 512
-mov bx, [0x9000 + 512]
-call print_hex_word
-; END TMP CODE
+; Shouldn't get here...
+jmp $
 
-; Main logic. For now, it's just an infinite loop
-main_loop:
-    jmp main_loop
 
-; -- End of usual program --
+; Include 16-bit things
 include 'diskload.asm'
 include 'printfuncs.asm'
 include 'gdt.asm'
 
+; Include 32-bit things
+include 'protmode.asm'
+include 'printfuncs32.asm'
+
 ; Variables
 startup_message:
     db 'KoiZ OS. Stack Start: ', 0x00
+bit32_mode_message:
+    db 'Entered 32-bit protected mode', 0x00
 
-; Buffer out to 512 bytes
+; 32 bit main func
+; Main logic. For now, it's just an infinite loop
+use32
+main_32b:
+    mov ebx, bit32_mode_message
+    call print_string_pm
+    jmp $
+
+; Buffer bootsector out to 512 bytes
 times 510-($-$$) db 0
 dw 0xaa55 
-
-; We know that BIOS will load only the first 512 - byte sector from the disk ,
-; so if we purposely add a few more sectors to our code by repeating some
-; familiar numbers , we can prove to ourselfs that we actually loaded those
-; additional two sectors from the disk we booted from.
-times 256 dw 0xdada
-times 256 dw 0xface
