@@ -26,6 +26,7 @@ mov dh, 5
 mov dl, [boot_drive]
 call disk_load
 
+; START TMP CODE
 ; Read the contents at address 0x9000
 mov bx, [0x9000]
 call print_hex_word
@@ -33,15 +34,16 @@ call print_hex_word
 ; Read the contents at address 0x9000 + 512
 mov bx, [0x9000 + 512]
 call print_hex_word
+; END TMP CODE
 
 ; Main logic. For now, it's just an infinite loop
 main_loop:
     jmp main_loop
 
-
 ; -- End of usual program --
 include 'diskload.asm'
 include 'printfuncs.asm'
+include 'gdt.asm'
 
 ; Variables
 startup_message:
