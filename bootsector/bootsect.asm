@@ -14,10 +14,7 @@ call print_string
 
 ; Print out stack location
 mov bx, bp
-mov al, bh
-call print_hex_byte
-mov al, bl
-call print_hex_byte
+call print_hex_word
 
 ; Print newline
 mov ah, 0x0E
@@ -38,17 +35,11 @@ call disk_load
 
 ; Print the read contents of bx 
 mov bx, [0x9000]
-mov al, bh
-call print_hex_byte
-mov al, bl
-call print_hex_byte
+call print_hex_word
 
 ; Print the read contents of bx 
 mov bx, [0x9000 + 512]
-mov al, bh
-call print_hex_byte
-mov al, bl
-call print_hex_byte
+call print_hex_word
 
 ; Main logic
 main_loop:
@@ -73,7 +64,7 @@ disk_load:
 
     ; BIOS interrupt
     int 0x13
-    
+
     ; Error happens if carry flag is set
     jc .disk_error
 
@@ -102,6 +93,16 @@ print_string:
     .done:
         popa
         ret
+
+; Assume the byte is in bx prior to calling
+print_hex_word:
+    push ax
+    mov al, bh
+    call print_hex_byte
+    mov al, bl
+    call print_hex_byte
+    pop ax
+    ret
 
 ; Assume the byte is already in al
 print_hex_byte:
