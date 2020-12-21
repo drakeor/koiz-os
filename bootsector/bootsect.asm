@@ -15,130 +15,37 @@ call print_string
 ; Print out stack location
 mov bx, bp
 call print_hex_word
-
-; Print newline
-mov ah, 0x0E
-mov al, 0x0A
-int 10h
-mov al, 0x0D
-int 10h
+call print_newline
 
 ; BIOS puts the boot drive in dl. We'll store it.
 mov [boot_drive], dl
 
 ; Load 5 sectors from 0x0000(ES):0x9000(BX)
-; mov es, $0
 mov bx, 0x9000 
 mov dh, 5
 mov dl, [boot_drive]
 call disk_load
 
-; Print the read contents of bx 
+; Read the contents at address 0x9000
 mov bx, [0x9000]
 call print_hex_word
 
-; Print the read contents of bx 
+; Read the contents at address 0x9000 + 512
 mov bx, [0x9000 + 512]
 call print_hex_word
 
-; Main logic
+; Main logic. For now, it's just an infinite loop
 main_loop:
     jmp main_loop
 
+
 ; -- End of usual program --
-
-; Loads dh sectors to ES:BX,. Adapted from os-dev book.
-disk_load:
-    pusha
-    push dx 
-
-    ; 0x2 means read sector
-    mov ah, 0x02
-    mov al, dh
-
-    ; Select head and cylinder 0, and read from the 2nd sector.
-    ; Remember 1 is our boot sector
-    mov ch, 0x00
-    mov dh, 0x00
-    mov cl, 0x02
-
-    ; BIOS interrupt
-    int 0x13
-
-    ; Error happens if carry flag is set
-    jc .disk_error
-
-    pop dx
-    cmp dh, al
-    jne .disk_error
-
-    popa
-    ret
-
-    .disk_error:
-        mov si, disk_error_message
-        call print_string
-        jmp $
-
-; Put the address of the string in si prior to calling. Terminated by 0x00
-print_string:
-    pusha
-    mov ah, 0x0E
-    .p_loop:
-        lodsb
-        cmp al, 0x00
-        je .done
-        int 10h
-        jmp .p_loop
-    .done:
-        popa
-        ret
-
-; Assume the byte is in bx prior to calling
-print_hex_word:
-    push ax
-    mov al, bh
-    call print_hex_byte
-    mov al, bl
-    call print_hex_byte
-    pop ax
-    ret
-
-; Assume the byte is already in al
-print_hex_byte:
-    pusha
-    ; Get the higher 4 bits
-    mov dl, al
-    shr al, $4
-    call print_hex
-    ; Get the lower 4 bits
-    mov al, dl
-    mov cl, 0x0F
-    and al, cl
-    call print_hex
-    popa
-    ret
-
-; Assume the byte is already in al
-print_hex:
-    pusha
-    mov ah, 0x0E
-    add al, 0x30
-    cmp al, 0x39
-    jbe .done
-    add al, 0x07
-    .done:
-        int 10h
-        popa
-        ret
+include 'diskload.asm'
+include 'printfuncs.asm'
 
 ; Variables
 startup_message:
     db 'KoiZ OS. Stack Start: ', 0x00
-disk_error_message:
-    db 'Error reading disk!', 0x00
-boot_drive:
-    db 0
 
 ; Buffer out to 512 bytes
 times 510-($-$$) db 0
