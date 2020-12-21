@@ -4,6 +4,9 @@ use16
 ; Set global memory offset
 org 0x7c00
 
+; Memory offset where we'll load the kernel
+KERNEL_OFFSET equ 0x1000
+
 ; Set up the stack
 mov bp, 0x8000
 mov sp, bp
@@ -20,9 +23,9 @@ call print_newline
 ; BIOS puts the boot drive in dl. We'll store it.
 mov [boot_drive], dl
 
-; Load 5 sectors from 0x0000(ES):0x9000(BX)
+; Load 15 sectors from 0x0000(ES):0x9000(BX)
 mov bx, 0x9000 
-mov dh, 5
+mov dh, 15
 mov dl, [boot_drive]
 call disk_load
 
@@ -54,6 +57,10 @@ use32
 main_32b:
     mov ebx, bit32_mode_message
     call print_string_pm
+
+    ; Alright, enter into our kernel!
+    call KERNEL_OFFSET
+
     jmp $
 
 ; Buffer bootsector out to 512 bytes

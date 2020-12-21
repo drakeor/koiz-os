@@ -13,7 +13,7 @@ fn panic(_info: &PanicInfo) -> ! {
 // Make sure rust doesn't mangle the name
 // This function is also never allowed to return (-> !)
 #[no_mangle]
-pub extern "C" fn _start() -> ! {
+pub extern "C" fn start_kernel() {
     let vga_buffer = 0xb8000 as *mut u8;
 
     for (i, &byte) in HELLO.iter().enumerate() {
