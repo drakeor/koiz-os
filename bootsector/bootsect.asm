@@ -7,8 +7,11 @@ org 0x7c00
 ; Memory offset where we'll load the kernel
 KERNEL_OFFSET equ 0x1000
 
+; BIOS puts the boot drive in dl. We'll store it.
+mov [boot_drive], dl
+
 ; Set up the stack
-mov bp, 0x8000
+mov bp, 0x9000
 mov sp, bp
 
 ; Print name of Bootloader
@@ -20,14 +23,8 @@ mov bx, bp
 call print_hex_word
 call print_newline
 
-; BIOS puts the boot drive in dl. We'll store it.
-mov [boot_drive], dl
-
-; Load 15 sectors from 0x0000(ES):0x9000(BX)
-mov bx, 0x9000 
-mov dh, 15
-mov dl, [boot_drive]
-call disk_load
+; Load kernel to disk
+call load_kernel
 
 ; Move to 32 bit protected mode
 call use_32bpm
@@ -40,6 +37,7 @@ jmp $
 include 'diskload.asm'
 include 'printfuncs.asm'
 include 'gdt.asm'
+include 'loadkernel.asm'
 
 ; Include 32-bit things
 include 'protmode.asm'

@@ -1,6 +1,6 @@
 # KoiZ Operating System
 
-Built mostly as a pet project. It's an x86_64 based operating system built in Rust and ASM.
+Built mostly as a pet project. It's an x86_64 based operating system built in C, Rust and ASM.
 
 A lot of programs and stuff revolve around math since I like math. 
 
@@ -8,17 +8,11 @@ It doesn't really serve any practical purpose outside that.
 
 # Requirements to build
 
-- Rust (Nightly required. Can use `rustup default nightly` to install it)
-
-- Phil Opp's Rust BootImage (`cargo install bootimage`)
-
-- LLVM Tools (`rustop component add llvm-tools-preview`)
-
 - FASM (https://flatassembler.net/download.php)
 
 # Running
 
-- You can run this OS bare metal or on QEMU (qemu-x86_64). You'll probably need to pass -fdr to QEMU to get it to work.
+- You can run this OS bare metal or on QEMU (qemu-x86_64). You'll probably need to pass -fda to QEMU to get it to work.
 
 # FAQ
 
@@ -39,4 +33,4 @@ FASM Manual (Incredibly helpful since most snippets are built in NASM and it's a
 
 ReDox (A very complete OS made in Rust): https://github.com/redox-os/redox
 
-Phil Opp (Another dude who build an OS in Rust. His site helped a lot for programming free-standing binaries): https://os.phil-opp.com/
+Phil Opp (Another dude who build an OS in Rust. His site helped a lot for programming free-standing binaries in Rust): https://os.phil-opp.com/
