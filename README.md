@@ -10,7 +10,9 @@ It doesn't really serve any practical purpose outside that.
 
 - Rust (Nightly required. Can use `rustup default nightly` to install it)
 
-- Xargo `cargo install xargo`
+- Phil Opp's Rust BootImage (`cargo install bootimage`)
+
+- LLVM Tools (`rustop component add llvm-tools-preview`)
 
 - FASM (https://flatassembler.net/download.php)
 

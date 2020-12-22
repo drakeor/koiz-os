@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-static HELLO: &[u8] = b"Hello World!";
+static HELLO: &[u8] = b"Koiz OS!";
 
 // Panic Handler
 use core::panic::PanicInfo;
