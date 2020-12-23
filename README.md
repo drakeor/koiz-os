@@ -2,6 +2,8 @@
 
 Built mostly as a pet project. It's an x86_64 based operating system built in C, Rust and ASM.
 
+It currently runs 32-bit mode with plans to have a 64-bit mode as well.
+
 A lot of programs and stuff revolve around math since I like math. 
 
 It doesn't really serve any practical purpose outside that.
@@ -23,14 +25,12 @@ Most likely have to run fasm.x64 instead
 
 # Useful references / credits
 
-OS Dev Book (Does a pretty good job explaining theory): https://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf
+OS Dev Book (Does a pretty good job explaining theory. Used this heavily): https://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf
 
 X86 Assembly Reference: https://en.wikibooks.org/wiki/X86_Assembly
 
 OS Dev.org (Lots of great information and resource): https://wiki.osdev.org/Main_Page
 
-FASM Manual (Incredibly helpful since most snippets are built in NASM and it's always 1 for 1): https://flatassembler.net/docs.php?article=manual
+FASM Manual (Incredibly helpful since most snippets are built in NASM and I like using FASM: https://flatassembler.net/docs.php?article=manual
 
-ReDox (A very complete OS made in Rust): https://github.com/redox-os/redox
-
-Phil Opp (Another dude who build an OS in Rust. His site helped a lot for programming free-standing binaries in Rust): https://os.phil-opp.com/
+In-line assembly docs for GCC: https://gcc.gnu.org/onlinedocs/gcc/Using-Assembly-Language-with-C.html#Using-Assembly-Language-with-C 
