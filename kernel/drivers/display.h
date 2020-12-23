@@ -3,10 +3,13 @@
 
 #include <stdint.h>
 
-// Hard-coded display values
+/* Hard-coded display values */
 #define VIDEO_ADDRESS 0xb8000
 #define MAX_ROWS 25
 #define MAX_COLS 80
+#define VCHAR_CELLSIZE 2
+
+/* Screen I/O ports */
 #define REG_SCREEN_CTRL 0x3D4
 #define REG_SCREEN_DATA 0x3D5
 
@@ -30,7 +33,7 @@ enum BASE_DISPLAY_COLOR
     BASE_DISPLAY_COLOR_WHITE         = 15
 };
 
-// Generates a foreground/background color combo
+/* Generates a foreground/background color combo */
 static inline uint8_t make_display_color(uint8_t foreground, uint8_t background) 
 {
     return (background << 4) | foreground;
@@ -38,15 +41,6 @@ static inline uint8_t make_display_color(uint8_t foreground, uint8_t background)
 
 void print(char *message, uint8_t color);
 
-/* 
- * Prints an ASCII character at a screen position
- * Leave char_color at 0 to do default black on white
- */
-void print_char(uint8_t character, uint8_t col, uint8_t row, uint8_t char_color);
-
-/*
- * Clears the screen
- */
 void clear_screen();
 
 #endif
