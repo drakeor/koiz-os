@@ -4,6 +4,7 @@
 /*
  * Paraphrased from https://littleosbook.github.io/#the-serial-ports 
  * and https://wiki.osdev.org/Serial_Ports 
+ * and https://en.wikibooks.org/wiki/Serial_Programming/8250_UART_Programming 
  * We need to send: 
  * - Speed used for sending data (bit rate/divisor)
  * - If error checking should be used
@@ -32,8 +33,10 @@ uint8_t init_serial(uint16_t port)
      * Set datatype to 8 bits (bit 0/1 = 0b11) 
      * with 1 stop bit (bit 2 = 0b0)
      * and no parity (bit3/4/5 = 0b000) 
+     * and no break control (bit 6 = 0b0)
+     * and no DLAB (bit 7 = 0b0)
      */
-    io_byte_out(port, 0b00011);
+    io_byte_out(port + 3, 0b00000011);
 
     /*
      * Configuring the buffers
