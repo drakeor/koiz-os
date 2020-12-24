@@ -1,6 +1,8 @@
 # I just use this for X-Server
 export LIBGL_ALWAYS_INDIRECT=Yes
-export DISPLAY=localhost:0.0
+#export DISPLAY=127.0.0.1:0.0
+
+export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0
 
 # Build bootsector (Obsolete, replaced by bootimage rust crate)
 cd bootsector
