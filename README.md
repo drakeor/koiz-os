@@ -8,13 +8,48 @@ A lot of programs and stuff revolve around math since I like math.
 
 It doesn't really serve any practical purpose outside that.
 
+
+# Completed Features
+
+- Custom bootloader image to load the kernel (DONE)
+
+- Prints stuff to the console in 32 bit mode (DONE)
+
+
+# Planned Features (in order of development)
+
+- Write output to a serial port for debugging (IN PROGRESS)
+
+- Starting libc functions
+
+- Adding Interrupts
+
+- Malloc 
+
+- Shell
+
+- Keyboard support
+
+- Userspace application
+
+- Processes
+
+- Backend Compiler for OS
+
+
 # Requirements to build
 
 - FASM (https://flatassembler.net/download.php)
 
+- GCC (Supports at least C99 standard)
+
+- LD
+
+
 # Running
 
 - You can run this OS bare metal or on QEMU (qemu-x86_64). You'll probably need to pass -fda to QEMU to get it to work.
+
 
 # FAQ
 

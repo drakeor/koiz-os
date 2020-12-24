@@ -15,5 +15,8 @@ cd ..
 # Combine them
 cat bin/bootsect.bin bin/kernel.bin > bin/koizos-img.bin
 
+# Add log director
+mkdir -p logs
+
 # Run in QEMU
-qemu-system-x86_64 -fda bin/koizos-img.bin
+qemu-system-x86_64 -fda bin/koizos-img.bin -serial file:logs/serial.log
