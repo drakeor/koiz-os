@@ -22,6 +22,8 @@ It doesn't really serve any practical purpose outside that.
 
 - Starting libc functions
 
+- Adding self-tests
+
 - Adding Interrupts
 
 - Malloc 
@@ -60,16 +62,16 @@ Most likely have to run fasm.x64 instead
 
 # Useful references / credits
 
-OS Dev Book (Does a pretty good job explaining theory. Used this heavily in beginning my OS): https://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf
+- OS Dev Book (Does a pretty good job explaining theory. Used this heavily in beginning my OS): https://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf
 
-X86 Assembly Reference (We can't avoid assembly for parts of this OS): https://en.wikibooks.org/wiki/X86_Assembly
+- X86 Assembly Reference (We can't avoid assembly for parts of this OS): https://en.wikibooks.org/wiki/X86_Assembly
 
-OS Dev.org (Lots of great information and resource): https://wiki.osdev.org/Main_Page
+- OS Dev.org (Lots of great information and resource): https://wiki.osdev.org/Main_Page
 
-FASM Manual (Incredibly helpful since most snippets are built in NASM and I like using FASM: https://flatassembler.net/docs.php?article=manual
+- FASM Manual (Incredibly helpful since most snippets are built in NASM and I like using FASM: https://flatassembler.net/docs.php?article=manual
 
-In-line assembly docs for GCC (Since the syntax can be awkward sometimes, at least for me): https://gcc.gnu.org/onlinedocs/gcc/Using-Assembly-Language-with-C.html#Using-Assembly-Language-with-C 
+- In-line assembly docs for GCC (Since the syntax can be awkward sometimes, at least for me): https://gcc.gnu.org/onlinedocs/gcc/Using-Assembly-Language-with-C.html#Using-Assembly-Language-with-C 
 
-Kernel.org Coding Style (I'm not programming the linux kernel so it's not strictly followed, but my coding style is similar. I do really enjoy the rationale being explained in this document though.): https://www.kernel.org/doc/Documentation/process/coding-style.rst 
+- Kernel.org Coding Style (I'm not programming the linux kernel so it's not strictly followed, but my coding style is similar. I do really enjoy the rationale being explained in this document though.): https://www.kernel.org/doc/Documentation/process/coding-style.rst 
 
-Linux Kernel (Helps to see what people much better at this than me are doing): https://github.com/torvalds/linux 
+- Linux Kernel (Helps to see what people much better at this than me are doing): https://github.com/torvalds/linux 

@@ -65,8 +65,8 @@ int print_char(uint8_t character, uint8_t col, uint8_t row, uint8_t char_color) 
 
     /* Move to next line */
     if(character == '\n') {
-        row = get_cursor_offset();
-        vidmem_offset = get_offset(0, row+1);
+        row = row + 1;
+        vidmem_offset = get_offset(0, row);
     } else {
         vidmem[vidmem_offset] = character;
         vidmem[vidmem_offset+1] = char_color;
@@ -88,6 +88,8 @@ int print_char(uint8_t character, uint8_t col, uint8_t row, uint8_t char_color) 
         for(j = 0; j < MAX_COLS * VCHAR_CELLSIZE; j++)
             *(vidmem + get_offset(0, MAX_ROWS-1) + j) = 0;
         
+        /* Fix offsets and variables */
+        row = row - 1;
         vidmem_offset -= MAX_COLS * VCHAR_CELLSIZE;
     }
 
