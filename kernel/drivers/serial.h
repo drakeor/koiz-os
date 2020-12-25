@@ -15,6 +15,11 @@ uint8_t init_serial(uint16_t port);
 // TODO: Add check to make sure port is initialized!
 uint8_t write_serial(uint16_t port, uint8_t data);
 
+uint8_t write_serial_string(uint16_t port, char* data);
+
+uint8_t write_serial_noblock(uint16_t port, uint8_t data);
+
+// TODO: rename
 uint8_t is_transmit_empty(uint16_t port);
 
 uint8_t read_serial(uint16_t port);

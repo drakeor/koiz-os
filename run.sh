@@ -21,6 +21,7 @@ cat bin/bootsect.bin bin/kernel.bin > bin/koizos-img.bin
 mkdir -p logs
 
 # Run in QEMU
-qemu-system-x86_64 -fda bin/koizos-img.bin -serial pty
+qemu-system-x86_64 -fda bin/koizos-img.bin -serial file:logs/serial.log
+#qemu-system-x86_64 -fda bin/koizos-img.bin -serial pty
 #qemu-system-x86_64 -fda bin/koizos-img.bin -chardev stdio,id=char0,logfile=logs/serial.log,signal=off \
 #  -serial chardev:char0

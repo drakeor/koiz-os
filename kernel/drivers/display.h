@@ -39,7 +39,7 @@ static inline uint8_t make_display_color(uint8_t foreground, uint8_t background)
     return (background << 4) | foreground;
 } 
 
-void print(char *message, uint8_t color);
+void kprint(char *message, uint8_t color);
 
 void clear_screen();
 

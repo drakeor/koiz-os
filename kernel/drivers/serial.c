@@ -89,14 +89,34 @@ uint8_t is_transmit_empty(uint16_t port)
 
 /*
  * Writes a byte of data to the specified serial port
- * Note that is_transit_empty should be 1 prior.
+ * Blocks until the pipeline is free
  */
 uint8_t write_serial(uint16_t port, uint8_t data)
 {
-    if(is_transmit_empty(port) == 0)
-        return 1;
+    while(is_transmit_empty(port) == 0);
     io_byte_out(port, data);
     return 0;
+}
+
+
+uint8_t write_serial_string(uint16_t port, char* data)
+{
+    int i = 0;
+    while(data[i] != 0x0) {
+        write_serial(port, data[i]);
+        i++;
+    }
+    return 0;
+}
+
+
+/*
+ * Writes a byte of data to the specified serial port
+ * Note that is_transit_empty should be 1 prior.
+ */
+uint8_t write_serial_noblock(uint16_t port, uint8_t data)
+{
+
 }
 
 /*

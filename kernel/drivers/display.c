@@ -111,7 +111,7 @@ void clear_screen()
     set_cursor_offset(0);
 }
 
-void print(char *message, uint8_t color)
+void kprint(char *message, uint8_t color)
 {
     int offset = get_cursor_offset();
 

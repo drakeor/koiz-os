@@ -15,12 +15,12 @@ It doesn't really serve any practical purpose outside that.
 
 - Prints stuff to the console in 32 bit mode (DONE)
 
+- Write output to a serial port for logging (DONE)
+
 
 # Planned Features (in order of development)
 
-- Write output to a serial port for debugging (IN PROGRESS)
-
-- Starting libc functions
+- Starting libc functions (IN PROGRESS)
 
 - Adding self-tests
 
