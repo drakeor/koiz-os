@@ -3,6 +3,8 @@
 #include "../drivers/display.h"
 #include "../drivers/serial.h"
 
+#include "stdarg.h"
+
 #define DEFAULT_TEXT_COLOR 0x0F
 #define DEFAULT_ERROR_COLOR 0x05
 
@@ -39,4 +41,19 @@ void kernel_init()
 void clear_display()
 {
     kclear_screen();
+}
+
+int printf_impl(char *format, va_list arg) 
+{
+    print("not yet implemented");
+}
+
+void printf(char *format, ...)
+{
+    va_list arg;
+    int length;
+
+    va_start(arg, format);
+    printf_impl(format, arg);
+    va_end(arg);
 }
