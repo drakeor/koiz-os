@@ -1,4 +1,4 @@
-#include "stdio.h"
+#include "stdlib.h"
 #include "../config.h"
 #include "../drivers/display.h"
 #include "../drivers/serial.h"

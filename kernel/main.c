@@ -2,7 +2,7 @@
 #include "drivers/display.h"
 #include "drivers/serial.h"
 
-#include "libc/stdio.h"
+#include "libc/stdlib.h"
 
 #include "config.h"
 

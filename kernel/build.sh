@@ -16,7 +16,7 @@ gcc -m32 -ffreestanding -c main.c -o ../obj/main.o -fno-pie
 gcc -m32 -ffreestanding -c drivers/basic_io.c -o ../obj/drivers/basic_io.o -fno-pie
 gcc -m32 -ffreestanding -c drivers/display.c -o ../obj/drivers/display.o -fno-pie
 gcc -m32 -ffreestanding -c drivers/serial.c -o ../obj/drivers/serial.o -fno-pie
-gcc -m32 -ffreestanding -c libc/stdio.c -o ../obj/libc/stdio.o -fno-pie
+gcc -m32 -ffreestanding -c libc/stdlib.c -o ../obj/libc/stdlib.o -fno-pie
 
 # Link everything together
 echo "linking 32-bit kernel"
@@ -25,5 +25,5 @@ ld -o ../bin/kernel.bin -Ttext 0x1000 ../obj/kernel_entry.o \
 ../obj/drivers/basic_io.o \
 ../obj/drivers/display.o \
 ../obj/drivers/serial.o \
-../obj/libc/stdio.o \
+../obj/libc/stdlib.o \
 --oformat binary -m elf_i386

@@ -1,5 +1,5 @@
-#ifndef _STDIO_H_
-#define _STDIO_H_
+#ifndef _STDLIB_H_
+#define _STDLIB_H_
 
 void print(char *message);
 void error(char *message);
