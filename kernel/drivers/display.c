@@ -99,7 +99,7 @@ int print_char(uint8_t character, uint8_t col, uint8_t row, uint8_t char_color) 
 
 }
 
-void clear_screen()
+void kclear_screen()
 {
     uint8_t row = 0;
     uint8_t col = 0;
