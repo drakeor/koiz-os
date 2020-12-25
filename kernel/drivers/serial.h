@@ -15,7 +15,10 @@ uint8_t init_serial(uint16_t port);
 // TODO: Add check to make sure port is initialized!
 uint8_t write_serial(uint16_t port, uint8_t data);
 
-// TODO: Add non-blocking version
+uint8_t is_transmit_empty(uint16_t port);
+
 uint8_t read_serial(uint16_t port);
+
+uint8_t serial_received(uint16_t port);
 
 #endif

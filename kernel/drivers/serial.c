@@ -87,19 +87,34 @@ uint8_t is_transmit_empty(uint16_t port)
    return io_byte_in(port + 5) & 0x20;
 }
 
+/*
+ * Writes a byte of data to the specified serial port
+ * Note that is_transit_empty should be 1 prior.
+ */
 uint8_t write_serial(uint16_t port, uint8_t data)
 {
-    while(is_transmit_empty(port) == 0);
+    if(is_transmit_empty(port) == 0)
+        return 1;
     io_byte_out(port, data);
     return 0;
 }
 
-int serial_received(uint16_t port) {
+/*
+ * Indicates whether there's currently data for us to read on the port
+ */
+uint8_t serial_received(uint16_t port) {
    return io_byte_in(port + 5) & 1;
 }
 
+/*
+ * Reads a byte off the port.
+ * Will return 0 if nothing is recieved.
+ * Since this could not be intended behaviour, you should check serial_recieved
+ * prior to calling this function
+ */
 uint8_t read_serial(uint16_t port)
 {
-    while (serial_received(port) == 0);
+    if(serial_received(port) == 0)
+        return 0;
     return io_byte_in(port);
 }

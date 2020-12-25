@@ -28,12 +28,23 @@ void main ()
     print("booted up", 0);
 
     while(1) {
-        uint8_t data = read_serial(PORT_COM1);
-        uint8_t end_data[2] = {
-            data, 0x00
-        };
+        if(serial_received(PORT_COM1)) {
 
-        print(end_data, 0);
+            // Get Message
+            uint8_t data = read_serial(PORT_COM1);
+
+            // Print message
+            uint8_t end_data[2] = {
+                data, 0x00
+            };
+            print(end_data, 0);
+
+            // Return message
+            if(is_transmit_empty(PORT_COM1)) {
+                write_serial(PORT_COM1, data);
+            }
+        }
+        
     }
 
     print("shouldnt get here", 0);
