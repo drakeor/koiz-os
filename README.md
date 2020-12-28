@@ -1,6 +1,6 @@
 # KoiZ Operating System
 
-Built mostly as a pet project. It's an x86_64 based operating system built in C, Rust and ASM.
+Built mostly as a pet project. It's an x86_64 based general operating system built in C, Rust and ASM.
 
 It currently runs 32-bit mode with plans to have a 64-bit mode as well.
 
@@ -18,19 +18,23 @@ It doesn't really serve any practical purpose outside that.
 - Write output to a serial port for logging (DONE)
 
 
-# Planned Features (in order of development)
+# In Progress Features
 
 - Starting libc functions (IN PROGRESS)
 
-- Adding self-tests
+- Adding Interrupts (IN PROGRESS)
 
-- Adding Interrupts
+
+# Planned Features (in order of development)
+
+- Keyboard support
+
+- Adding self-tests
 
 - Malloc 
 
 - Shell
 
-- Keyboard support
 
 - Userspace application
 

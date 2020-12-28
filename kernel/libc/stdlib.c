@@ -45,7 +45,7 @@ void clear_display()
 
 int printf_impl(char *format, va_list arg) 
 {
-    print("not yet implemented");
+    error("printf not yet implemented");
 }
 
 void printf(char *format, ...)
