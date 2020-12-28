@@ -20,7 +20,7 @@ section '.data' writeable
         db "rawr",0
     idt_start:
         irq0:
-            dw handle_interrupt
+            dw 0x0000
             dw 0x0008
             db 0x00
             db 10101110b
