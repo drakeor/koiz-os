@@ -18,6 +18,7 @@ section '.text' executable
 section '.data' writeable
     msg:
         db "rawr",0
+    public idt_info
     idt_start:
         irq0:
             dw 0x0000

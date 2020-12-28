@@ -3,10 +3,14 @@
 #include "../drivers/display.h"
 #include "../drivers/serial.h"
 
+#include "../core/interrupt_handler.h"
+
 #include "stdarg.h"
 
 #define DEFAULT_TEXT_COLOR 0x0F
 #define DEFAULT_ERROR_COLOR 0x05
+
+extern void load_idt(void);
 
 void print(char *message)
 {
@@ -36,6 +40,10 @@ void kernel_init()
     print("using serial COM1 for logging serial...\n");
     //write_serial_string(PORT_COM1, "using serial COM1 for logging\n");
 #endif
+
+    /* Load our IDT */
+    setup_idt();
+    load_idt();
 }
 
 void clear_display()
