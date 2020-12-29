@@ -62,6 +62,21 @@ void printf(char *format, ...)
     int length;
 
     va_start(arg, format);
-    printf_impl(format, arg);
+    /*printf_impl(format, arg);*/
+    while(*format != '\0') {
+
+        // Handle special characters
+        if(*format == '%') {
+            if(*(format + 1) == '%') {
+                
+            } else {
+                error("Unknown escape sequence %");
+                print(*(format+1));
+            }
+        }
+
+        // Move to the next character
+        format++;
+    }
     va_end(arg);
 }
