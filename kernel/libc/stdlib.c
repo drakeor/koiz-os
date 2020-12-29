@@ -41,7 +41,7 @@ void kernel_init()
     //write_serial_string(PORT_COM1, "using serial COM1 for logging\n");
 #endif
 
-    /* Load our IDT */
+    /* Setup Load our IDT */
     setup_idt();
     load_idt();
 }
@@ -56,6 +56,52 @@ int printf_impl(char *format, va_list arg)
     error("printf not yet implemented");
 }
 
+/*
+ * Helper function for the printf function
+ */
+void print_uint_to_string(unsigned int number, unsigned int base)
+{
+    /* error checking */
+    if(base > 16) {
+        error("printf base cannot be greater than 16!");
+        return;
+    }
+
+    /* handle printing different bases */
+    if(base == 2)
+        kprint("0b", DEFAULT_TEXT_COLOR);
+    if(base == 16)
+        kprint("0x", DEFAULT_TEXT_COLOR);
+
+    /* if the number is 0, just print 0. save some processing */
+    if(number == 0) {
+        kprint_char('0', DEFAULT_TEXT_COLOR);
+        return;
+    }
+
+    /* 
+     * otherwise convert the number into a string.
+     * it'll be in reverse order so print it in reverse.
+     */
+    const int buffer_size = 32;
+    char buffer[buffer_size];
+    int current_pos = 0;
+    const char numtochar[] = "0123456789ABCDEF";
+    do {
+        buffer[current_pos] = numtochar[number % base];
+        number /= base;
+        ++current_pos;
+    } while(number != 0 && current_pos < buffer_size);
+
+    int i;
+    for(i = current_pos; i > 0; i--)
+        kprint_char(buffer[i-1], DEFAULT_TEXT_COLOR);
+}
+
+/*
+ * A light-weight printf function
+ * Supports printing integers, hexidecimal, and other strings.
+ */
 void printf(char *format, ...)
 {
     va_list arg;
@@ -65,14 +111,34 @@ void printf(char *format, ...)
     /*printf_impl(format, arg);*/
     while(*format != '\0') {
 
-        // Handle special characters
+        /* Handle special characters */
         if(*format == '%') {
             if(*(format + 1) == '%') {
-                
+                kprint_char('%', DEFAULT_TEXT_COLOR);
+            } else if(*(format + 1) == 's') {
+                char* subString = va_arg(arg, char*);
+                kprint(subString, DEFAULT_TEXT_COLOR);
+            } else if(*(format + 1) == 'd') {
+                unsigned int num = va_arg(arg, unsigned int);
+                print_uint_to_string(num, 10);
+            } else if(*(format + 1) == 'x') {
+                unsigned int num = va_arg(arg, unsigned int);
+                print_uint_to_string(num, 16);
+            } else if(*(format + 1) == 'b') {
+                unsigned int num = va_arg(arg, unsigned int);
+                print_uint_to_string(num, 2);
+            } else if(*(format + 1) == '\0') {
+                error("printf error: next character is null");
+                break;
             } else {
-                error("Unknown escape sequence %");
-                print(*(format+1));
+                error("printf error: Unknown escape sequence %");
+                kprint_char(*(format + 1), DEFAULT_TEXT_COLOR);
+                break;
             }
+            format++;
+        /* Simply print the next character */
+        } else {
+            kprint_char(*format, DEFAULT_TEXT_COLOR);
         }
 
         // Move to the next character

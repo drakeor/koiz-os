@@ -17,8 +17,9 @@ void main ()
     print("\n");
 
     print("booted up");
-    error("this is an error test");
+    error("this is an error test\n");
 
+    printf("we know that %s is %d is %x is %b", "100", 100, 100, 100);
    // print("shouldnt get here", 0);
 
     /* Done */

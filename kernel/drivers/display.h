@@ -40,6 +40,7 @@ static inline uint8_t make_display_color(uint8_t foreground, uint8_t background)
 } 
 
 void kprint(char *message, uint8_t color);
+void kprint_char(char character, uint8_t color);
 
 void kclear_screen();
 

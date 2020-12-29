@@ -121,9 +121,21 @@ void kprint(char *message, uint8_t color)
         int row = get_offset_row(offset);
         int col = get_offset_col(offset);
 
-        /* print each character. print_char will return the cursor position */
+        /* print each character. print_char will return the new cursor position */
         offset = print_char(message[i], col, row, color);
 
         ++i;
     }
+}
+
+void kprint_char(char character, uint8_t color)
+{
+    int offset = get_cursor_offset();
+
+    int row = get_offset_row(offset);
+    int col = get_offset_col(offset);
+
+    /* print character */
+    print_char(character, col, row, color);
+
 }
