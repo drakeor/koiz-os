@@ -42,7 +42,7 @@ void kernel_init()
 #endif
 
     /* Setup Load our IDT */
-    setup_idt();
+    //setup_idt();
     load_idt();
 }
 

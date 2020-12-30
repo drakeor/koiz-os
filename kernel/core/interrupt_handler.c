@@ -1,10 +1,23 @@
 #include "interrupt_handler.h"
 #include "../libc/stdlib.h"
 
-void handle_interrupt(void)
+/*void handle_interrupt(void)
 {
     print("Handling an interrupt!\n");
+}*/
+
+extern uint64_t idt_start;
+
+void interrupt_handler(struct cpu_state cpu, struct stack_state stack, uint32_t interrupt)
+{
+    //printf("Handling an interrupt %x!\n", &idt_info);
+    int i;
+    for(i = 0; i < 10; i++) {
+        printf("Handling an interrupt %d: %x!\n", i,  *((&idt_start)+i));
+    }
+
 }
+
 
 /*
  * This function populates the interrupt descriptor table
