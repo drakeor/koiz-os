@@ -9,6 +9,7 @@ uint32_t test;
 void main () 
 {
     kernel_init();
+
     /* Test out our screen print functions */
     //clear_display();
     /*int i;

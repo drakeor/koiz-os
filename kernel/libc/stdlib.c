@@ -43,8 +43,10 @@ void kernel_init()
 #endif
 
     /* Setup Load our IDT */
-    //setup_idt();
     load_idt();
+
+    /* Run self tests */
+    self_test_idt();
 }
 
 void clear_display()
