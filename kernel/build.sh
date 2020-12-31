@@ -14,12 +14,12 @@ fasm.x64 core/x86_idt.asm ../obj/core/x86_idt.o
 
 # Compile the kernel
 echo "compiling 32-bit kernel c code"
-gcc -g -m32 -ffreestanding -c main.c -o ../obj/main.o -fno-pie
-gcc -g -m32 -ffreestanding -c core/interrupt_handler.c -o ../obj/core/interrupt_handler.o -fno-pie
-gcc -g -m32 -ffreestanding -c drivers/basic_io.c -o ../obj/drivers/basic_io.o -fno-pie
-gcc -g -m32 -ffreestanding -c drivers/display.c -o ../obj/drivers/display.o -fno-pie
-gcc -g -m32 -ffreestanding -c drivers/serial.c -o ../obj/drivers/serial.o -fno-pie
-gcc -g -m32 -ffreestanding -c libc/stdlib.c -o ../obj/libc/stdlib.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c main.c -o ../obj/main.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c core/interrupt_handler.c -o ../obj/core/interrupt_handler.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/basic_io.c -o ../obj/drivers/basic_io.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/display.c -o ../obj/drivers/display.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/serial.c -o ../obj/drivers/serial.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c libc/stdlib.c -o ../obj/libc/stdlib.o -fno-pie
 
 # Link everything together
 # It is IMPORTANT that KERNEL_ENTRY.O is first!!

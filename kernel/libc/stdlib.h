@@ -8,6 +8,8 @@ void clear_display();
 void print(char *message);
 void error(char *message);
 
+void panic(char *message);
+
 void printf(char *format, ...);
 
 #endif

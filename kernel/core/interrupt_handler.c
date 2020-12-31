@@ -1,7 +1,7 @@
 #include "interrupt_handler.h"
 #include "../libc/stdlib.h"
 
-#define INTERRUPT_COUNT 2
+#define INTERRUPT_COUNT 10
 
 /* Represents an entry in the descriptor table */
 struct interrupt_descriptor_t {
@@ -14,10 +14,21 @@ struct interrupt_descriptor_t {
 
 extern struct interrupt_descriptor_t idt_start[INTERRUPT_COUNT];
 
+/* For debug */
 extern uint32_t idt_info;
 
+/* Specific interrupt handlers */
 extern uintptr_t isr_0;
 extern uintptr_t isr_1;
+extern uintptr_t isr_2;
+extern uintptr_t isr_3;
+extern uintptr_t isr_4;
+extern uintptr_t isr_5;
+extern uintptr_t isr_6;
+extern uintptr_t isr_7;
+extern uintptr_t isr_8;
+extern uintptr_t isr_9;
+extern uintptr_t isr_10;
 
 /*
  * This function populates the interrupt descriptor table
@@ -42,9 +53,35 @@ void setup_idt(void)
         case 1:
           isr_addr = (uint32_t)&isr_1;
           break;
+        case 2:
+          isr_addr = (uint32_t)&isr_2;
+          break;
+        case 3:
+          isr_addr = (uint32_t)&isr_3;
+          break;
+        case 4:
+          isr_addr = (uint32_t)&isr_4;
+          break;
+        case 5:
+          isr_addr = (uint32_t)&isr_5;
+          break;
+        case 6:
+          isr_addr = (uint32_t)&isr_6;
+          break;
+        case 7:
+          isr_addr = (uint32_t)&isr_7;
+          break;
+        case 8:
+          isr_addr = (uint32_t)&isr_8;
+          break;
+        case 9:
+          isr_addr = (uint32_t)&isr_9;
+          break;
+        case 10:
+          isr_addr = (uint32_t)&isr_10;
+          break;
         default:
-          // TODO: Make this a panic
-          error("Improperly configured IDT Table!!");
+          panic("Improperly configured IDT Table!!");
       }
 
       /* Fill in the IDT table with the proper values */
@@ -71,4 +108,12 @@ void self_test_idt(void)
 {
    asm("INT $0");
    asm("INT $1");
+   asm("INT $2");
+   asm("INT $3");
+   asm("INT $4");
+   asm("INT $5");
+   asm("INT $6");
+   asm("INT $7");
+   asm("INT $8");
+   asm("INT $9");
 }

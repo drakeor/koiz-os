@@ -15,7 +15,7 @@ extern void load_idt(void);
 
 void print(char *message)
 {
-#if USE_COM1_AS_LOG == 1
+#ifdef USE_COM1_AS_LOG
     write_serial_string(PORT_COM1, message);
 #endif 
     kprint(message, DEFAULT_TEXT_COLOR);
@@ -23,7 +23,7 @@ void print(char *message)
 
 void error(char *message)
 {
-#if USE_COM1_AS_LOG == 1
+#ifdef USE_COM1_AS_LOG
     write_serial_string(PORT_COM1, message);
 #endif 
     kprint(message, DEFAULT_ERROR_COLOR);
@@ -31,7 +31,7 @@ void error(char *message)
 
 void kernel_init()
 {
-#if USE_COM1_AS_LOG == 1
+#ifdef USE_COM1_AS_LOG
     /* Test out our serial port */
     uint8_t serial_started = init_serial(PORT_COM1);
     if(serial_started != 0) {
@@ -99,6 +99,19 @@ void print_uint_to_string(unsigned int number, unsigned int base)
     int i;
     for(i = current_pos; i > 0; i--)
         kprint_char(buffer[i-1], DEFAULT_TEXT_COLOR);
+}
+
+/*
+ * Panic function
+ */
+__attribute__((__noreturn__))
+void panic(char *message)
+{
+    error("\n");
+    error("KERNEL PANIC: ");
+    error(message);
+    while (1) { }
+	__builtin_unreachable();
 }
 
 /*

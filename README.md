@@ -2,9 +2,7 @@
 
 Built mostly as a pet project. It's an x86_64 based general operating system built in C, Rust and ASM.
 
-It currently runs 32-bit mode with plans to have a 64-bit mode as well.
-
-A lot of programs and stuff revolve around math since I like math. 
+It currently only runs in 32-bit since I don't have all the code setup for 64-bit.
 
 It doesn't really serve any practical purpose outside that.
 
@@ -17,30 +15,37 @@ It doesn't really serve any practical purpose outside that.
 
 - Write output to a serial port for logging (DONE)
 
+- Starting libc functions (DONE)
+
+- Adding Interrupts (DONE)
+
 
 # In Progress Features
-
-- Starting libc functions (IN PROGRESS)
-
-- Adding Interrupts (IN PROGRESS)
-
-
-# Planned Features (in order of development)
 
 - Keyboard support
 
 - Adding self-tests
 
+
+# Planned Features (in order of development)
+
+- Memory Management
+
 - Malloc 
 
 - Shell
-
 
 - Userspace application
 
 - Processes
 
 - Backend Compiler for OS
+
+- TCP/IP
+
+- GUI
+
+- Multi-processor support
 
 
 # Requirements to build

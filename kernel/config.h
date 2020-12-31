@@ -2,7 +2,7 @@
 #define _CONFIG_H_
 
 /* Use serial com1 port as log */
-#define USE_COM1_AS_LOG 1
+#define USE_COM1_AS_LOG
 
 /* Show debug messages for interrupts */
 #define DEBUG_MSG_INTERRUPTS

@@ -92,7 +92,9 @@ section '.text' executable
         ;call interrupt_handler
         mov edi, esp
         add edi, 28
-        ccall printf, msg, [edi]
+        mov ecx, esp
+        add ecx, 32
+        ccall printf, msg, [edi], [ecx]
 
         ; Restore registers
         popd ebp
@@ -110,16 +112,57 @@ section '.text' executable
         cli
         iret
 
-    no_error_code_interrupt_handler 0
-    no_error_code_interrupt_handler 1
+    ; Once I figure out FASMs macro system for loops I'll change this
+    no_error_code_interrupt_handler 0   ; Divide by 0 error
+    no_error_code_interrupt_handler 1   ; Debug exception
+    no_error_code_interrupt_handler 2   ; Non-maskable interrup
+    no_error_code_interrupt_handler 3   ; Breakpoint exception 
+    no_error_code_interrupt_handler 4   ; Overflow detected exception
+    no_error_code_interrupt_handler 5   ; Out of bounds exception
+    no_error_code_interrupt_handler 6   ; Invalid opcode
+    no_error_code_interrupt_handler 7   ; No coprocessor
+    no_error_code_interrupt_handler 8   ; Double fault
+    no_error_code_interrupt_handler 9   ; Coprocessor segment overrun
+    error_code_interrupt_handler 10     ; Bad TSS exception
+    error_code_interrupt_handler 11     ; Segment not present
+    error_code_interrupt_handler 12     ; Stack segment fault
+    error_code_interrupt_handler 13     ; General Protection fault
+    error_code_interrupt_handler 14     ; Page fault
+    no_error_code_interrupt_handler 15  ; Unknown interrupt
+    no_error_code_interrupt_handler 16  ; Coprocessor fault
+    no_error_code_interrupt_handler 17  ; Alignment check
+    no_error_code_interrupt_handler 18  ; Machine check
+    no_error_code_interrupt_handler 19  ; Everything from here and below are reserved
+    no_error_code_interrupt_handler 20
+    no_error_code_interrupt_handler 21
+    no_error_code_interrupt_handler 22 
+    no_error_code_interrupt_handler 23
+    no_error_code_interrupt_handler 24
+    no_error_code_interrupt_handler 25
+    no_error_code_interrupt_handler 26
+    no_error_code_interrupt_handler 27
+    no_error_code_interrupt_handler 28
+    no_error_code_interrupt_handler 29
+    no_error_code_interrupt_handler 30
+    no_error_code_interrupt_handler 31
+
 
 section '.rodata'
-    msg db "Handling Interrupt %x",0xA,0
+    msg db "Handling Interrupt %x. Error code: %x",0xA,0
     public idt_info
     public idt_start
     idt_start:
         irq_interrupt_entry 0
         irq_interrupt_entry 1
+        irq_interrupt_entry 2
+        irq_interrupt_entry 3
+        irq_interrupt_entry 4
+        irq_interrupt_entry 5
+        irq_interrupt_entry 6
+        irq_interrupt_entry 7
+        irq_interrupt_entry 8
+        irq_interrupt_entry 9
+        irq_interrupt_entry 10
     idt_end:
     idt_info:
         dw idt_end - idt_start - 1
