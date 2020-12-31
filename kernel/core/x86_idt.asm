@@ -44,26 +44,35 @@ section '.text' executable
         lidt [idt_info]
         call setup_idt
 
-        ccall printf, msg
-
+        int 0x0
+        int 0x0
         int 0x0
 
         POPAD
         ret
 
     common_interrupt_handler:
+        sti 
         ; Manually save registers
         ; Only because we want to match the stack that the C function is expecting
-        pushd eax
-        pushd ebx
-        pushd ecx
-        pushd edx
-        pushd esi
-        pushd edi
-        pushd ebp
+        ; 44 eflags
+        ; 40 cs
+        ; 36 eip
+        ; 32 error code
+        ; 28 interrupt num
+        pushd eax ;24
+        pushd ebx ;20
+        pushd ecx ;16
+        pushd edx ;12
+        pushd esi ;8
+        pushd edi ;4
+        pushd ebp ;0
 
         ; Call our C function
-        call interrupt_handler
+        ;call interrupt_handler
+        mov edi, esp
+        add edi, 28
+        ccall printf, msg, [edi]
 
         ; Restore registers
         popd ebp
@@ -78,13 +87,14 @@ section '.text' executable
         add esp, 8
 
         ; We need to use iret to return from 
+        cli
         iret
 
     no_error_code_interrupt_handler 0
     no_error_code_interrupt_handler 1
 
 section '.rodata'
-    msg db "rawr",0
+    msg db "Handling Interrupt %x",0xA,0
     public idt_info
     public idt_start
     idt_start:
