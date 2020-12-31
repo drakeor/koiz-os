@@ -53,8 +53,11 @@ section '.text' executable
 
     common_interrupt_handler:
         sti 
+
         ; Manually save registers
-        ; Only because we want to match the stack that the C function is expecting
+        ; Only because we want to access the other members of the stack
+
+        ; Stack layout is as following:
         ; 44 eflags
         ; 40 cs
         ; 36 eip
@@ -99,13 +102,11 @@ section '.rodata'
     public idt_start
     idt_start:
         irq0:
-            ;dw ((interrupt_handler_0 shl 0x30) shr 0x30)
             dw 0xDEAD
             dw 0x0008
             db 0x00
             db 10101110b
             dw 0xDEAD
-            ;dw (interrupt_handler_0 shr 0x10)
     idt_end:
     idt_info:
         dw idt_end - idt_start - 1
