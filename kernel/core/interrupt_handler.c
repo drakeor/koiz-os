@@ -6,16 +6,28 @@
     print("Handling an interrupt!\n");
 }*/
 
-extern uint64_t idt_start;
+/* Represents an entry in the descriptor table */
+struct interrupt_descriptor_t {
+  uint16_t offset_low;
+  uint16_t selector;
+  uint8_t unused;
+  uint8_t flags;
+  uint16_t offset_high;
+} __attribute__((packed));
+
+extern struct interrupt_descriptor_t idt_start;
+extern uint32_t idt_info;
+
+extern uintptr_t isr_0;
 
 void interrupt_handler(struct cpu_state cpu, struct stack_state stack, uint32_t interrupt)
 {
-    //printf("Handling an interrupt %x!\n", &idt_info);
-    int i;
+    
+    /*int i;
     for(i = 0; i < 10; i++) {
         printf("Handling an interrupt %d: %x!\n", i,  *((&idt_start)+i));
-    }
-
+    }*/
+    printf("Handling interrupt %x", interrupt);
 }
 
 
@@ -25,9 +37,18 @@ void interrupt_handler(struct cpu_state cpu, struct stack_state stack, uint32_t 
  */
 void setup_idt(void)
 {
-    uint16_t idt_size;
-    uint32_t idt_start_addr;
+    printf("IDT Info %x!\n", &idt_info);
     
+    uint32_t isr_0_addr = (uint32_t)&isr_0;
+
+    printf("ISR_0 location: %x\n", isr_0_addr);
+
+    idt_start.offset_high = (isr_0_addr >> 16) & 0xFFFF;
+    idt_start.offset_low = isr_0_addr & 0xFFFF;
+
+    printf("Interrupt 0x0: Offset High/Low: %x %x | Selector: %x | Flags: %x \n", idt_start.offset_high, 
+        idt_start.offset_low, idt_start.selector, idt_start.flags);
+
     /* Might have been easier to load it into as a 64-bit and
      * manipulate it but whatever */
     /*idt_size = (uint16_t)idt_info[0] << 8 | idt_info[1];

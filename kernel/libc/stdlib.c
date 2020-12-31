@@ -1,11 +1,12 @@
 #include "stdlib.h"
+#include "stdarg.h"
+
 #include "../config.h"
 #include "../drivers/display.h"
 #include "../drivers/serial.h"
 
 #include "../core/interrupt_handler.h"
 
-#include "stdarg.h"
 
 #define DEFAULT_TEXT_COLOR 0x0F
 #define DEFAULT_ERROR_COLOR 0x05

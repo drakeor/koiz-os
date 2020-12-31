@@ -29,6 +29,7 @@ section '.text' executable
     public common_interrupt_handler
     extrn printf
     extrn interrupt_handler
+    extrn setup_idt
 
     ; at this point the stack should contain [esp + 4] -> first entry in EDT
     ; [esp] -> the return address    
@@ -41,9 +42,11 @@ section '.text' executable
         ;mov [idt_start], eax
 
         lidt [idt_info]
-        call interrupt_handler
+        call setup_idt
 
         ccall printf, msg
+
+        int 0x0
 
         POPAD
         ret
@@ -91,7 +94,7 @@ section '.rodata'
             dw 0x0008
             db 0x00
             db 10101110b
-            dw 0x0000
+            dw 0xDEAD
             ;dw (interrupt_handler_0 shr 0x10)
     idt_end:
     idt_info:

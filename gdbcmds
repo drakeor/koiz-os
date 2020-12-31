@@ -1,3 +1,4 @@
 target remote localhost:1234
-handle SIGINT stop
 symbol-file bin/kernel.elf
+y
+c
