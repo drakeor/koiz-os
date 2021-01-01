@@ -53,9 +53,11 @@ section '.text' executable
 
     public load_idt
     public common_interrupt_handler
+
     extrn printf
     extrn interrupt_handler
     extrn setup_idt
+    extrn panic
 
     ; at this point the stack should contain [esp + 4] -> first entry in EDT
     ; [esp] -> the return address    
@@ -69,8 +71,8 @@ section '.text' executable
         ret
 
     common_interrupt_handler:
-        sti 
 
+        cli 
         ; Manually save registers
         ; Only because we want to access the other members of the stack
 
@@ -96,6 +98,22 @@ section '.text' executable
         add ecx, 32
         ccall printf, msg, [edi], [ecx]
 
+        ; Interrupt 1 is recoverable
+        mov edi, esp
+        add edi, 28
+        mov ecx, 1
+        cmp [edi], ecx
+        je .resume
+
+        ; Interrupt 3 is recoverable
+        mov ecx, 3
+        cmp [edi], ecx
+        je .resume
+
+        ; Otherwise panic!
+        ccall panic, panicmsg
+
+    .resume:
         ; Restore registers
         popd ebp
         popd edi
@@ -109,7 +127,7 @@ section '.text' executable
         add esp, 8
 
         ; We need to use iret to return from 
-        cli
+        sti
         iret
 
     ; Once I figure out FASMs macro system for loops I'll change this
@@ -121,7 +139,7 @@ section '.text' executable
     no_error_code_interrupt_handler 5   ; Out of bounds exception
     no_error_code_interrupt_handler 6   ; Invalid opcode
     no_error_code_interrupt_handler 7   ; No coprocessor
-    no_error_code_interrupt_handler 8   ; Double fault
+    error_code_interrupt_handler 8   ; Double fault
     no_error_code_interrupt_handler 9   ; Coprocessor segment overrun
     error_code_interrupt_handler 10     ; Bad TSS exception
     error_code_interrupt_handler 11     ; Segment not present
@@ -149,6 +167,7 @@ section '.text' executable
 
 section '.rodata'
     msg db "Handling Interrupt %x. Error code: %x",0xA,0
+    panicmsg db "Interrupt is non-recoverable!",0xA,0
     public idt_info
     public idt_start
     idt_start:
@@ -163,6 +182,27 @@ section '.rodata'
         irq_interrupt_entry 8
         irq_interrupt_entry 9
         irq_interrupt_entry 10
+        irq_interrupt_entry 11
+        irq_interrupt_entry 12
+        irq_interrupt_entry 13
+        irq_interrupt_entry 14
+        irq_interrupt_entry 15
+        irq_interrupt_entry 16
+        irq_interrupt_entry 17
+        irq_interrupt_entry 18
+        irq_interrupt_entry 19
+        irq_interrupt_entry 20
+        irq_interrupt_entry 21
+        irq_interrupt_entry 22
+        irq_interrupt_entry 23
+        irq_interrupt_entry 24
+        irq_interrupt_entry 25
+        irq_interrupt_entry 26
+        irq_interrupt_entry 27
+        irq_interrupt_entry 28
+        irq_interrupt_entry 29
+        irq_interrupt_entry 30
+        irq_interrupt_entry 31
     idt_end:
     idt_info:
         dw idt_end - idt_start - 1

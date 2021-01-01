@@ -1,7 +1,7 @@
 #include "interrupt_handler.h"
 #include "../libc/stdlib.h"
 
-#define INTERRUPT_COUNT 10
+#define INTERRUPT_COUNT 32
 
 /* Represents an entry in the descriptor table */
 struct interrupt_descriptor_t {
@@ -29,6 +29,27 @@ extern uintptr_t isr_7;
 extern uintptr_t isr_8;
 extern uintptr_t isr_9;
 extern uintptr_t isr_10;
+extern uintptr_t isr_11;
+extern uintptr_t isr_12;
+extern uintptr_t isr_13;
+extern uintptr_t isr_14;
+extern uintptr_t isr_15;
+extern uintptr_t isr_16;
+extern uintptr_t isr_17;
+extern uintptr_t isr_18;
+extern uintptr_t isr_19;
+extern uintptr_t isr_20;
+extern uintptr_t isr_21;
+extern uintptr_t isr_22;
+extern uintptr_t isr_23;
+extern uintptr_t isr_24;
+extern uintptr_t isr_25;
+extern uintptr_t isr_26;
+extern uintptr_t isr_27;
+extern uintptr_t isr_28;
+extern uintptr_t isr_29;
+extern uintptr_t isr_30;
+extern uintptr_t isr_31;
 
 /*
  * This function populates the interrupt descriptor table
@@ -80,6 +101,69 @@ void setup_idt(void)
         case 10:
           isr_addr = (uint32_t)&isr_10;
           break;
+        case 11:
+          isr_addr = (uint32_t)&isr_11;
+          break;
+        case 12:
+          isr_addr = (uint32_t)&isr_12;
+          break;
+        case 13:
+          isr_addr = (uint32_t)&isr_13;
+          break;
+        case 14:
+          isr_addr = (uint32_t)&isr_14;
+          break;
+        case 15:
+          isr_addr = (uint32_t)&isr_15;
+          break;
+        case 16:
+          isr_addr = (uint32_t)&isr_16;
+          break;
+        case 17:
+          isr_addr = (uint32_t)&isr_17;
+          break;
+        case 18:
+          isr_addr = (uint32_t)&isr_18;
+          break;
+        case 19:
+          isr_addr = (uint32_t)&isr_19;
+          break;
+        case 20:
+          isr_addr = (uint32_t)&isr_20;
+          break;
+        case 21:
+          isr_addr = (uint32_t)&isr_21;
+          break;
+        case 22:
+          isr_addr = (uint32_t)&isr_22;
+          break;
+        case 23:
+          isr_addr = (uint32_t)&isr_23;
+          break;
+        case 24:
+          isr_addr = (uint32_t)&isr_24;
+          break;
+        case 25:
+          isr_addr = (uint32_t)&isr_25;
+          break;
+        case 26:
+          isr_addr = (uint32_t)&isr_26;
+          break;
+        case 27:
+          isr_addr = (uint32_t)&isr_27;
+          break;
+        case 28:
+          isr_addr = (uint32_t)&isr_28;
+          break;
+        case 29:
+          isr_addr = (uint32_t)&isr_29;
+          break;
+        case 30:
+          isr_addr = (uint32_t)&isr_30;
+          break;
+        case 31:
+          isr_addr = (uint32_t)&isr_31;
+          break;
         default:
           panic("Improperly configured IDT Table!!");
       }
@@ -101,19 +185,13 @@ void setup_idt(void)
 }
 
 /* 
- * Self-test. We can't do this as a loop since the compiler will complain,
- * even with pre-processor macros. Guess we could dynamically do this in assembly..
+ * Self-test a few of the recoverable interrupts to make
+ * sure everything is working
  * */
 void self_test_idt(void)
 {
-   asm("INT $0");
-   asm("INT $1");
-   asm("INT $2");
-   asm("INT $3");
-   asm("INT $4");
-   asm("INT $5");
-   asm("INT $6");
-   asm("INT $7");
-   asm("INT $8");
-   asm("INT $9");
+  printf("Self-testing Interrupts\n");
+  asm("INT $1");
+  asm("INT $3");
+  printf("Self-test Complete\n");
 }
