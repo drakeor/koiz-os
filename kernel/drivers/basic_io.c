@@ -61,3 +61,15 @@ void io_word_out(uint16_t port, uint16_t data)
           "d" (port) // load [R,E]dx with port
     );
 }
+
+/* 
+ * Uses port 0x80 which is used for checkpoints during post.
+ * 
+ */
+void io_wait(void)
+{
+    __asm__( "outb %%al, $0x80" 
+        : 
+        : "a"(0) 
+    );
+}

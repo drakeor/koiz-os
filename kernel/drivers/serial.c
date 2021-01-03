@@ -32,7 +32,7 @@ uint8_t init_serial(uint16_t port)
     /* 
      * Set datatype to 8 bits (bit 0/1 = 0b11) 
      * with 1 stop bit (bit 2 = 0b0)
-     * and no parity (bit3/4/5 = 0b000) 
+     * and no parity (bit 3/4/5 = 0b000) 
      * and no break control (bit 6 = 0b0)
      * and no DLAB (bit 7 = 0b0)
      */

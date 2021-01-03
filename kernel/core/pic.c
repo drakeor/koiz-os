@@ -1,0 +1,90 @@
+#include "pic.h"
+#include "../drivers/basic_io.h"
+
+
+/* Helpful definitions taken from osdev.org */
+
+#define PIC1		0x20		/* IO base address for primary PIC */
+#define PIC2		0xA0		/* IO base address for secondary PIC */
+#define PIC1_COMMAND	PIC1
+#define PIC1_DATA	(PIC1+1)
+#define PIC2_COMMAND	PIC2
+#define PIC2_DATA	(PIC2+1)
+
+#define PIC_EOI		0x20		/* End-of-interrupt command code */
+
+#define ICW1_ICW4	0x01		/* ICW4 (not) needed */
+#define ICW1_SINGLE	0x02		/* Single (cascade) mode */
+#define ICW1_INTERVAL4	0x04	/* Call address interval 4 (8) */
+#define ICW1_LEVEL	0x08		/* Level triggered (edge) mode */
+#define ICW1_INIT	0x10		/* Initialization - required! */
+ 
+#define ICW4_8086	0x01		/* 8086/88 (MCS-80/85) mode */
+#define ICW4_AUTO	0x02		/* Auto (normal) EOI */
+#define ICW4_BUF_SLAVE	0x08	/* Buffered mode/slave */
+#define ICW4_BUF_MASTER	0x0C	/* Buffered mode/master */
+#define ICW4_SFNM	0x10		/* Special fully nested (not) */
+ 
+ /* End of helpful osdev.org definitions */
+
+
+/* 
+ * Sends an end of interrupt command to the PIC chips 
+ * We use this at the end of an IRQ routine.
+ * We issue to both PICs if the IRQ > 8.
+ */
+
+void PIC_send_EOI(uint8_t irq)
+{
+    if(irq >= 8)
+        io_byte_out(PIC2_COMMAND, PIC_EOI);
+
+    io_byte_out(PIC1_COMMAND, PIC_EOI);
+}
+
+/*
+ * PICs are weird.
+ * We're remapping them using the code for 8259 PIC Chips on OSDEV
+ * Argument offset1 - offset for the leader PIC. 
+ * This makes the leader offsets become offset1 - offset1 + 7
+ * offset2 is for the follower PIC. offset2 - offset2 + 7
+ */
+void PIC_remap(int offset1, int offset2)
+{
+    /* We save the makes so we can restore them at the end of the function */
+    uint8_t pic1_mask = io_byte_in(PIC1_DATA);
+    uint8_t pic2_mask = io_byte_in(PIC2_DATA);
+
+    /* 
+     * Starts initialization in cascade mode
+     * Initialize both PICs the same way 
+     */
+    io_byte_out(PIC1_COMMAND, ICW1_INIT | ICW1_ICW4);
+    io_wait();
+    io_byte_out(PIC2_COMMAND, ICW1_INIT | ICW1_ICW4);
+    io_wait();
+    
+    /* Set vector offsets for both the leader and follower PICs */
+    io_byte_out(PIC1_DATA, offset1);
+    io_wait();
+    io_byte_out(PIC2_DATA, offset2);
+    io_wait();
+
+    /* Tell the leader PIC that the follower is at IRQ2 (0000 0100b) */
+    io_byte_out(PIC1_DATA, 4);
+    io_wait();
+
+    /* Tell follower PIC that it's identity is 2 (0000 0010b) */
+    io_byte_out(PIC2_DATA, 2);
+    io_wait();
+
+    /* Set to 8086 mode */
+    io_byte_out(PIC1_DATA, ICW4_8086);
+    io_wait();
+    io_byte_out(PIC2_DATA, ICW4_8086);
+    io_wait();
+
+    /* Restore masks */
+    io_byte_out(PIC1_DATA, pic1_mask);
+    io_byte_out(PIC2_DATA, pic2_mask);
+}

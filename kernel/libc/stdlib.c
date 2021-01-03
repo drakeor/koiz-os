@@ -6,7 +6,7 @@
 #include "../drivers/serial.h"
 
 #include "../core/interrupt_handler.h"
-
+#include "../core/pic.h"
 
 #define DEFAULT_TEXT_COLOR 0x0F
 #define DEFAULT_ERROR_COLOR 0x05
@@ -47,6 +47,10 @@ void kernel_init()
 
     /* Run self tests */
     self_test_idt();
+
+    /* Load PIC stuff */
+
+    PIC_remap(0x20, 0x28);
 }
 
 void clear_display()
