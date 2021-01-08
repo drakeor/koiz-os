@@ -99,11 +99,16 @@ void PIC_remap()
 
 void PIC_set_interrupt_masks()
 {
-    /* Only listen to irqs 0, 1, and 2 */
-    io_byte_out( PIC1_DATA, 0xf8 ); /* master PIC */
+    /* Only listen to irqs 1 */
+    io_byte_out( PIC1_DATA, 0xfd ); /* master PIC */
     io_byte_out( PIC2_DATA, 0xff ); /* slave PIC */
+    asm("sti"); /* enable interrupts */
 }
 
+uint8_t read_kb_scan_code(void)
+{
+    return io_byte_in(KBD_DATA_PORT);
+}
 
 /*
  * Sends out acknowledgement message from interrupt to

@@ -2,6 +2,8 @@
 #include "libc/stdlib.h"
 #include "stdint.h"
 
+#include "core/pic.h"
+
 uint32_t test3;
 uint32_t test2;
 uint32_t test;
@@ -33,5 +35,10 @@ void main ()
     /* Done */
     while(1) {
         //printf("new");
+        PIC_acknowledge(0x20);
+        read_kb_scan_code();
+
     }
+	__builtin_unreachable();
+
 }

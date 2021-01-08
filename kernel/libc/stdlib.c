@@ -52,6 +52,7 @@ void kernel_init()
     PIC_remap();
     PIC_set_interrupt_masks();
 
+    //read_kb_scan_code();
     printf("kernel init");
 }
 
