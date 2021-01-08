@@ -49,8 +49,10 @@ void kernel_init()
     self_test_idt();
 
     /* Load PIC stuff */
+    PIC_remap();
+    PIC_set_interrupt_masks();
 
-    PIC_remap(0x20, 0x28);
+    printf("kernel init");
 }
 
 void clear_display()

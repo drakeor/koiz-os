@@ -163,6 +163,27 @@ section '.text' executable
     no_error_code_interrupt_handler 29
     no_error_code_interrupt_handler 30
     no_error_code_interrupt_handler 31
+    no_error_code_interrupt_handler 32
+    no_error_code_interrupt_handler 33
+    no_error_code_interrupt_handler 34
+    no_error_code_interrupt_handler 35
+    no_error_code_interrupt_handler 36
+    no_error_code_interrupt_handler 37
+    no_error_code_interrupt_handler 38
+    no_error_code_interrupt_handler 39
+    no_error_code_interrupt_handler 40
+    no_error_code_interrupt_handler 41
+    no_error_code_interrupt_handler 42
+    no_error_code_interrupt_handler 43
+    no_error_code_interrupt_handler 44
+    no_error_code_interrupt_handler 45
+    no_error_code_interrupt_handler 46
+    no_error_code_interrupt_handler 47
+    no_error_code_interrupt_handler 48
+    no_error_code_interrupt_handler 49
+    no_error_code_interrupt_handler 50
+    
+
 
 
 section '.rodata'
@@ -203,6 +224,25 @@ section '.rodata'
         irq_interrupt_entry 29
         irq_interrupt_entry 30
         irq_interrupt_entry 31
+        irq_interrupt_entry 32
+        irq_interrupt_entry 33
+        irq_interrupt_entry 34
+        irq_interrupt_entry 35
+        irq_interrupt_entry 36
+        irq_interrupt_entry 37
+        irq_interrupt_entry 38
+        irq_interrupt_entry 39
+        irq_interrupt_entry 40
+        irq_interrupt_entry 41
+        irq_interrupt_entry 42
+        irq_interrupt_entry 43
+        irq_interrupt_entry 44
+        irq_interrupt_entry 45
+        irq_interrupt_entry 46
+        irq_interrupt_entry 47
+        irq_interrupt_entry 48
+        irq_interrupt_entry 49
+        irq_interrupt_entry 50
     idt_end:
     idt_info:
         dw idt_end - idt_start - 1

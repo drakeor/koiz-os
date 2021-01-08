@@ -1,7 +1,7 @@
 #include "interrupt_handler.h"
 #include "../libc/stdlib.h"
 
-#define INTERRUPT_COUNT 32
+#define INTERRUPT_COUNT 50
 
 /* Represents an entry in the descriptor table */
 struct interrupt_descriptor_t {
@@ -50,6 +50,25 @@ extern uintptr_t isr_28;
 extern uintptr_t isr_29;
 extern uintptr_t isr_30;
 extern uintptr_t isr_31;
+extern uintptr_t isr_32;
+extern uintptr_t isr_33;
+extern uintptr_t isr_34;
+extern uintptr_t isr_35;
+extern uintptr_t isr_36;
+extern uintptr_t isr_37;
+extern uintptr_t isr_38;
+extern uintptr_t isr_39;
+extern uintptr_t isr_40;
+extern uintptr_t isr_41;
+extern uintptr_t isr_42;
+extern uintptr_t isr_43;
+extern uintptr_t isr_44;
+extern uintptr_t isr_45;
+extern uintptr_t isr_46;
+extern uintptr_t isr_47;
+extern uintptr_t isr_48;
+extern uintptr_t isr_49;
+extern uintptr_t isr_50;
 
 /*
  * This function populates the interrupt descriptor table
@@ -163,6 +182,63 @@ void setup_idt(void)
           break;
         case 31:
           isr_addr = (uint32_t)&isr_31;
+          break;
+        case 32:
+          isr_addr = (uint32_t)&isr_32;
+          break;
+        case 33:
+          isr_addr = (uint32_t)&isr_33;
+          break;
+        case 34:
+          isr_addr = (uint32_t)&isr_34;
+          break;
+        case 35:
+          isr_addr = (uint32_t)&isr_35;
+          break;
+        case 36:
+          isr_addr = (uint32_t)&isr_36;
+          break;
+        case 37:
+          isr_addr = (uint32_t)&isr_37;
+          break;
+        case 38:
+          isr_addr = (uint32_t)&isr_38;
+          break;
+        case 39:
+          isr_addr = (uint32_t)&isr_39;
+          break;
+        case 40:
+          isr_addr = (uint32_t)&isr_40;
+          break;
+        case 41:
+          isr_addr = (uint32_t)&isr_41;
+          break;
+        case 42:
+          isr_addr = (uint32_t)&isr_42;
+          break;
+        case 43:
+          isr_addr = (uint32_t)&isr_43;
+          break;
+        case 44:
+          isr_addr = (uint32_t)&isr_44;
+          break;
+        case 45:
+          isr_addr = (uint32_t)&isr_45;
+          break;
+        case 46:
+          isr_addr = (uint32_t)&isr_46;
+          break;
+        case 47:
+          isr_addr = (uint32_t)&isr_47;
+          break;
+        case 48:
+          isr_addr = (uint32_t)&isr_48;
+          break;
+        case 49:
+          isr_addr = (uint32_t)&isr_49;
+          break;
+        case 50:
+          isr_addr = (uint32_t)&isr_49;
           break;
         default:
           panic("Improperly configured IDT Table!!");

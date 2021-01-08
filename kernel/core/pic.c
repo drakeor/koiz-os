@@ -27,6 +27,12 @@
  
  /* End of helpful osdev.org definitions */
 
+ /* These are from LittleOSBook */
+#define PIC1_START_INTERRUPT 0x20
+#define PIC2_START_INTERRUPT 0x28
+#define PIC2_END_INTERRUPT   PIC2_START_INTERRUPT + 7
+#define PIC_ACK     0x20
+#define KBD_DATA_PORT   0x60
 
 /* 
  * Sends an end of interrupt command to the PIC chips 
@@ -49,7 +55,7 @@ void PIC_send_EOI(uint8_t irq)
  * This makes the leader offsets become offset1 - offset1 + 7
  * offset2 is for the follower PIC. offset2 - offset2 + 7
  */
-void PIC_remap(int offset1, int offset2)
+void PIC_remap()
 {
     /* We save the makes so we can restore them at the end of the function */
     uint8_t pic1_mask = io_byte_in(PIC1_DATA);
@@ -65,9 +71,9 @@ void PIC_remap(int offset1, int offset2)
     io_wait();
     
     /* Set vector offsets for both the leader and follower PICs */
-    io_byte_out(PIC1_DATA, offset1);
+    io_byte_out(PIC1_DATA, PIC1_START_INTERRUPT);
     io_wait();
-    io_byte_out(PIC2_DATA, offset2);
+    io_byte_out(PIC2_DATA, PIC2_START_INTERRUPT);
     io_wait();
 
     /* Tell the leader PIC that the follower is at IRQ2 (0000 0100b) */
@@ -85,6 +91,31 @@ void PIC_remap(int offset1, int offset2)
     io_wait();
 
     /* Restore masks */
-    io_byte_out(PIC1_DATA, pic1_mask);
-    io_byte_out(PIC2_DATA, pic2_mask);
+    //io_byte_out(PIC1_DATA, pic1_mask);
+    //io_byte_out(PIC2_DATA, pic2_mask);
+    io_byte_out( PIC1_DATA, 0xf8 ); /* master PIC */
+    io_byte_out( PIC2_DATA, 0xff ); /* slave PIC */
+}
+
+void PIC_set_interrupt_masks()
+{
+    /* Only listen to irqs 0, 1, and 2 */
+    io_byte_out( PIC1_DATA, 0xf8 ); /* master PIC */
+    io_byte_out( PIC2_DATA, 0xff ); /* slave PIC */
+}
+
+
+/*
+ * Sends out acknowledgement message from interrupt to
+ * the corresponding PIC
+ */
+void PIC_acknowledge(uint8_t interrupt)
+{
+    if (interrupt < PIC1_START_INTERRUPT || interrupt > PIC2_END_INTERRUPT)
+        return;
+
+    if (interrupt < PIC2_START_INTERRUPT) 
+        io_byte_out(PIC1, PIC_ACK);
+    else
+        io_byte_out(PIC2, PIC_ACK);
 }

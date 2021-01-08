@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
-void PIC_remap(int offset1, int offset2);
+void PIC_remap();
+
+void PIC_acknowledge(uint8_t interrupt);
+
+void PIC_set_interrupt_masks();
 
 #endif

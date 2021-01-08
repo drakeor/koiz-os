@@ -31,4 +31,7 @@ void main ()
    // print("shouldnt get here", 0);
 
     /* Done */
+    while(1) {
+        //printf("new");
+    }
 }
