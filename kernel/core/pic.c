@@ -2,7 +2,6 @@
 #include "../drivers/basic_io.h"
 
 
-/* Helpful definitions taken from osdev.org */
 
 #define PIC1		0x20		/* IO base address for primary PIC */
 #define PIC2		0xA0		/* IO base address for secondary PIC */
@@ -28,11 +27,10 @@
  /* End of helpful osdev.org definitions */
 
  /* These are from LittleOSBook */
+#define PIC_ACK     0x20
 #define PIC1_START_INTERRUPT 0x20
 #define PIC2_START_INTERRUPT 0x28
 #define PIC2_END_INTERRUPT   PIC2_START_INTERRUPT + 7
-#define PIC_ACK     0x20
-#define KBD_DATA_PORT   0x60
 
 /* 
  * Sends an end of interrupt command to the PIC chips 
@@ -104,16 +102,17 @@ void PIC_set_interrupt_masks()
     io_byte_out( PIC2_DATA, 0xff ); /* slave PIC */
     asm("sti"); /* enable interrupts */
 }
-
+/*
 uint8_t read_kb_scan_code(void)
 {
     return io_byte_in(KBD_DATA_PORT);
 }
-
+*/
 /*
  * Sends out acknowledgement message from interrupt to
  * the corresponding PIC
  */
+
 void PIC_acknowledge(uint8_t interrupt)
 {
     if (interrupt < PIC1_START_INTERRUPT || interrupt > PIC2_END_INTERRUPT)

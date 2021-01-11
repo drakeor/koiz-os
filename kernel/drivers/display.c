@@ -16,7 +16,7 @@ int get_offset_col(int offset) {
  * Grabs the high byte with (data 14)
  * Grabs the low byte with (data 15)
  */
-uint16_t get_cursor_offset()
+uint16_t get_cursor_offset(void)
 {
     io_byte_out(REG_SCREEN_CTRL, 14);
     uint16_t cur_offset = io_byte_in(REG_SCREEN_DATA);
@@ -99,7 +99,7 @@ int print_char(uint8_t character, uint8_t col, uint8_t row, uint8_t char_color) 
 
 }
 
-void kclear_screen()
+void kclear_screen(void)
 {
     uint8_t row = 0;
     uint8_t col = 0;

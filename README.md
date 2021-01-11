@@ -24,6 +24,8 @@ It doesn't really serve any practical purpose outside that.
 
 - Keyboard support
 
+- Terminal Support
+
 - Adding self-tests
 
 

@@ -35,8 +35,8 @@ void main ()
     /* Done */
     while(1) {
         //printf("new");
-        PIC_acknowledge(0x20);
-        read_kb_scan_code();
+        //PIC_acknowledge(0x20);
+        //read_kb_scan_code();
 
     }
 	__builtin_unreachable();

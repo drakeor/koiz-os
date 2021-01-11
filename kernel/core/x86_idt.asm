@@ -59,6 +59,8 @@ section '.text' executable
     extrn setup_idt
     extrn panic
 
+    extrn keyboard_int_handler
+
     ; at this point the stack should contain [esp + 4] -> first entry in EDT
     ; [esp] -> the return address    
     load_idt:
@@ -74,7 +76,7 @@ section '.text' executable
 
         cli 
         ; Manually save registers
-        ; Only because we want to access the other members of the stack
+        ; Only because we want to access the other members of the stack in specific positions
 
         ; Stack layout is as following:
         ; 44 eflags
@@ -90,13 +92,14 @@ section '.text' executable
         pushd edi ;4
         pushd ebp ;0
 
-        ; Call our C function
-        ;call interrupt_handler
+        ; EDI = interrupt #
+        ; ECX = error
+        ; EBX = 1 to print interrupt, 0 = do not print
         mov edi, esp
         add edi, 28
         mov ecx, esp
         add ecx, 32
-        ccall printf, msg, [edi], [ecx]
+        mov ebx, 1 ; Set to 0 to disable printing interrupts
 
         ; Interrupt 1 is recoverable
         mov edi, esp
@@ -110,10 +113,31 @@ section '.text' executable
         cmp [edi], ecx
         je .resume
 
-        ; Otherwise panic!
-        ccall panic, panicmsg
+        ; Interrupt 0x21 is handled by the keyboard handler!
+        mov ecx, 0x21
+        cmp [edi], ecx
+        mov ebx, 0         ; Don't print
+        je .call_keyboard_handler
 
+        ; Otherwise panic! (We don't know how to handle this interrupt)
+        ; This function should NEVER return!
+        ccall printf, msg, [edi], [ecx]
+        ccall panic, panicmsg
+        HLT 
+
+    ; Handle keyboard interrupts
+    .call_keyboard_handler:
+        push ebx
+        ccall keyboard_int_handler
+        pop ebx
+        jmp .resume
+
+    ; Clean up after interrupt
     .resume:
+        cmp ebx, 1
+        jne .do_not_print
+        ccall printf, msg, [edi], [ecx]
+    .do_not_print:
         ; Restore registers
         popd ebp
         popd edi

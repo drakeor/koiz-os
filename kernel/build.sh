@@ -19,6 +19,7 @@ gcc -g -m32 -ffreestanding -mno-red-zone -c core/interrupt_handler.c -o ../obj/c
 gcc -g -m32 -ffreestanding -mno-red-zone -c core/pic.c -o ../obj/core/pic.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/basic_io.c -o ../obj/drivers/basic_io.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/display.c -o ../obj/drivers/display.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/keyboard.c -o ../obj/drivers/keyboard.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/serial.c -o ../obj/drivers/serial.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c libc/stdlib.c -o ../obj/libc/stdlib.o -fno-pie
 
@@ -32,6 +33,7 @@ ld -o ../bin/kernel.elf -Ttext 0x1000 ../obj/kernel_entry.o \
 ../obj/main.o \
 ../obj/drivers/basic_io.o \
 ../obj/drivers/display.o \
+../obj/drivers/keyboard.o \
 ../obj/drivers/serial.o \
 ../obj/libc/stdlib.o \
 -m elf_i386

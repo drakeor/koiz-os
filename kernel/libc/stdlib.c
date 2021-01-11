@@ -29,7 +29,7 @@ void error(char *message)
     kprint(message, DEFAULT_ERROR_COLOR);
 }
 
-void kernel_init()
+void kernel_init(void)
 {
 #ifdef USE_COM1_AS_LOG
     /* Test out our serial port */
@@ -56,7 +56,7 @@ void kernel_init()
     printf("kernel init");
 }
 
-void clear_display()
+void clear_display(void)
 {
     kclear_screen();
 }

@@ -1,9 +1,9 @@
 #ifndef _STDLIB_H_
 #define _STDLIB_H_
 
-void kernel_init();
+void kernel_init(void);
 
-void clear_display();
+void clear_display(void);
 
 void print(char *message);
 void error(char *message);
