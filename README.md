@@ -26,6 +26,8 @@ It doesn't really serve any practical purpose outside that.
 
 - Terminal Support
 
+- Network Driver
+
 - Adding self-tests
 
 
