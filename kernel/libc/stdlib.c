@@ -4,6 +4,7 @@
 #include "../config.h"
 #include "../drivers/display.h"
 #include "../drivers/serial.h"
+#include "../drivers/tty.h"
 
 #include "../core/interrupt_handler.h"
 #include "../core/pic.h"
@@ -54,6 +55,14 @@ void kernel_init(void)
 
     //read_kb_scan_code();
     printf("kernel init");
+
+    /* Initialize the terminal last */
+    init_tty();
+}
+
+void kernel_update(void)
+{
+    tty_update();
 }
 
 void clear_display(void)

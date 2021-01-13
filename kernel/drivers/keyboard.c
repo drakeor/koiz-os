@@ -2,6 +2,7 @@
 #include "../core/pic.h"
 #include "basic_io.h"
 #include "display.h"
+#include "tty.h"
 
 #define KEYBOARD_INTERRUPT 0x21
 
@@ -55,7 +56,7 @@ uint8_t scan_to_ascii(uint8_t scan_code)
         /* 0x00 - 00xF */
         NULL, NULL, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', NULL, NULL,
         /* 0x10 - 0x1F */
-        'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', NULL, NULL, 'a', 's',
+        'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', 0xA, NULL, 'a', 's',
         /* 0x20 - 0x2F */
         'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', NULL, '\\', 'z', 'x', 'c', 'v',
         /* 0x30 - 0x3F */
@@ -103,6 +104,6 @@ void keyboard_int_handler(void)
 
     /* Simply print the character to the screen for now */
     if(ascii_char != NULL)
-        kprint_char(ascii_char, 0xF);
+        tty_putchar(ascii_char);
 }
 

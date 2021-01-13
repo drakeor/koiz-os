@@ -34,6 +34,7 @@ void main ()
 
     /* Done */
     while(1) {
+        kernel_update();
         //printf("new");
         //PIC_acknowledge(0x20);
         //read_kb_scan_code();

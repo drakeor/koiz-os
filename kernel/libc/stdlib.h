@@ -2,6 +2,7 @@
 #define _STDLIB_H_
 
 void kernel_init(void);
+void kernel_update(void);
 
 void clear_display(void);
 
