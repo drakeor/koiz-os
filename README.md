@@ -19,25 +19,21 @@ It doesn't really serve any practical purpose outside that.
 
 - Adding Interrupts (DONE)
 
+- Basic Keyboard support (DONE)
+
+- Basic Terminal Support (DONE)
 
 # In Progress Features
 
-- Keyboard support
-
-- Terminal Support
+- Memory Management
 
 - Network Driver
 
 - Adding self-tests
 
-
 # Planned Features (in order of development)
 
-- Memory Management
-
 - Malloc 
-
-- Shell
 
 - Userspace application
 
