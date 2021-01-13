@@ -42,8 +42,9 @@ ld -o ../bin/kernel.elf -Ttext 0x1000 ../obj/kernel_entry.o \
 #--oformat binary 
 
 # Get rid of the annoying GNU section that bloats this file
-strip --remove-section=.note.gnu.property ../bin/kernel.elf
+cp ../bin/kernel.elf ../bin/kernel2.elf
+strip --remove-section=.note.gnu.property ../bin/kernel2.elf
 
 # Copy across elf file to bin
 # We use the elf file for debugging
-objcopy -O binary ../bin/kernel.elf ../bin/kernel.bin
+objcopy -O binary ../bin/kernel2.elf ../bin/kernel.bin
