@@ -8,6 +8,7 @@
 
 #include "../core/interrupt_handler.h"
 #include "../core/pic.h"
+#include "../core/mem.h"
 
 #define DEFAULT_TEXT_COLOR 0x0F
 #define DEFAULT_ERROR_COLOR 0x05
@@ -53,8 +54,11 @@ void kernel_init(void)
     PIC_remap();
     PIC_set_interrupt_masks();
 
+    /* initialize memory stuff */
+    initialize_memory();
+
     //read_kb_scan_code();
-    printf("kernel init");
+    printf("kernel init\n");
 
     /* Initialize the terminal last */
     init_tty();

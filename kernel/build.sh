@@ -16,6 +16,7 @@ fasm.x64 core/x86_idt.asm ../obj/core/x86_idt.o
 echo "compiling 32-bit kernel c code"
 gcc -g -m32 -ffreestanding -mno-red-zone -c main.c -o ../obj/main.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c core/interrupt_handler.c -o ../obj/core/interrupt_handler.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c core/mem.c -o ../obj/core/mem.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c core/pic.c -o ../obj/core/pic.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/basic_io.c -o ../obj/drivers/basic_io.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/display.c -o ../obj/drivers/display.o -fno-pie
@@ -29,6 +30,7 @@ gcc -g -m32 -ffreestanding -mno-red-zone -c libc/stdlib.c -o ../obj/libc/stdlib.
 echo "linking 32-bit kernel"
 ld -o ../bin/kernel.elf -Ttext 0x1000 ../obj/kernel_entry.o \
 ../obj/core/interrupt_handler.o \
+../obj/core/mem.o \
 ../obj/core/pic.o \
 ../obj/core/x86_idt.o \
 ../obj/main.o \

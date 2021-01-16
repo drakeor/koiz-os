@@ -10,4 +10,7 @@
 /* Run tests for interrupts */
 #define SELF_TEST_INTERRUPTS
 
+/* Show debug messages for memory maps */
+#define DEBUG_MSG_MEMORYMAP
+
 #endif
