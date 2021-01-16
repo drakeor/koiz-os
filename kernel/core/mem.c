@@ -1,7 +1,18 @@
 #include "../config.h"
 #include "mem.h"
-#include "stdint.h"
 #include "../libc/stdlib.h"
+
+
+/* 
+ * Good reference for memory maps 
+ * https://wiki.osdev.org/Memory_Map_(x86)
+ */
+
+/*
+ * Physical memory allocation happens on the largest section of detected free memory
+ * It's allocated in 4096 byte chunks using simple flat list allocation
+ * Probably switch to buddy allocation later...
+ */
 
 /* This is where our bootloader stores the memory map location */
 #define BIOS_MEMORY_MAP_SIZE_LOC 0x8000
@@ -9,15 +20,10 @@
 
 /* Reserved section of memory */
 #define MEM_RESERVED_SECTION_MIN 0x10000
+#define MIN_MEM_SIZE 0xFFFF
 
-#define MIN_PHYS_BLOCK_SIZE 4096
-#define MAX_PHYS_BLOCK_ORDER 4
-/*
- * 2^0 = 4KB
- * 2^1 = 8KB
- * 2^2 = 16KB
- * 2^3 = 32KB
- */
+/* Size of physical blocks of memory to give out */
+#define PHYS_BLOCK_SIZE 4096
 
 uint32_t* map_regions_count;
 
@@ -34,16 +40,19 @@ struct memory_map_entry_t {
 
 struct memory_map_entry_t* map_entry;
 
-/*
- * This is where our main physical memory is stored
- * 
- */
-
+/* This is where our main memory is stored */
 uint32_t* main_memory_start;
 uint32_t main_memory_length;
 
+/* Since the memory allocation blocks take up the first few MBs, this is where we'll malloc */
+uint32_t* alloc_start;
+uint32_t mem_mgr_reserved_size;
+
+/* This points to the next physical spot on the list */
+uint32_t* alloc_ptr;
+
 /* 
- * Region Types
+ * Region Types Reference
  * Type 1: Usable (normal) RAM
  * Type 2: Reserved - unusable
  * Type 3: ACPI reclaimable memory
@@ -51,6 +60,12 @@ uint32_t main_memory_length;
  * Type 5: Area containing bad memory
  */
 
+/*
+ * The BIOS populates the memory map at 0x8000
+ * We scan this list for the largest free block
+ * We allocate the start of this block for the memory manager
+ * The rest of it is free for allocation
+ */
 void initialize_memory(void)
 {
     /* Grab the memory map region count */
@@ -83,7 +98,8 @@ void initialize_memory(void)
     for(i=0; i < *map_regions_count; ++i)
     {
         /* Region 1 is free and we want to grab the largest region we can */
-        if(map_entry->region_type == 1 && map_entry->region_length_low > main_memory_length)
+        if(map_entry->region_type == 1 
+            && map_entry->region_length_low > main_memory_length)
         {
             main_memory_start = (uint32_t*)map_entry->base_address_low;
             main_memory_length = map_entry->region_length_low;
@@ -100,8 +116,15 @@ void initialize_memory(void)
 #endif
     }
 
+    /* Immediately allocate storage for our physical memory manager */
+    mem_mgr_reserved_size = 0xF + (main_memory_length / PHYS_BLOCK_SIZE);
+    alloc_ptr = main_memory_start;
+    alloc_start = main_memory_start;
+    alloc_start += mem_mgr_reserved_size;
+
     /* Print our memory info */
-    printf("Memory Start: %x, Memory Length: %x\n", main_memory_start, main_memory_length);
+    printf("Memory Start: %x, Memory Length: %x, Allocatable Start: %x\n", 
+        main_memory_start, main_memory_length, alloc_start);
 
     /* 
      * Last few sanity checks 
@@ -112,5 +135,29 @@ void initialize_memory(void)
         panic("invalid memory start region!");
     if(main_memory_length == 0x00)
         panic("cannot have a memory of length 0!");
+    if(main_memory_length < MIN_MEM_SIZE)
+        panic("not enough memory!");
+
+}
+
+/* Helper function to grab record from ptr */
+uint32_t* pmem_to_entry(uint32_t* ptr)
+{
+
+}
+
+/* Helper function to grab ptr from record */
+uint32_t* entry_to_pmem(uint32_t* ptr)
+{
+
+}
+
+uint32_t* pmem_alloc()
+{
+
+}
+
+int pmem_free(uint32_t* ptr)
+{
 
 }
