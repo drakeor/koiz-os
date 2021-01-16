@@ -23,9 +23,13 @@ It doesn't really serve any practical purpose outside that.
 
 - Basic Terminal Support (DONE)
 
+- Memory Detection (DONE)
+
 # In Progress Features
 
-- Memory Management
+- Physical Memory Management
+
+- Virtual Memory Management
 
 - Network Driver
 
