@@ -48,3 +48,13 @@ strip --remove-section=.note.gnu.property ../bin/kernel2.elf
 # Copy across elf file to bin
 # We use the elf file for debugging
 objcopy -O binary ../bin/kernel2.elf ../bin/kernel.bin
+
+# Verify the filesize is under 25KiB (So it doesn't overwrite the bootloader)
+# Memory kernel occupies is 0x1000 - 0x7BFF
+myfilesize=$(wc -c "../bin/kernel.bin" | awk '{print $1}')
+printf "final kernel image size: %d\n" $myfilesize
+if [ $myfilesize -gt 25000 ]
+then
+    printf "build error! kernel image is too big!\n"
+    exit 1
+fi

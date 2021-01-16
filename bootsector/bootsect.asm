@@ -23,6 +23,9 @@ mov bx, bp
 call print_hex_word
 call print_newline
 
+; Detect memory
+call do_e820
+
 ; Load kernel to disk
 call load_kernel
 
@@ -38,6 +41,7 @@ include 'diskload.asm'
 include 'printfuncs.asm'
 include 'gdt.asm'
 include 'loadkernel.asm'
+include 'detectmem.asm'
 
 ; Include 32-bit things
 include 'protmode.asm'
