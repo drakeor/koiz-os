@@ -25,15 +25,17 @@ It doesn't really serve any practical purpose outside that.
 
 - Memory Detection (DONE)
 
-# In Progress Features
+- Physical Memory Management (DONE)
 
-- Physical Memory Management
+
+# In Progress Features
 
 - Virtual Memory Management
 
 - Network Driver
 
 - Adding self-tests
+
 
 # Planned Features (in order of development)
 

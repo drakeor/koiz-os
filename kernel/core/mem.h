@@ -3,6 +3,9 @@
 
 #include "stdint.h"
 
+/* Size of physical blocks of memory to give out */
+#define PHYS_BLOCK_SIZE 4096
+
 uint32_t* pmem_alloc();
 
 int pmem_free(uint32_t* ptr);

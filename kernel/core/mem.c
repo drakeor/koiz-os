@@ -22,9 +22,6 @@
 #define MEM_RESERVED_SECTION_MIN 0x10000
 #define MIN_MEM_SIZE 0xFFFF
 
-/* Size of physical blocks of memory to give out */
-#define PHYS_BLOCK_SIZE 4096
-
 uint32_t* map_regions_count;
 
 /* Represents an entry in the memory map table */

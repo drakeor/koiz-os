@@ -9,6 +9,7 @@
 #include "../core/interrupt_handler.h"
 #include "../core/pic.h"
 #include "../core/mem.h"
+#include "../core/vmem.h"
 
 #define DEFAULT_TEXT_COLOR 0x0F
 #define DEFAULT_ERROR_COLOR 0x05
@@ -56,6 +57,7 @@ void kernel_init(void)
 
     /* initialize memory stuff */
     initialize_memory();
+    vmem_init();
 
     //read_kb_scan_code();
     printf("kernel init\n");
