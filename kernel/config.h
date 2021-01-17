@@ -13,4 +13,11 @@
 /* Show debug messages for memory maps */
 #define DEBUG_MSG_MEMORYMAP
 
+/* Run tests for pmem */
+#define SELF_TEST_PMEM
+
+/* Show debug messages for pmem */
+#define DEBUG_MSG_PMEM
+
+
 #endif
