@@ -1,0 +1,41 @@
+#!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+WORKSPACE=$DIR/../../
+
+DEV_IMAGE=koiz-dev:latest
+
+# Make our dev environment
+make .make/koiz-dev
+
+# For non-interactive terminals such as Eclipse or Jenkins
+if [ -z "$NON_INTERACTIVE" ]; then
+    DOCKER_INTERACTIVE_FLAG="-i"
+else
+    DOCKER_INTERACTIVE_FLAG=""
+fi
+
+# Control console colors (eclipse spews junk in console when color characters are printed)
+if [ -z "$MONO" ]; then
+    COLOR_FLAG=""
+else
+    COLOR_FLAG="-e TERM=xterm-mono"
+fi
+
+echo "
+bash -c \"$@\"
+" > /tmp/koiz-dev-start.sh
+
+xhost +
+
+docker run \
+    -e DISPLAY=$DISPLAY \
+    $COLOR_FLAG \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -v /tmp/koiz-dev-start.sh:/start.sh \
+    -v $WORKSPACE:/space/koiz-os \
+    --network=host \
+    --rm \
+    $DOCKER_INTERACTIVE_FLAG \
+    -t $DEV_IMAGE \
+    /bin/bash /start.sh
