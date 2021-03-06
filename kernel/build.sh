@@ -10,6 +10,7 @@ mkdir -p ../obj/libc
 # Build our custom kernel entry executable
 echo "compiling 32-bit kernel asm code"
 fasm.x64 kernel_entry.asm ../obj/kernel_entry.o
+fasm.x64 core/x86_pagedir.asm ../obj/core/x86_pagedir.o
 fasm.x64 core/x86_idt.asm ../obj/core/x86_idt.o
 
 # Compile the kernel
@@ -33,6 +34,7 @@ ld -o ../bin/kernel.elf -Ttext 0x1000 ../obj/kernel_entry.o \
 ../obj/core/interrupt_handler.o \
 ../obj/core/mem.o \
 ../obj/core/pic.o \
+../obj/core/x86_pagedir.o \
 ../obj/core/x86_idt.o \
 ../obj/core/vmem.o \
 ../obj/main.o \

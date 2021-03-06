@@ -2,7 +2,7 @@
 
 Built mostly as a pet project. It's an x86_64 based general operating system built in C, Rust and ASM.
 
-It currently only runs in 32-bit since I don't have all the code setup for 64-bit.
+It currently only runs in 32-bit since I don't have all the code setup for 64-bit. 
 
 It doesn't really serve any practical purpose outside that.
 
@@ -27,6 +27,8 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 - Memory Detection (DONE)
 
 - Physical Memory Management (DONE)
+
+- Added paging (DONE)
 
 
 # In Progress Features
