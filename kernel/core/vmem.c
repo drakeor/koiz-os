@@ -95,7 +95,7 @@ void vmem_init(void)
     /* Identity page the first 4 megabytes */
     uint32_t* kernel_pt = vmem_ptable_new();
     int32_t i;
-    for(i = 0; i < 1024; i++)
+    for(i = 0; i < IDENTITY_MAP_SIZE / 4096; i++)
         kernel_pt[i] = (i * 4096) | 1;
 
     /* Set to present and read/write */
@@ -104,7 +104,7 @@ void vmem_init(void)
     /* Enable the page directory */
     vmem_enable_page_dir(base_ptr);
 
-    printf("Paging Enabled. First 4MB of kernel identity-mapped.\n");
+    printf("Paging Enabled. First %d KB of kernel identity-mapped.\n", IDENTITY_MAP_SIZE / 1024);
 
 #ifdef SELF_TEST_VMEM
     do_vmem_tests(); 

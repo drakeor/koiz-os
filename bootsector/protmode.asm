@@ -28,7 +28,7 @@ init_32bpm:
     mov gs, ax
 
     ; Update stack position so its on top of free space
-    mov ebp, 0x10000
+    mov ebp, 0x80000
     mov esp, ebp
 
     call main_32b

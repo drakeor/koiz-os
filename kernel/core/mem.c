@@ -22,6 +22,9 @@
 #define MEM_RESERVED_SECTION_MIN 0x10000
 #define MIN_MEM_SIZE 0xFFFF
 
+/* Minimum memory to run our operating system */
+#define MIN_USERSPACE_SIZE (IDENTITY_MAP_SIZE + MIN_MEM_SIZE)
+
 uint32_t* map_regions_count;
 
 /* Represents an entry in the memory map table */

@@ -68,8 +68,24 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 # Running
 
-- You can run this OS bare metal or on QEMU (qemu-x86_64). You'll probably need to pass -fda to QEMU to get it to work.
+- You can (theoretically) run this OS bare metal or on QEMU (qemu-x86_64). You'll probably need to pass -fda to QEMU to get it to work.
 
+- The kernel needs at bare minimum 4MB of RAM to start. It will fail with anything less.
+
+# Known Issues
+
+- Will triple fault on some modern bare metal machines. Not guaranteed to work on yours.
+
+- No checks for kernel stack to start writing into kernel code. Obviously stability and security issue.
+
+# Memory Layout
+
+- 0x1000    - Kernel Entry Point
+- 0x8000    - BIOS Memory Map Size Location (bootsector/detectmem.asm)
+- 0x8004    - BIOS Memory Map Location (bootsector/detectmem.asm)
+- 0x80000   - Kernel Stack Start
+- 0x100000  - Identity Mapped Free Memory
+- 0x1000000 - Non-Identity Mapped Free Memory
 
 # FAQ
 
@@ -77,6 +93,9 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 Most likely have to run fasm.x64 instead
 
+## Can I use this for my project?
+
+If it's to reference to learn/develop your own OS, I encourage it! If you want to use this on an actual production process, I discourage it. I can't guarantee the stability and security of this operating system.
 
 # Useful references / credits
 
@@ -90,6 +109,6 @@ Most likely have to run fasm.x64 instead
 
 - In-line assembly docs for GCC (Since the syntax can be awkward sometimes, at least for me): https://gcc.gnu.org/onlinedocs/gcc/Using-Assembly-Language-with-C.html#Using-Assembly-Language-with-C 
 
-- Kernel.org Coding Style (I'm not programming the linux kernel so it's not strictly followed, but my coding style is similar. I do really enjoy the rationale being explained in this document though.): https://www.kernel.org/doc/Documentation/process/coding-style.rst 
+- Kernel.org Coding Style (I'm not programming the linux kernel so it's not strictly followed, but my coding style is similar. I do really enjoy the rationale being explained in this document though): https://www.kernel.org/doc/Documentation/process/coding-style.rst 
 
 - Linux Kernel (Helps to see what people much better at this than me are doing): https://github.com/torvalds/linux 
