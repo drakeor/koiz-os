@@ -2,6 +2,7 @@
 #include "vmem.h"
 
 #include "../libc/stdlib.h"
+#include "../config.h"
 
 #include <stdint.h>
 
@@ -40,6 +41,20 @@ uint32_t* vmem_ptable_new()
         ptr[i] = 0x0;
 
     return ptr;
+}
+
+void do_vmem_tests()
+{
+    printf("Running vmem tests\n");
+
+    /* Access memory that isn't paged */
+    uint32_t* bad_ptr = (uint32_t*)0x01FF0000;
+    printf("Accessing bad memory from %x\n", *bad_ptr);
+
+    /* Write to memory that isn't paged */
+    *bad_ptr = 4;
+
+    printf("vmem tests finished\n");
 }
 
 /*
@@ -83,13 +98,16 @@ void vmem_init(void)
     for(i = 0; i < 1024; i++)
         kernel_pt[i] = (i * 4096) | 1;
 
-    base_ptr[0] = ((uint32_t)kernel_pt) | 1;
+    /* Set to present and read/write */
+    base_ptr[0] = ((uint32_t)kernel_pt) | 3;
 
     /* Enable the page directory */
     vmem_enable_page_dir(base_ptr);
 
     printf("Paging Enabled. First 4MB of kernel identity-mapped.\n");
 
-    /*uint32_t* bad_ptr = (uint32_t*)0x01FF0000;
-    printf("Accessing bad memory from %x\n", *bad_ptr);*/
+#ifdef SELF_TEST_VMEM
+    do_vmem_tests(); 
+#endif
+
 }

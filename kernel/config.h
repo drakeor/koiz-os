@@ -19,5 +19,7 @@
 /* Show debug messages for pmem */
 #define DEBUG_MSG_PMEM
 
+/* Run tests for vmem */
+#define SELF_TEST_VMEM
 
 #endif
