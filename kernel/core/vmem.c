@@ -107,22 +107,16 @@ void do_vmem_tests()
     uint32_t* good_ptr = (uint32_t*) IDENTITY_MAP_SIZE - 3092;
     printf("Looking up address for %x\n", good_ptr);
     uint32_t* good_ptr_phys = vmem_get_phys_addr(page_directory, good_ptr);
-    printf("Physical address for %x is %x", good_ptr, good_ptr_phys);
+    printf("Physical address for %x is %x\n", good_ptr, good_ptr_phys);
+    if(good_ptr != good_ptr_phys)
+        panic("do_vmem_tests: failed address lookup");
 
+    printf("test passed\n");
     printf("Running vmem access tests\n");
 
     /* Access memory that is identity mapped */
-    printf("Accessing good memory from %x\n", good_ptr);
-    printf("Good memory: %x\n", *good_ptr);
-
-    /* Access memory that isn't currently paged */
-    uint32_t* bad_ptr = (uint32_t*)IDENTITY_MAP_SIZE + 3092;
-    printf("Accessing bad memory from %x\n", bad_ptr);
-    printf("Bad memory: %x\n", *bad_ptr);
-
-    /* Write to memory that isn't currently paged */
-     printf("Writing to bad memory at %x\n", bad_ptr);
-    *bad_ptr = 4;
+    printf("Accessing memory from %x\n", good_ptr);
+    printf("Memory value: %x\n", *good_ptr);
 
     printf("vmem tests finished\n");
 }
@@ -164,28 +158,23 @@ void vmem_init(void)
     /* We can use ptable_new to create the page directory */
     uint32_t* base_ptr = vmem_ptable_new();
 
-    /* Identity page the first 4 megabytes */
-    /* Since we're page-aligned, the bottom 12 bits (except bit 0) will already be 0 */
-    uint32_t* kernel_pt = vmem_ptable_new();
-    for(i = 0; i < IDENTITY_MAP_SIZE / 4096; i++)
-        kernel_pt[i] = (i * 4096) | 1;
-
-    /* Set kernel pagetable to present and read/write in the page directory */
-    base_ptr[0] = ((uint32_t)kernel_pt) | 3;
-
     /* 
      * Identity page the entire kernel-space. This just makes it easier.
      * However, note that user processes are not paged this way
      */
     for(i = 0; i < 1024; i++) {
+
+        /* Set kernel pagetable to present and read/write in the page directory */
         uint32_t* kernel_pt = vmem_ptable_new();
         base_ptr[i] = ((uint32_t)kernel_pt) | 3;
 
+        /* Populate the pagetable with identity-map entries */
         uint32_t j;
         for(j = 0; j < 1024; j++) {
             uint32_t virt_addr_entry = ((i << 22) | (j << 12)) & ~0xFFF;
             kernel_pt[j] = virt_addr_entry | 1;
         }
+
     }
 
     /* Set the global page directory variable */
