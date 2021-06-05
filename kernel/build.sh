@@ -23,6 +23,7 @@ gcc -g -m32 -ffreestanding -mno-red-zone -c core/vmem.c -o ../obj/core/vmem.o -f
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/basic_io.c -o ../obj/drivers/basic_io.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/display.c -o ../obj/drivers/display.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/keyboard.c -o ../obj/drivers/keyboard.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/network.c -o ../obj/drivers/network.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/serial.c -o ../obj/drivers/serial.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/tty.c -o ../obj/drivers/tty.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c libc/stdlib.c -o ../obj/libc/stdlib.o -fno-pie
@@ -41,6 +42,7 @@ ld -o ../bin/kernel.elf -Ttext 0x1000 ../obj/kernel_entry.o \
 ../obj/drivers/basic_io.o \
 ../obj/drivers/display.o \
 ../obj/drivers/keyboard.o \
+../obj/drivers/network.o \
 ../obj/drivers/serial.o \
 ../obj/drivers/tty.o \
 ../obj/libc/stdlib.o \

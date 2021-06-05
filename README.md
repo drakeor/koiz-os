@@ -30,25 +30,26 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Added paging (DONE)
 
+- Virtual Memory Management (DONE)
+
+- Virtual to physical address translation functions (DONE)
+
 
 # In Progress Features
 
-- Virtual Memory Management
-
-- Virtual to physical address translation functions
-
-- Handling page faults
-
 - Network Driver
 
-- Adding self-tests
-
+- PCI scanning
 
 # Planned Features (in order of development)
 
 - Malloc 
 
+- File management
+
 - Userspace application
+
+- Handling userspace page faults
 
 - Processes
 
