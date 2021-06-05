@@ -35,6 +35,10 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Virtual Memory Management
 
+- Virtual to physical address translation functions
+
+- Handling page faults
+
 - Network Driver
 
 - Adding self-tests

@@ -13,7 +13,7 @@
 /* Show debug messages for memory maps */
 #define DEBUG_MSG_MEMORYMAP
 
-/* Run tests for pmem */
+/* Run tests for pmem. Note that this test takes a while! */
 //#define SELF_TEST_PMEM
 
 /* Show debug messages for pmem */
@@ -21,5 +21,8 @@
 
 /* Run tests for vmem */
 #define SELF_TEST_VMEM
+
+/* Show debug messages from vmem */
+#define DEBUG_MSG_VMEM
 
 #endif

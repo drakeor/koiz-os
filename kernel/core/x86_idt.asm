@@ -113,6 +113,12 @@ section '.text' executable
         cmp [edi], ecx
         je .resume
 
+        ; Interrupt 0xE is page faults and handled by the page fault handler!
+        mov ecx, 0xE
+        cmp [edi], ecx
+        mov ebx, 0         ; Don't print
+        je .call_pagefault_handler
+
         ; Interrupt 0x21 is handled by the keyboard handler!
         mov ecx, 0x21
         cmp [edi], ecx
@@ -130,6 +136,16 @@ section '.text' executable
         push ebx
         ccall keyboard_int_handler
         pop ebx
+        jmp .resume
+
+    ; Handle page fault interrupts
+    ; Not finished yet so halt
+    .call_pagefault_handler:
+        push ecx
+        ;mov cr2, ecx
+        mov rax, cr2
+        ccall printf, pagefault_msg, [ecx]
+        pop ecx
         jmp .resume
 
     ; Clean up after interrupt
@@ -212,6 +228,7 @@ section '.text' executable
 
 section '.rodata'
     msg db "Handling Interrupt %x. Error code: %x",0xA,0
+    pagefault_msg db "Page fault address: %x",0xA,0
     panicmsg db "Interrupt is non-recoverable!",0xA,0
     public idt_info
     public idt_start
