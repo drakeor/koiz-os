@@ -74,7 +74,9 @@ section '.text' executable
 
     common_interrupt_handler:
 
+        ; Disable interrupts
         cli 
+
         ; Manually save registers
         ; Only because we want to access the other members of the stack in specific positions
 
@@ -141,11 +143,11 @@ section '.text' executable
     ; Handle page fault interrupts
     ; Not finished yet so halt
     .call_pagefault_handler:
-        push ecx
-        ;mov cr2, ecx
-        mov rax, cr2
-        ccall printf, pagefault_msg, [ecx]
-        pop ecx
+        push ebx
+        mov ebx, cr2
+        ccall printf, pagefault_msg, ebx
+        pop ebx
+        HLT
         jmp .resume
 
     ; Clean up after interrupt
@@ -166,8 +168,10 @@ section '.text' executable
         ; Restores the ESP
         add esp, 8
 
-        ; We need to use iret to return from 
+        ; Re-enable interrupts
         sti
+
+        ; We need to use iret to return from 
         iret
 
     ; Once I figure out FASMs macro system for loops I'll change this
