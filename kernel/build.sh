@@ -5,6 +5,7 @@ mkdir -p ../bin
 mkdir -p ../obj
 mkdir -p ../obj/core
 mkdir -p ../obj/drivers
+mkdir -p ../obj/drivers/fs_backend
 mkdir -p ../obj/libc
 
 # Build our custom kernel entry executable
@@ -20,8 +21,10 @@ gcc -g -m32 -ffreestanding -mno-red-zone -c core/interrupt_handler.c -o ../obj/c
 gcc -g -m32 -ffreestanding -mno-red-zone -c core/mem.c -o ../obj/core/mem.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c core/pic.c -o ../obj/core/pic.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c core/vmem.c -o ../obj/core/vmem.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/fs_backend/ramdisk.c -o ../obj/drivers/fs_backend/ramdisk.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/basic_io.c -o ../obj/drivers/basic_io.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/display.c -o ../obj/drivers/display.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/filesystem.c -o ../obj/drivers/filesystem.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/keyboard.c -o ../obj/drivers/keyboard.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/network.c -o ../obj/drivers/network.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/serial.c -o ../obj/drivers/serial.o -fno-pie
@@ -39,8 +42,10 @@ ld -o ../bin/kernel.elf -Ttext 0x1000 ../obj/kernel_entry.o \
 ../obj/core/x86_idt.o \
 ../obj/core/vmem.o \
 ../obj/main.o \
+../obj/drivers/fs_backend/ramdisk.o \
 ../obj/drivers/basic_io.o \
 ../obj/drivers/display.o \
+../obj/drivers/filesystem.o \
 ../obj/drivers/keyboard.o \
 ../obj/drivers/network.o \
 ../obj/drivers/serial.o \
@@ -63,6 +68,6 @@ myfilesize=$(wc -c "../bin/kernel.bin" | awk '{print $1}')
 printf "final kernel image size: %d\n" $myfilesize
 if [ $myfilesize -gt 25000 ]
 then
-    printf "build error! kernel image is too big!\n"
+    printf "Build error!! kernel image will overwrite bootloader!\n"
     exit 1
 fi

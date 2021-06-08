@@ -5,6 +5,7 @@
 #include "../drivers/display.h"
 #include "../drivers/serial.h"
 #include "../drivers/tty.h"
+#include "../drivers/fs_backend/ramdisk.h"
 
 #include "../core/interrupt_handler.h"
 #include "../core/pic.h"
@@ -58,6 +59,10 @@ void kernel_init(void)
     /* initialize memory stuff */
     initialize_memory();
     vmem_init();
+
+    /* initialize the ramdisk */
+    ramdisk_tests();
+    init_disk_ramdisk(PHYS_BLOCK_SIZE * 10);
 
     //read_kb_scan_code();
     printf("kernel init\n");

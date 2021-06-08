@@ -86,11 +86,11 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 # Memory Layout
 
 - 0x1000    - Kernel Entry Point
+- 0x7c00    - Bootloader location
 - 0x8000    - BIOS Memory Map Size Location (bootsector/detectmem.asm)
 - 0x8004    - BIOS Memory Map Location (bootsector/detectmem.asm)
 - 0x80000   - Kernel Stack Start
-- 0x100000  - Identity Mapped Free Memory
-- 0x1000000 - Non-Identity Mapped Free Memory
+- 0x100000  - Identity Mapped Free Memory start
 
 # FAQ
 

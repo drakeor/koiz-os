@@ -25,4 +25,7 @@
 /* Show debug messages from vmem */
 #define DEBUG_MSG_VMEM
 
+/* Run tests for ramdisk */
+#define SELF_TEST_RAMDISK
+
 #endif

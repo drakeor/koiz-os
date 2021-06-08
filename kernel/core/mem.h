@@ -6,7 +6,7 @@
 /* Size of physical blocks of memory to give out */
 #define PHYS_BLOCK_SIZE 4096
 
-/* Direct mapped kernel page size */
+/* Direct mapped kernel page size. PROBABLY UNUSED NOW */
 #define IDENTITY_MAP_SIZE (1024 * 1024)
 
 uint32_t* pmem_alloc();

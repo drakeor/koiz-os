@@ -2,6 +2,8 @@
 use16
 
 ; Set global memory offset
+; This is the MBR which is loaded by the BIOS at physical address 0x7C00
+; Therefore, all our our operations need to be offset by that amount.
 org 0x7c00
 
 ; Memory offset where we'll load the kernel
