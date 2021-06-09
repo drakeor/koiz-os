@@ -34,18 +34,23 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Virtual to physical address translation functions (DONE)
 
-
 # In Progress Features
+
+- Ramdisk for virtual hard drive
+
+- FAT32 filesystem on ramdisk
+
+- File management
+
+- Userspace application in filesystem
+
+- Malloc 
+
+# Planned Features (in order of development)
 
 - Network Driver
 
 - PCI scanning
-
-# Planned Features (in order of development)
-
-- Malloc 
-
-- File management
 
 - Userspace application
 

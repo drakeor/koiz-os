@@ -62,7 +62,7 @@ void kernel_init(void)
 
     /* initialize the ramdisk */
     ramdisk_tests();
-    init_disk_ramdisk(PHYS_BLOCK_SIZE * 10);
+    ramdisk_init(PHYS_BLOCK_SIZE * 10);
 
     //read_kb_scan_code();
     printf("kernel init\n");
