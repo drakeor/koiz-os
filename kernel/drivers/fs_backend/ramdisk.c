@@ -6,7 +6,7 @@
 /* Global variables to hold the ramdisk */
 uint32_t ramdisk_block_size = 0;
 /* Todo: change this to double-pointer to avoid grossness later... */
-uint32_t* ramdisk_block_pointers = 0; 
+void** ramdisk_block_pointers = 0; 
 
 /* Size variables (in bytes) */
 const uint32_t sector_size = 512;
@@ -18,18 +18,21 @@ void ramdisk_init(uint32_t size_in_bytes)
 {
     /* Error checking */
     if(size_in_bytes == 0)
-        panic("init_disk_ramdisk: sizeInBytes cannot be zero!");
+        panic("init_disk_ramdisk: size_in_bytes cannot be zero!");
     if(size_in_bytes % PHYS_BLOCK_SIZE != 0)
-        panic("init_disk_ramdisk: sizeInBytes must be a factor of the blockSize!");
+        panic("init_disk_ramdisk: size_in_bytes must be a factor of the PHYS_BLOCK_SIZE!");
     if(ramdisk_block_size > 0)
         panic("init_disk_ramdisk: ramdisk already initialized!");
     if(ramdisk_block_pointers > 0)
         panic("init_disk_ramdisk: ramdisk_block_pointers already set!");
+    if(sizeof(void*) != 4)
+        panic("init_disk_ramdisk: init_disk_ramdisk can only work on 32-bit pointers");
+
 
     /* Currently, we only support cluster sizes being the same size as
        the block sizes */
     if(sector_size * sectors_per_cluster != PHYS_BLOCK_SIZE)
-        panic("init_disk_ramdisk: clustersize must be PHYS_BLOCK_SIZE ");
+        panic("init_disk_ramdisk: cluster size must be PHYS_BLOCK_SIZE ");
 
     /* Convert to block size */
     ramdisk_block_size = size_in_bytes / PHYS_BLOCK_SIZE;
@@ -40,7 +43,7 @@ void ramdisk_init(uint32_t size_in_bytes)
     ramdisk_block_pointers = pmem_alloc();
     int i;
     for(i = 0; i < ramdisk_block_size; i++) {
-        ramdisk_block_pointers[i] = (uint32_t)pmem_alloc();
+        *(ramdisk_block_pointers + i) = pmem_alloc();
     }
 }
 
@@ -55,7 +58,7 @@ void ramdisk_destroy()
     /* Free all the blocks in the list first */
     int i;
     for(i = 0; i < ramdisk_block_size; i++) {
-        pmem_free((uint32_t*)ramdisk_block_pointers[i]);
+        pmem_free(*(ramdisk_block_pointers + i));
     }
 
     /* Free the list itself last */
@@ -67,9 +70,21 @@ void ramdisk_destroy()
 }
 
 
-int ramdisk_write(uint32_t start_addr, uint8_t* data, uint32_t data_size)
+
+/** 
+ * ramdisk_internal_io() - performs an IO function to the ramdisk
+ * 
+ * @io_type:        0 = READ, 1 = WRITE
+ * @start_addr:     starting address of where to read the data
+ * @data:           pointer to where the data should be read into
+ * @data_size:      data size (in bytes) to write
+ * 
+ * returns 0 if it succeeds
+ */
+int ramdisk_internal_io(uint32_t io_type, uint32_t start_addr, 
+    uint8_t* data, uint32_t data_size)
 {
-    /* Error checking */
+     /* Error checking */
     if(ramdisk_block_size == 0)
         panic("init_disk_ramdisk: ramDisk is not initialized!");
     if(start_addr + data_size > ramdisk_block_size * PHYS_BLOCK_SIZE)
@@ -82,9 +97,16 @@ int ramdisk_write(uint32_t start_addr, uint8_t* data, uint32_t data_size)
     uint32_t old_block_number = UINT32_MAX;
 
 #ifdef DEBUG_MSG_RAMDISK
-        /* Debug message if we need to switch blocks */
-        printf("Writing into block %d at disk starting location %x...\n", (uint32_t)(start_addr / PHYS_BLOCK_SIZE), 
+    /* Debug message to say that we're currently writing into the ramdisk */
+    if(io_type == 0) {
+        printf("Reading from block %d at disk starting location 0x%x...\n", 
+            (uint32_t)(start_addr / PHYS_BLOCK_SIZE), 
             start_addr);
+    } else {
+        printf("Writing into block %d at disk starting location 0x%x...\n", 
+            (uint32_t)(start_addr / PHYS_BLOCK_SIZE), 
+            start_addr);
+    }
 #endif
 
     /* Since our ramdisk is distributed over multiple blocks in
@@ -98,38 +120,73 @@ int ramdisk_write(uint32_t start_addr, uint8_t* data, uint32_t data_size)
 #ifdef DEBUG_MSG_RAMDISK
         /* Debug message if we need to switch blocks */
         if(old_block_number != block_number) {
-            printf("Writing into block %x at block location %x...\n", block_number, 
-                ramdisk_block_pointers[block_number]);
+            if(io_type == 0) {
+                printf("Reading from block %x at block location 0x%x...\n", 
+                    block_number,     
+                    ramdisk_block_pointers[block_number]);
+            } else {
+                printf("Writing into block %x at block location 0x%x...\n", 
+                    block_number,     
+                    ramdisk_block_pointers[block_number]);
+            }
         }
 #endif
         uint32_t* current_page_addr = 
-            (uint32_t*)ramdisk_block_pointers[block_number];
-        
-        *(current_page_addr + offset) = data[i];
+                ramdisk_block_pointers[block_number];
+        /* Read into data */
+        if(io_type == 0) {
+            data[i] = *(current_page_addr + offset);
+        }
+        /* Write into data */
+        else {
+            *(current_page_addr + offset) = data[i];
+        }
+        /* Update current block number. Currently only used for debugging */
         old_block_number = block_number;
+
     }
 
     return 0;
 }
 
+int ramdisk_write(uint32_t start_addr, uint8_t* data, uint32_t data_size)
+{
+    return ramdisk_internal_io(1, start_addr, data, data_size);
+}
+
 int ramdisk_read(uint32_t start_addr, uint8_t* data, uint32_t data_size)
 {
-
+    return ramdisk_internal_io(0, start_addr, data, data_size);
 }
 
 void ramdisk_tests()
 {
 #ifdef SELF_TEST_RAMDISK
+    /* Variables we need for tests */
+    uint32_t i = 0;
+    int result = 0;
+        
+    /* Allocate a tmp page to write test data from */
+    uint32_t* tmp_page_write = pmem_alloc();
+    for(i = 0; i < PHYS_BLOCK_SIZE / 4; i++)
+        tmp_page_write[i] = i;
+
+    /* Allocate a tmp page to read test data to */
+    uint32_t* tmp_page_read = pmem_alloc();
+    for(i = 0; i < PHYS_BLOCK_SIZE / 4; i++)
+        tmp_page_read[i] = 0;
+
     printf("ramdisk: beginning self-tests\n");
 
-    /* Test 1 only allocates 2 blocks */
+    /* Test 1 only allocates 5 blocks */
     printf("ramdisk: running test 1...\n");
-    ramdisk_init(PHYS_BLOCK_SIZE * 2);
-    printf("ramdisk is at %x. block 1: %x. block 2: %x\n", 
+    ramdisk_init(PHYS_BLOCK_SIZE * 5);
+    printf("ramdisk is at %x. block 1: %x. block 5: %x\n", 
         ramdisk_block_pointers, 
         ramdisk_block_pointers[0], 
-        ramdisk_block_pointers[1]);
+        ramdisk_block_pointers[4]);
     ramdisk_destroy();
+
 
     /* Test 2 allocates 20 blocks */
     printf("ramdisk: running test 2...\n");
@@ -140,25 +197,57 @@ void ramdisk_tests()
         ramdisk_block_pointers[19]);
     ramdisk_destroy();
 
-    /* allocate a tmp page to write test data from */
-    uint32_t* tmp_page_write = pmem_alloc();
-    uint32_t i = 0;
-    int result = 0;
-    for(i = 0; i < PHYS_BLOCK_SIZE / 4; i++)
-        tmp_page_write[i] = i;
-
-    /* Test 3 to write to ramdisk */
+    /* 
+     * Test 3 to write to ramdisk spanning across 2 blocks 
+     */
     printf("ramdisk: running test 3...\n");
+
     ramdisk_init(PHYS_BLOCK_SIZE * 2);
-    result = ramdisk_write(PHYS_BLOCK_SIZE / 2, (uint8_t*)tmp_page_write, PHYS_BLOCK_SIZE);
+
+    result = ramdisk_write(PHYS_BLOCK_SIZE / 2, (uint8_t*)tmp_page_write, 
+        PHYS_BLOCK_SIZE);
     if(result != 0) {
         printf("ramdisk_write threw error code: %d\n", result);
         panic("test failed!");
     }
+
     ramdisk_destroy();
 
-    /* free our tmp page */
+
+    /* 
+     * Test 4 to read/write to ramdisk spanning across 2 blocks 
+     */
+    printf("ramdisk: running test 4...\n");
+
+    ramdisk_init(PHYS_BLOCK_SIZE * 2);
+
+    result = ramdisk_write(PHYS_BLOCK_SIZE / 2, (uint8_t*)tmp_page_write, 
+        PHYS_BLOCK_SIZE);
+    if(result != 0) {
+        printf("ramdisk_write threw error code: %d\n", result);
+        panic("test failed!");
+    }
+
+    result = ramdisk_read(PHYS_BLOCK_SIZE / 2, (uint8_t*)tmp_page_read, 
+        PHYS_BLOCK_SIZE);
+    if(result != 0) {
+        printf("ramdisk_read threw error code: %d\n", result);
+        panic("test failed!");
+    }
+
+    printf("ramdisk contents: \n");
+    for(i = 0; i < PHYS_BLOCK_SIZE / 4; i++) {
+        printf("%d : %d", i, tmp_page_read[i]);
+        if(tmp_page_read[i] != tmp_page_write[i])
+            panic("test failed!");
+    }
+    printf("\n");
+
+    ramdisk_destroy();
+
+    /* free our allocated tmp pages */
     pmem_free(tmp_page_write);
+    pmem_free(tmp_page_read);
 
     printf("ramdisk: finished self-tests\n");
 #endif
