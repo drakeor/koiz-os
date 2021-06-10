@@ -11,6 +11,10 @@ int get_offset_col(int offset) {
     return (offset - (get_offset_row(offset) * MAX_COLS * VCHAR_CELLSIZE)) / VCHAR_CELLSIZE; 
 }
 
+#ifdef USE_SOFTWARE_CURSOR
+    /* global variable for current cursor offset */
+    uint16_t software_cursor_offset = 0;
+#endif
 
 /*
  * Grabs the current cursor position from VGA ports
@@ -19,23 +23,31 @@ int get_offset_col(int offset) {
  */
 uint16_t get_cursor_offset(void)
 {
+#ifdef USE_SOFTWARE_CURSOR
+    return software_cursor_offset;
+#else
     io_byte_out(REG_SCREEN_CTRL, 14);
     uint16_t cur_offset = io_byte_in(REG_SCREEN_DATA);
     cur_offset <<= 8;
 
     io_byte_out(REG_SCREEN_CTRL, 15);
     cur_offset |= io_byte_in(REG_SCREEN_DATA);
-
     return cur_offset * VCHAR_CELLSIZE;
+#endif
 }
 
-/*
- * Sets cursor position
+/**
+ * set_cursor_offset() - Sets cursor position
+ * 
+ * @offset:            - offset to set the cursor at.
  */
 
 void set_cursor_offset(uint16_t offset)
 {
-    offset /= 2;
+#ifdef USE_SOFTWARE_CURSOR
+    software_cursor_offset = offset;
+#endif
+    offset /= VCHAR_CELLSIZE;
     io_byte_out(REG_SCREEN_CTRL, 14);
     io_byte_out(REG_SCREEN_DATA, (uint8_t)(offset >> 8));
     io_byte_out(REG_SCREEN_CTRL, 15);
@@ -43,12 +55,18 @@ void set_cursor_offset(uint16_t offset)
 }
 
 
-/* 
- * Prints an ASCII character at a screen position
- * Leave char_color at 0 to do default black on white
+/** 
+ * print_char() - internal helper method for printing a character
+ *
+ * @character:  - character to print
+ * @col:        - which column to print character
+ * @row:        - which row to print character
+ * @char_color  - Leave char_color at 0 to do default black on white
+ * 
  * Returns the new offset which is also the new position of the cursor
  */
-int print_char(uint8_t character, uint8_t col, uint8_t row, uint8_t char_color) {
+int 
+print_char(uint8_t character, uint8_t col, uint8_t row, uint8_t char_color) {
 
     uint8_t *vidmem = (uint8_t*) VIDEO_ADDRESS;
     
@@ -71,7 +89,7 @@ int print_char(uint8_t character, uint8_t col, uint8_t row, uint8_t char_color) 
     } else {
         vidmem[vidmem_offset] = character;
         vidmem[vidmem_offset+1] = char_color;
-        vidmem_offset += 2; 
+        vidmem_offset += VCHAR_CELLSIZE; 
     }
     
     /* Handle out of bounds by scrolling */
@@ -117,14 +135,14 @@ void kprint(char *message, uint8_t color)
     int offset = get_cursor_offset();
 
     int i=0;
-    while(message[i] != 0) {
+    while(message[i] != 0x0) {
 
         int row = get_offset_row(offset);
         int col = get_offset_col(offset);
 
         /* print each character. print_char will return the new cursor position */
         offset = print_char(message[i], col, row, color);
-
+        
         ++i;
     }
 }

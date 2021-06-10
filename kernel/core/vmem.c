@@ -71,7 +71,7 @@ uint32_t* vmem_get_phys_addr(uint32_t* proc_page_directory, uint32_t* virtual_ad
     /* Check if the entry in the page directory exists */
     if(proc_page_directory[page_dir_entry] == 0) {
 #ifdef DEBUG_MSG_VMEM
-        printf("vmem_get_phys_addr: page directory entry %d does not exist", page_dir_entry);
+        printf("vmem_get_phys_addr: page directory entry %d does not exist\n", page_dir_entry);
 #endif
         return 0;
     }
@@ -86,7 +86,7 @@ uint32_t* vmem_get_phys_addr(uint32_t* proc_page_directory, uint32_t* virtual_ad
     /* Check if the page table entry exists. If it does not, return 0 */
     if(page_table_addr[page_table_entry] == 0) {
 #ifdef DEBUG_MSG_VMEM
-        printf("vmem_get_phys_addr: page table entry %d does not exist", page_dir_entry);
+        printf("vmem_get_phys_addr: page table entry %d does not exist\n", page_dir_entry);
 #endif
         return 0;
     }
@@ -94,7 +94,7 @@ uint32_t* vmem_get_phys_addr(uint32_t* proc_page_directory, uint32_t* virtual_ad
     /* It exists, we'll process it into a physical address */
     uint32_t phys_addr = (page_table_addr[page_table_entry] & ~0xFFF) + ((uint32_t)virtual_addr & 0xFFF);
 #ifdef DEBUG_MSG_VMEM
-        printf("vmem_get_phys_addr: physical address for %x is %x", virtual_addr, phys_addr);
+        printf("vmem_get_phys_addr: physical address for %x is %x\n", virtual_addr, phys_addr);
 #endif 
     return (uint32_t*)phys_addr;
 }

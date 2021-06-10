@@ -40,6 +40,8 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - FAT32 filesystem on ramdisk
 
+- Make GRUB compatiable
+
 - File management
 
 - Userspace application in filesystem
@@ -90,10 +92,12 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 # Memory Layout
 
-- 0x1000    - Kernel Entry Point
+- 0x0000    - Free memory
+- 0x1000    - Old Kernel Entry Point
 - 0x7c00    - Bootloader location
 - 0x8000    - BIOS Memory Map Size Location (bootsector/detectmem.asm)
 - 0x8004    - BIOS Memory Map Location (bootsector/detectmem.asm)
+- 0x10000   - New Kernel Entry Point
 - 0x80000   - Kernel Stack Start
 - 0xb8000   - Video memory 
 - 0x100000  - Identity Mapped Free Memory start

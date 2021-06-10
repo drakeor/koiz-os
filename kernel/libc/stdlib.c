@@ -28,7 +28,7 @@ void std_print(char *message)
 void std_print_char(char message)
 {
 #ifdef USE_COM1_AS_LOG
-    write_serial_string(PORT_COM1, message);
+    write_serial(PORT_COM1, message);
 #endif 
     kprint_char(message, DEFAULT_TEXT_COLOR);
 }
