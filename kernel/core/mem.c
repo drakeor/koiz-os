@@ -217,8 +217,10 @@ int pmem_free(uint32_t* ptr)
     uint8_t* record_ptr = (uint8_t*)main_memory_start + record;
 
     /* Memory is already free */
-    if(*record_ptr == 0x0)
-        return -1;
+    if(*record_ptr == 0x0) {
+        printf("cannot free address %x", ptr);
+        panic("attempted to free memory that's already free!");
+    }
 
     /* Mark record as free */
     *record_ptr = 0x0;

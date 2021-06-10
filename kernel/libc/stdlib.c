@@ -17,7 +17,7 @@
 
 extern void load_idt(void);
 
-void print(char *message)
+void std_print(char *message)
 {
 #ifdef USE_COM1_AS_LOG
     write_serial_string(PORT_COM1, message);
@@ -25,7 +25,15 @@ void print(char *message)
     kprint(message, DEFAULT_TEXT_COLOR);
 }
 
-void error(char *message)
+void std_print_char(char message)
+{
+#ifdef USE_COM1_AS_LOG
+    write_serial_string(PORT_COM1, message);
+#endif 
+    kprint_char(message, DEFAULT_TEXT_COLOR);
+}
+
+void std_error(char *message)
 {
 #ifdef USE_COM1_AS_LOG
     write_serial_string(PORT_COM1, message);
@@ -39,10 +47,11 @@ void kernel_init(void)
     /* Test out our serial port */
     uint8_t serial_started = init_serial(PORT_COM1);
     if(serial_started != 0) {
-        print("error initializaing serial port COM1\n");
+        std_print("error initializaing serial port COM1\n");
+        panic("cannot initialize serial connection");
         return;
     }
-    print("using serial COM1 for logging serial...\n");
+    std_print("using serial COM1 for logging serial...\n");
     //write_serial_string(PORT_COM1, "using serial COM1 for logging\n");
 #endif
 
@@ -83,7 +92,7 @@ void clear_display(void)
 
 int printf_impl(char *format, va_list arg) 
 {
-    error("printf not yet implemented");
+    std_error("printf not yet implemented");
 }
 
 /*
@@ -93,19 +102,19 @@ void print_uint_to_string(unsigned int number, unsigned int base)
 {
     /* error checking */
     if(base > 16) {
-        error("printf base cannot be greater than 16!");
+        std_error("printf base cannot be greater than 16!");
         return;
     }
 
     /* handle printing different bases */
     if(base == 2)
-        kprint("0b", DEFAULT_TEXT_COLOR);
+        std_print("0b");
     if(base == 16)
-        kprint("0x", DEFAULT_TEXT_COLOR);
+        std_print("0x");
 
     /* if the number is 0, just print 0. save some processing */
     if(number == 0) {
-        kprint_char('0', DEFAULT_TEXT_COLOR);
+        std_print_char('0');
         return;
     }
 
@@ -125,7 +134,7 @@ void print_uint_to_string(unsigned int number, unsigned int base)
 
     int i;
     for(i = current_pos; i > 0; i--)
-        kprint_char(buffer[i-1], DEFAULT_TEXT_COLOR);
+        std_print_char(buffer[i-1]);
 }
 
 /*
@@ -134,9 +143,9 @@ void print_uint_to_string(unsigned int number, unsigned int base)
 __attribute__((__noreturn__))
 void panic(char *message)
 {
-    error("\n");
-    error("KERNEL PANIC: ");
-    error(message);
+    std_error("\n");
+    std_error("KERNEL PANIC: ");
+    std_error(message);
     while (1) { }
 	__builtin_unreachable();
 }
@@ -157,31 +166,31 @@ void printf(char *format, ...)
         /* Handle special characters */
         if(*format == '%') {
             if(*(format + 1) == '%') {
-                kprint_char('%', DEFAULT_TEXT_COLOR);
+                std_print_char('%');
             } else if(*(format + 1) == 's') {
                 char* subString = va_arg(arg, char*);
-                kprint(subString, DEFAULT_TEXT_COLOR);
+                std_print(subString);
             } else if(*(format + 1) == 'd') {
-                unsigned int num = va_arg(arg, unsigned int);
+                unsigned int num = va_arg(arg, uint32_t);
                 print_uint_to_string(num, 10);
             } else if(*(format + 1) == 'x') {
-                unsigned int num = va_arg(arg, unsigned int);
+                unsigned int num = va_arg(arg, uint32_t);
                 print_uint_to_string(num, 16);
             } else if(*(format + 1) == 'b') {
-                unsigned int num = va_arg(arg, unsigned int);
+                unsigned int num = va_arg(arg, uint32_t);
                 print_uint_to_string(num, 2);
             } else if(*(format + 1) == '\0') {
-                error("printf error: next character is null");
+                std_error("printf error: next character is null");
                 break;
             } else {
-                error("printf error: Unknown escape sequence %");
-                kprint_char(*(format + 1), DEFAULT_TEXT_COLOR);
+                std_error("printf error: Unknown escape sequence %");
+                std_print_char(*(format + 1));
                 break;
             }
             format++;
         /* Simply print the next character */
         } else {
-            kprint_char(*format, DEFAULT_TEXT_COLOR);
+            std_print_char(*format);
         }
 
         // Move to the next character

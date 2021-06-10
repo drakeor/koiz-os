@@ -27,6 +27,7 @@ mkdir -p logs
 # Run in QEMU
 echo "waiting for gdb debugger"
 qemu-system-x86_64 -fda bin/koizos-img.bin -device rtl8139 -serial file:logs/serial.log -s -S &
+# qemu-system-x86_64 -fda bin/koizos-img.bin -device rtl8139 -serial stdio -s -S &
 pid=$!
 gdb -x ./gdbcmds
 kill $pid

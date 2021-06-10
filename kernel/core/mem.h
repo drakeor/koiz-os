@@ -9,6 +9,7 @@
 /* Direct mapped kernel page size. PROBABLY UNUSED NOW */
 #define IDENTITY_MAP_SIZE (1024 * 1024)
 
+/* NOTE that the memory block returned is NOT guaranteed to be zero'd out! */
 uint32_t* pmem_alloc();
 
 int pmem_free(uint32_t* ptr);

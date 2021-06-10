@@ -1,5 +1,6 @@
 #include "display.h"
 #include "basic_io.h"
+#include "serial.h"
 
 /* Helper functions for translating offsets */
 int get_offset(int col, int row) { return (row * MAX_COLS + col) * VCHAR_CELLSIZE; }

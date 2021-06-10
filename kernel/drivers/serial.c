@@ -116,7 +116,8 @@ uint8_t write_serial_string(uint16_t port, char* data)
  */
 uint8_t write_serial_noblock(uint16_t port, uint8_t data)
 {
-
+    io_byte_out(port, data);
+    return 0;
 }
 
 /*

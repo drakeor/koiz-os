@@ -95,6 +95,7 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 - 0x8000    - BIOS Memory Map Size Location (bootsector/detectmem.asm)
 - 0x8004    - BIOS Memory Map Location (bootsector/detectmem.asm)
 - 0x80000   - Kernel Stack Start
+- 0xb8000   - Video memory 
 - 0x100000  - Identity Mapped Free Memory start
 
 # FAQ

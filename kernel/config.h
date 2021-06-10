@@ -14,7 +14,7 @@
 #define DEBUG_MSG_MEMORYMAP
 
 /* Run tests for pmem. Note that this test takes a while! */
-//#define SELF_TEST_PMEM
+#define SELF_TEST_PMEM
 
 /* Show debug messages for pmem */
 //#define DEBUG_MSG_PMEM

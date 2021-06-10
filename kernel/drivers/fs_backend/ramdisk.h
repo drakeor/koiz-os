@@ -6,6 +6,9 @@
 /* ramdisk errors */
 #define RAMDISK_ERROR_OUT_OF_BOUNDS 1
 #define RAMDISK_ERROR_OVERFLOW      2
+#define RAMDISK_ERROR_READ          3
+#define RAMDISK_ERROR_WRITE         4
+
 
 /** 
  * init_disk_ramdisk() - initializes a ramdisk with a given size
