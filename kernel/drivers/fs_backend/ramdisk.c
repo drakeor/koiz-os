@@ -121,17 +121,19 @@ int ramdisk_internal_io(uint32_t io_type, uint32_t start_addr,
         /* Debug message if we need to switch blocks */
         if(old_block_number != block_number) {
             if(io_type == 0) {
-                printf("Reading from block %x at block location %x...\n", 
+                printf("Reading from block %x at block location %x + %x...\n", 
                     block_number,     
-                    ramdisk_block_pointers[block_number]);
+                    ramdisk_block_pointers[block_number],
+                    offset);
             } else {
-                printf("Writing into block %x at block location %x...\n", 
+                printf("Writing into block %x at block location %x + %x...\n", 
                     block_number,     
-                    ramdisk_block_pointers[block_number]);
+                    ramdisk_block_pointers[block_number],
+                    offset);
             }
         }
 #endif
-        uint32_t* current_page_addr = 
+        uint8_t* current_page_addr = 
                 ramdisk_block_pointers[block_number];
         /* Read into data */
         if(io_type == 0) {
@@ -235,11 +237,11 @@ void ramdisk_tests()
         panic("test failed!");
     }
 
-    printf("ramdisk contents: \n");
     for(i = 0; i < PHYS_BLOCK_SIZE / 4; i++) {
-        printf("%d : %d = %d", i, tmp_page_read[i], tmp_page_write[i]);
-        if(tmp_page_read[i] != tmp_page_write[i])
+        if(tmp_page_read[i] != tmp_page_write[i]) {
+            printf("%d : %d = %d", i, tmp_page_read[i], tmp_page_write[i]);
             panic("test failed!");
+        }
     }
     printf("\n");
 
