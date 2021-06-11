@@ -8,7 +8,7 @@ uint32_t test3;
 uint32_t test2;
 uint32_t test;
 
-void main () 
+void kernel_main () 
 {
     kernel_init();
 

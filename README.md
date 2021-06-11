@@ -1,6 +1,6 @@
 # KoiZ Operating System
 
-Built mostly as a pet project. It's an x86_64 based general operating system built in C, Rust and ASM.
+Built mostly as a pet project. It's an x86_64 based general operating system built in C and ASM.
 
 It currently only runs in 32-bit since I don't have all the code setup for 64-bit. 
 
@@ -75,7 +75,9 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - GCC (Supports at least C99 standard)
 
-- LD
+- grub (apt-get install grub grub-pc-bin)
+
+- xorriso (apt-get install xorriso)
 
 
 # Running
