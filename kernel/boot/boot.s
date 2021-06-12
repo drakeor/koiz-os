@@ -37,7 +37,7 @@ undefined behavior.
 stack_bottom:
 .skip 16384 # 16 KiB
 stack_top:
- 
+
 /*
 The linker script specifies _start as the entry point to the kernel and the
 bootloader will jump to this position once the kernel has been loaded. It
@@ -59,7 +59,7 @@ _start:
 	itself. It has absolute and complete power over the
 	machine.
 	*/
- 
+
 	/*
 	To set up a stack, we set the esp register to point to the top of the
 	stack (as it grows downwards on x86 systems). This is necessarily done

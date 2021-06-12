@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "stdarg.h": "c"
+        "stdarg.h": "c",
+        "ramdisk.h": "c"
     }
 }

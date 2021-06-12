@@ -5,6 +5,8 @@ mkdir -p ../bin
 mkdir -p ../obj
 mkdir -p ../obj/drivers
 mkdir -p ../obj/drivers/io
+mkdir -p ../obj/drivers/irq
+mkdir -p ../obj/drivers/memory
 mkdir -p ../obj/drivers/serial
 mkdir -p ../obj/drivers/video
 mkdir -p ../obj/libc
@@ -15,13 +17,15 @@ as --32 -nostdlib boot/boot.s -o ../obj/boot/boot.o
 # Build our custom kernel entry executable
 echo "compiling 32-bit kernel asm code"
 #fasm.x64 kernel_entry.asm ../obj/kernel_entry.o
-fasm.x64 core/x86_pagedir.asm ../obj/core/x86_pagedir.o
-fasm.x64 core/x86_idt.asm ../obj/core/x86_idt.o
+#fasm.x64 core/x86_pagedir.asm ../obj/core/x86_pagedir.o
+fasm.x64 drivers/irq/x86_idt.asm ../obj/drivers/irq/x86_idt.o
 
 # Compile the kernel
 echo "compiling 32-bit kernel c code"
 gcc -g -m32 -ffreestanding -mno-red-zone -c kernel_main.c -o ../obj/kernel_main.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/io/basic_io.c -o ../obj/drivers/io/basic_io.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/irq/interrupt_handler.c -o ../obj/drivers/irq/interrupt_handler.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/memory/gdt.c -o ../obj/drivers/memory/gdt.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/serial/serial.c -o ../obj/drivers/serial/serial.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/video/vga.c -o ../obj/drivers/video/vga.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c libc/stdlib.c -o ../obj/libc/stdlib.o -fno-pie
@@ -32,6 +36,9 @@ echo "linking 32-bit kernel"
 gcc -T linker.ld -o ../bin/koizos-grub.bin -ffreestanding -nostdlib -m32 \
 ../obj/boot/boot.o \
 ../obj/drivers/io/basic_io.o \
+../obj/drivers/irq/x86_idt.o \
+../obj/drivers/irq/interrupt_handler.o \
+../obj/drivers/memory/gdt.o \
 ../obj/drivers/serial/serial.o \
 ../obj/drivers/video/vga.o \
 ../obj/libc/stdlib.o \

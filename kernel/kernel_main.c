@@ -5,9 +5,12 @@
 
 /* Include for PORT_COM1 stuff */ 
 #include "drivers/serial/serial.h"
+#include "drivers/irq/interrupt_handler.h"
 
 /* Include our standard library */
 #include "libc/stdlib.h"
+
+extern void load_idt(void);
 
 void kernel_init(void)
 {
@@ -20,6 +23,12 @@ void kernel_init(void)
         return;
     }
     printf("using serial COM1 for logging serial...\n");
+
+    /* Setup Load our IDT */
+    load_idt();
+
+    /* Run self tests */
+    //self_test_idt();
 }
 
 void kernel_update(void)
