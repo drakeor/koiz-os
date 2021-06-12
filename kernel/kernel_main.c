@@ -5,7 +5,7 @@
 
 /* Include for PORT_COM1 stuff */ 
 #include "drivers/serial/serial.h"
-#include "drivers/irq/interrupt_handler.h"
+#include "drivers/irq/idt_setup.h"
 
 /* Include our standard library */
 #include "libc/stdlib.h"

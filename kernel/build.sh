@@ -20,13 +20,13 @@ fasm.x64 boot/gdt.asm ../obj/boot/gdt.o
 echo "compiling 32-bit kernel asm code"
 #fasm.x64 kernel_entry.asm ../obj/kernel_entry.o
 #fasm.x64 core/x86_pagedir.asm ../obj/core/x86_pagedir.o
-fasm.x64 drivers/irq/x86_idt.asm ../obj/drivers/irq/x86_idt.o
+fasm.x64 drivers/irq/interrupt_handler.asm ../obj/drivers/irq/interrupt_handler.o
 
 # Compile the kernel
 echo "compiling 32-bit kernel c code"
 gcc -g -m32 -ffreestanding -mno-red-zone -c kernel_main.c -o ../obj/kernel_main.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/io/basic_io.c -o ../obj/drivers/io/basic_io.o -fno-pie
-gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/irq/interrupt_handler.c -o ../obj/drivers/irq/interrupt_handler.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/irq/idt_setup.c -o ../obj/drivers/irq/idt_setup.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/serial/serial.c -o ../obj/drivers/serial/serial.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/video/vga.c -o ../obj/drivers/video/vga.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c libc/stdlib.c -o ../obj/libc/stdlib.o -fno-pie
@@ -38,7 +38,7 @@ gcc -T linker.ld -o ../bin/koizos-grub.bin -ffreestanding -nostdlib -m32 \
 ../obj/boot/boot.o \
 ../obj/boot/gdt.o \
 ../obj/drivers/io/basic_io.o \
-../obj/drivers/irq/x86_idt.o \
+../obj/drivers/irq/idt_setup.o \
 ../obj/drivers/irq/interrupt_handler.o \
 ../obj/drivers/serial/serial.o \
 ../obj/drivers/video/vga.o \

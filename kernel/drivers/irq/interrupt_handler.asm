@@ -56,22 +56,31 @@ section '.text' executable
 
     extrn printf
     extrn interrupt_handler
-    extrn setup_idt
+    extrn _setup_idt
     extrn panic
 
     ;extrn keyboard_int_handler
 
-    ; at this point the stack should contain [esp + 4] -> first entry in EDT
-    ; [esp] -> the return address    
+    ; load_idt() - Loads the IDT and enables interrupts
+    ; 
+    ; Note that at this point the stack should contain 
+    ; [esp + 4] -> first entry in EDT
+    ; [esp]     -> the return address    
     load_idt:
         PUSHAD
 
-        call setup_idt
+        ; This function will populate the IDT table
+        call _setup_idt
+
+        ; Load in the IDT table
         lidt [idt_info]
 
         POPAD
         ret
 
+    ; common_interrupt_handler() - This is called for every interrupt
+    ; 
+    ; This function then delegates the interrupt to the appropiate handler
     common_interrupt_handler:
 
         ; Disable interrupts
@@ -173,7 +182,8 @@ section '.text' executable
         ; Re-enable interrupts
         sti
 
-        ; We need to use iret to return from 
+        ; We need to use iret to return from instead of ret
+        ; since we're in an interrupt
         iret
 
     ; Once I figure out FASMs macro system for loops I'll change this

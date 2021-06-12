@@ -1,4 +1,4 @@
-#include "interrupt_handler.h"
+#include "idt_setup.h"
 #include "../../libc/stdlib.h"
 
 #include "../../config/config.h"
@@ -14,12 +14,14 @@ struct interrupt_descriptor_t {
   uint16_t offset_high;
 } __attribute__((packed));
 
+/* Holds all of our interrupts */
 extern struct interrupt_descriptor_t idt_start[INTERRUPT_COUNT];
 
 /* For debug */
 extern uint32_t idt_info;
 
 /* Specific interrupt handlers */
+/* The ISRs are populated in assembly (x86_idt.asm) */
 extern uintptr_t isr_0;
 extern uintptr_t isr_1;
 extern uintptr_t isr_2;
@@ -76,7 +78,7 @@ extern uintptr_t isr_50;
  * This function populates the interrupt descriptor table
  * It's allocated in assembly
  */
-void setup_idt(void)
+void _setup_idt(void)
 {
 #ifdef DEBUG_MSG_INTERRUPTS
     printf("IDT Info %x!\n", &idt_info);
