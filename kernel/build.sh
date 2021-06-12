@@ -12,7 +12,8 @@ mkdir -p ../obj/drivers/video
 mkdir -p ../obj/libc
 
 echo "compiling boot asm code"
-as --32 -nostdlib boot/boot.s -o ../obj/boot/boot.o
+#as --32 -nostdlib boot/boot.s -o ../obj/boot/boot.o
+fasm.x64 boot/boot.asm ../obj/boot/boot.o
 
 # Build our custom kernel entry executable
 echo "compiling 32-bit kernel asm code"
