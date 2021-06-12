@@ -59,6 +59,11 @@ section '.text'
         ; Here we initialize the GDT and paging
         lgdt [gdt_descriptor]
 
+        ; Execute farjump to the next segment
+        ; We NEED to do this to prevent a GPF
+        jmp CODE_SEG:continue_after_gdt
+
+    continue_after_gdt:
         ; Remember that our old segments are useless now
         ; Use DATA_SEG from gdt.asm
         mov ax, DATA_SEG

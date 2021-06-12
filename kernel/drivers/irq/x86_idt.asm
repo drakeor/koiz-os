@@ -150,11 +150,13 @@ section '.text' executable
         HLT
         jmp .resume
 
-    ; Clean up after interrupt
+    ; Continue processing and print the message
+    ; Falls through to clean-up
     .resume:
         cmp ebx, 1
         jne .do_not_print
         ccall printf, msg, [edi], [ecx]
+    ; Clean up after interrupt
     .do_not_print:
         ; Restore registers
         popd ebp
@@ -230,7 +232,7 @@ section '.text' executable
 
 
 
-section '.rodata'
+section '.bss'
     msg db "Handling Interrupt %x. Error code: %x",0xA,0
     pagefault_msg db "Page fault address: %x",0xA,0
     panicmsg db "Interrupt is non-recoverable!",0xA,0

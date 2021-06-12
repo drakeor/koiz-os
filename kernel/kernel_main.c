@@ -28,7 +28,7 @@ void kernel_init(void)
     load_idt();
 
     /* Run self tests */
-    //self_test_idt();
+    self_test_idt();
 }
 
 void kernel_update(void)
