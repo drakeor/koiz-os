@@ -13,7 +13,13 @@ void kernel_init(void)
 {
     /* Initialize the serial connection right away */
     /* We use this for logging messagse in stdlib.h */
-    init_serial(PORT_COM1);
+    uint8_t serial_started = serial_init(PORT_COM1);
+    if(serial_started != SERIAL_SUCCESS) {
+        printf("error initializaing serial port COM1\n");
+        panic("cannot initialize serial connection");
+        return;
+    }
+    printf("using serial COM1 for logging serial...\n");
 }
 
 void kernel_update(void)

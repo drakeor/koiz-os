@@ -11,8 +11,14 @@
  * - Number of bits that represent a unit of data
  */
 
-uint8_t init_serial(uint16_t port) 
+uint8_t is_serial_connected = 0;
+
+uint8_t serial_init(uint16_t port) 
 {
+    /* Check if we're already connected */
+    if(is_serial_connected)
+        return SERIAL_ERROR_ALREADY_CONNECTED;
+
     /* Disable interrupts */
     io_byte_out(port + 1, 0x00);
     
@@ -72,68 +78,54 @@ uint8_t init_serial(uint16_t port)
      */
     io_byte_out(port, 0xAE);
     if(io_byte_in(port) != 0xAE)
-        return 1;
+        return SERIAL_ERROR_CONNECTION_FAILED;
 
     /*
      * Awesome, if our serial chip works
      * Reconfigure our modem to work normally
      */
     io_byte_out(port + 4, 0x0F);
-    return 0;
+    is_serial_connected = 1;
+    return SERIAL_SUCCESS;
 }
 
-uint8_t is_transmit_empty(uint16_t port) 
+uint8_t serial_is_connected()
+{
+    return is_serial_connected;
+}
+
+uint8_t serial_is_transmit_empty(uint16_t port) 
 {
    return io_byte_in(port + 5) & 0x20;
 }
 
-/*
- * Writes a byte of data to the specified serial port
- * Blocks until the pipeline is free
- */
-uint8_t write_serial(uint16_t port, uint8_t data)
+void serial_write(uint16_t port, uint8_t data)
 {
-    while(is_transmit_empty(port) == 0);
+    /* Block until free */
+    while(serial_is_transmit_empty(port) == 0);
     io_byte_out(port, data);
-    return 0;
 }
 
 
-uint8_t write_serial_string(uint16_t port, char* data)
+void serial_write_string(uint16_t port, char* data)
 {
     int i = 0;
     while(data[i] != 0x0) {
-        write_serial(port, data[i]);
+        serial_write(port, data[i]);
         i++;
     }
-    return 0;
 }
 
-
-/*
- * Writes a byte of data to the specified serial port
- * Note that is_transit_empty should be 1 prior.
- */
-uint8_t write_serial_noblock(uint16_t port, uint8_t data)
+void serial_write_noblock(uint16_t port, uint8_t data)
 {
     io_byte_out(port, data);
-    return 0;
 }
 
-/*
- * Indicates whether there's currently data for us to read on the port
- */
 uint8_t serial_received(uint16_t port) {
    return io_byte_in(port + 5) & 1;
 }
 
-/*
- * Reads a byte off the port.
- * Will return 0 if nothing is recieved.
- * Since this could not be intended behaviour, you should check serial_recieved
- * prior to calling this function
- */
-uint8_t read_serial(uint16_t port)
+uint8_t serial_read(uint16_t port)
 {
     if(serial_received(port) == 0)
         return 0;

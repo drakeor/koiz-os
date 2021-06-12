@@ -16,7 +16,7 @@
 void std_print(char *message)
 {
 #ifdef LOG_ALL_MESSAGES_TO_SERIAL
-    write_serial_string(PORT_COM1, message);
+    serial_write_string(PORT_COM1, message);
 #endif 
     vga_print_screen(message, DEFAULT_TEXT_COLOR);
 }
@@ -24,7 +24,7 @@ void std_print(char *message)
 void std_print_char(char message)
 {
 #ifdef LOG_ALL_MESSAGES_TO_SERIAL
-    write_serial(PORT_COM1, message);
+    serial_write(PORT_COM1, message);
 #endif 
     vga_print_screen_char(message, DEFAULT_TEXT_COLOR);
 }
@@ -32,7 +32,7 @@ void std_print_char(char message)
 void std_error(char *message)
 {
 #ifdef LOG_ALL_MESSAGES_TO_SERIAL
-    write_serial_string(PORT_COM1, message);
+    serial_write_string(PORT_COM1, message);
 #endif 
     vga_print_screen(message, DEFAULT_ERROR_COLOR);
 }
