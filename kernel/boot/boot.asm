@@ -37,6 +37,8 @@ section '.bss' align 16
     stack_bottom:
     rb 16384
     stack_top:
+    ; Include GDT in this section
+    include 'gdt.asm'
 
 ; The linker script we built in linker.ld specifies _start as the entry
 ; point to the kernel. The bootloader jumps to this once the kernel is loaded.
@@ -55,6 +57,18 @@ section '.text'
         mov [stack_top], esp
 
         ; Here we initialize the GDT and paging
+        lgdt [gdt_descriptor]
+
+        ; Remember that our old segments are useless now
+        ; Use DATA_SEG from gdt.asm
+        mov ax, DATA_SEG
+
+        ; Point segment registers to what we defined in the GDT
+        mov ds, ax
+        mov ss, ax 
+        mov es, ax
+        mov fs, ax
+        mov gs, ax
 
         ; Finally, enter the high-level kernel
         call kernel_main
