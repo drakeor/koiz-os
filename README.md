@@ -34,13 +34,15 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Virtual to physical address translation functions (DONE)
 
+- Ramdisk for virtual hard drive (DONE)
+
 # In Progress Features
 
-- Ramdisk for virtual hard drive
-
-- FAT32 filesystem on ramdisk
+- Huge refactor for Kernel / GRUB
 
 - Make GRUB compatiable
+
+- FAT32 filesystem on ramdisk
 
 - File management
 

@@ -1,40 +1,98 @@
 #include "stdlib.h"
+#include "stdarg.h"
 
-#include <stdarg.h>
+#include "../config.h"
+#include "../drivers/display.h"
+#include "../drivers/serial.h"
+#include "../drivers/tty.h"
+#include "../drivers/fs_backend/ramdisk.h"
 
-#include "../drivers/video/vga.h"
-#include "../drivers/serial/serial.h"
+#include "../core/interrupt_handler.h"
+#include "../core/pic.h"
+#include "../core/mem.h"
+#include "../core/vmem.h"
 
-/* Constants to help us */
-#define PRINTF_BUFFER_SIZE 32
 #define DEFAULT_TEXT_COLOR 0x0F
 #define DEFAULT_ERROR_COLOR 0x05
 
-/* Comment out to disable serial port logging */
-#define LOG_ALL_MESSAGES_TO_SERIAL
+extern void load_idt(void);
 
 void std_print(char *message)
 {
-#ifdef LOG_ALL_MESSAGES_TO_SERIAL
+#ifdef USE_COM1_AS_LOG
     write_serial_string(PORT_COM1, message);
 #endif 
-    vga_print_screen(message, DEFAULT_TEXT_COLOR);
+    kprint(message, DEFAULT_TEXT_COLOR);
 }
 
 void std_print_char(char message)
 {
-#ifdef LOG_ALL_MESSAGES_TO_SERIAL
+#ifdef USE_COM1_AS_LOG
     write_serial(PORT_COM1, message);
 #endif 
-    vga_print_screen_char(message, DEFAULT_TEXT_COLOR);
+    kprint_char(message, DEFAULT_TEXT_COLOR);
 }
 
 void std_error(char *message)
 {
-#ifdef LOG_ALL_MESSAGES_TO_SERIAL
+#ifdef USE_COM1_AS_LOG
     write_serial_string(PORT_COM1, message);
 #endif 
-    vga_print_screen(message, DEFAULT_ERROR_COLOR);
+    kprint(message, DEFAULT_ERROR_COLOR);
+}
+
+void kernel_init(void)
+{
+#ifdef USE_COM1_AS_LOG
+    /* Test out our serial port */
+    uint8_t serial_started = init_serial(PORT_COM1);
+    if(serial_started != 0) {
+        std_print("error initializaing serial port COM1\n");
+        panic("cannot initialize serial connection");
+        return;
+    }
+    std_print("using serial COM1 for logging serial...\n");
+    //write_serial_string(PORT_COM1, "using serial COM1 for logging\n");
+#endif
+
+    /* Setup Load our IDT */
+    load_idt();
+
+    /* Run self tests */
+    self_test_idt();
+
+    /* Load PIC stuff */
+    PIC_remap();
+    PIC_set_interrupt_masks();
+
+    /* initialize memory stuff */
+    initialize_memory();
+    vmem_init();
+
+    /* initialize the ramdisk */
+    ramdisk_tests();
+    ramdisk_init(PHYS_BLOCK_SIZE * 10);
+
+    //read_kb_scan_code();
+    printf("kernel init\n");
+
+    /* Initialize the terminal last */
+    init_tty();
+}
+
+void kernel_update(void)
+{
+    tty_update();
+}
+
+void clear_display(void)
+{
+    kclear_screen();
+}
+
+int printf_impl(char *format, va_list arg) 
+{
+    std_error("printf not yet implemented");
 }
 
 /*
@@ -64,20 +122,20 @@ void print_uint_to_string(unsigned int number, unsigned int base)
      * otherwise convert the number into a string.
      * it'll be in reverse order so print it in reverse.
      */
-    char buffer[PRINTF_BUFFER_SIZE];
+    const int buffer_size = 32;
+    char buffer[buffer_size];
     int current_pos = 0;
     const char numtochar[] = "0123456789ABCDEF";
     do {
         buffer[current_pos] = numtochar[number % base];
         number /= base;
         ++current_pos;
-    } while(number != 0 && current_pos < PRINTF_BUFFER_SIZE);
+    } while(number != 0 && current_pos < buffer_size);
 
     int i;
     for(i = current_pos; i > 0; i--)
         std_print_char(buffer[i-1]);
 }
-
 
 /*
  * Panic function

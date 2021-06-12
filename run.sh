@@ -8,22 +8,10 @@ fi
 
 #export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0
 
-# Build bootsector (Obsolete, replaced by GRUB)
-#cd bootsector
-#./build.sh
-#cd ..
 # Build kernel
-#cd kernel
-#./build.sh
-#cd ..
-
-# Build kernel (GRUB)
 cd kernel
-./build_grub.sh
+./build.sh
 cd ..
-
-# Combine them
-#cat bin/bootsect.bin bin/kernel.bin > bin/koizos-img.bin
 
 # Add log director
 mkdir -p logs

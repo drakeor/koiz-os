@@ -3,18 +3,14 @@
 # Make sure these folders exist
 mkdir -p ../bin
 mkdir -p ../obj
-mkdir -p ../obj/boot
 mkdir -p ../obj/core
 mkdir -p ../obj/drivers
 mkdir -p ../obj/drivers/fs_backend
 mkdir -p ../obj/libc
 
-echo "compiling boot asm code"
-as --32 -nostdlib boot/boot.s -o ../obj/boot/boot.o
-
 # Build our custom kernel entry executable
 echo "compiling 32-bit kernel asm code"
-#fasm.x64 kernel_entry.asm ../obj/kernel_entry.o
+fasm.x64 kernel_entry.asm ../obj/kernel_entry.o
 fasm.x64 core/x86_pagedir.asm ../obj/core/x86_pagedir.o
 fasm.x64 core/x86_idt.asm ../obj/core/x86_idt.o
 
@@ -36,10 +32,9 @@ gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/tty.c -o ../obj/drivers/tty.
 gcc -g -m32 -ffreestanding -mno-red-zone -c libc/stdlib.c -o ../obj/libc/stdlib.o -fno-pie
 
 # Link everything together
-# It is IMPORTANT that boot.o is first!!
+# It is IMPORTANT that KERNEL_ENTRY.O is first!!
 echo "linking 32-bit kernel"
-gcc -T linker.ld -o ../bin/koizos-grub.bin -ffreestanding -nostdlib -m32 \
-../obj/boot/boot.o \
+ld -o ../bin/kernel.elf -Ttext 0x1000 ../obj/kernel_entry.o \
 ../obj/core/interrupt_handler.o \
 ../obj/core/mem.o \
 ../obj/core/pic.o \
@@ -56,48 +51,23 @@ gcc -T linker.ld -o ../bin/koizos-grub.bin -ffreestanding -nostdlib -m32 \
 ../obj/drivers/serial.o \
 ../obj/drivers/tty.o \
 ../obj/libc/stdlib.o \
-
+-m elf_i386
 #--oformat binary 
 
 # Get rid of the annoying GNU section that bloats this file
-#cp ../bin/kernel.elf ../bin/kernel2.elf
-#strip --remove-section=.note.gnu.property ../bin/kernel2.elf
+cp ../bin/kernel.elf ../bin/kernel2.elf
+strip --remove-section=.note.gnu.property ../bin/kernel2.elf
 
 # Copy across elf file to bin
 # We use the elf file for debugging
-#objcopy -O binary ../bin/kernel2.elf ../bin/kernel.bin
+objcopy -O binary ../bin/kernel2.elf ../bin/kernel.bin
 
 # Verify the filesize is under 25KiB (So it doesn't overwrite the bootloader)
 # Memory kernel occupies is 0x1000 - 0x7BFF
-#myfilesize=$(wc -c "../bin/kernel.bin" | awk '{print $1}')
-#printf "final kernel image size: %d\n" $myfilesize
-#if [ $myfilesize -gt 25000 ]
-#then
-#    printf "Build error!! kernel image will overwrite bootloader!\n"
-#    exit 1
-#fi
-
-# Ensure that the final image is a grub multiboot file
-grub-file --is-x86-multiboot ../bin/koizos-grub.bin
-if [ $? -ne 0 ]
-then
-    printf "kernel image is not a multiboot grub file!\n"
-    exit 1
-else
-    printf "kernel image is a valid multiboot grub file\n"
-fi
-
-# Print final image size
-myfilesize=$(wc -c "../bin/koizos-grub.bin" | awk '{print $1}')
+myfilesize=$(wc -c "../bin/kernel.bin" | awk '{print $1}')
 printf "final kernel image size: %d\n" $myfilesize
-
-# Build iso image
-printf "Building ISO image\n"
-mkdir -p ../bin/isodir/boot/grub
-cp ../bin/koizos-grub.bin ../bin/isodir/boot/koizos.bin
-cp boot/grub.cfg ../bin/isodir/boot/grub/grub.cfg
-grub-mkrescue -o ../bin/koizos.iso ../bin/isodir
-
-# Print final iso image size
-myfilesize=$(wc -c "../bin/koizos.iso" | awk '{print $1}')
-printf "final iso image size: %d\n" $myfilesize
+if [ $myfilesize -gt 25000 ]
+then
+    printf "Build error!! kernel image will overwrite bootloader!\n"
+    exit 1
+fi
