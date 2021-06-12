@@ -37,8 +37,6 @@ section '.bss' align 16
     stack_bottom:
     rb 16384
     stack_top:
-    ; Include GDT in this section
-    include 'gdt.asm'
 
 ; The linker script we built in linker.ld specifies _start as the entry
 ; point to the kernel. The bootloader jumps to this once the kernel is loaded.
@@ -46,6 +44,7 @@ section '.bss' align 16
 ; at this point.
 section '.text'
     extrn kernel_main
+    extrn _init_gdt
     public _start
     _start:
         ; At this point, the bootloader has us in 32-bit protected mode
@@ -56,24 +55,8 @@ section '.text'
         ; The first thing we want to do is set up the stack.
         mov [stack_top], esp
 
-        ; Here we initialize the GDT and paging
-        lgdt [gdt_descriptor]
-
-        ; Execute farjump to the next segment
-        ; We NEED to do this to prevent a GPF
-        jmp CODE_SEG:continue_after_gdt
-
-    continue_after_gdt:
-        ; Remember that our old segments are useless now
-        ; Use DATA_SEG from gdt.asm
-        mov ax, DATA_SEG
-
-        ; Point segment registers to what we defined in the GDT
-        mov ds, ax
-        mov ss, ax 
-        mov es, ax
-        mov fs, ax
-        mov gs, ax
+        ; Initialize gdt
+        call _init_gdt
 
         ; Finally, enter the high-level kernel
         call kernel_main
