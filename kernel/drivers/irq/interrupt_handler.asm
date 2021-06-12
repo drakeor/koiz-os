@@ -51,7 +51,7 @@ include '../../libc/ccall.inc'
 
 section '.text' executable
 
-    public load_idt
+    public load_and_enable_interrupts
     public common_interrupt_handler
 
     extrn printf
@@ -61,12 +61,12 @@ section '.text' executable
 
     ;extrn keyboard_int_handler
 
-    ; load_idt() - Loads the IDT and enables interrupts
+    ; load_and_enable_interrupts() - Loads the IDT and enables interrupts
     ; 
     ; Note that at this point the stack should contain 
     ; [esp + 4] -> first entry in EDT
     ; [esp]     -> the return address    
-    load_idt:
+    load_and_enable_interrupts:
         PUSHAD
 
         ; This function will populate the IDT table

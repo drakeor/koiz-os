@@ -10,7 +10,8 @@
 /* Include our standard library */
 #include "libc/stdlib.h"
 
-extern void load_idt(void);
+/* Include tests */
+#include "tests/interrupt_tests.h"
 
 void kernel_init(void)
 {
@@ -25,10 +26,10 @@ void kernel_init(void)
     printf("using serial COM1 for logging serial...\n");
 
     /* Setup Load our IDT */
-    load_idt();
+    load_and_enable_interrupts();
 
-    /* Run self tests */
-    self_test_idt();
+    /* Test our IDT after loading it */
+    test_run_idt();
 }
 
 void kernel_update(void)

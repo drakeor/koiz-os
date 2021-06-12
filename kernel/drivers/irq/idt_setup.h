@@ -10,6 +10,11 @@
  */
 void setup_idt(void);
 
-void self_test_idt(void);
+/**
+ * load_and_enable_interrupts() - Loads and enables interrupts
+ * 
+ * Note that the implementation is done in interrupt_handler.asm
+ */
+void load_and_enable_interrupts(void);
 
 #endif

@@ -264,14 +264,3 @@ void _setup_idt(void)
     }
 }
 
-/* 
- * Self-test a few of the recoverable interrupts to make
- * sure everything is working
- * */
-void self_test_idt(void)
-{
-  printf("Self-testing Interrupts\n");
-  asm("INT $1");
-  asm("INT $3");
-  printf("Self-test Complete\n");
-}

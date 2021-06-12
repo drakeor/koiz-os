@@ -10,6 +10,7 @@ mkdir -p ../obj/drivers/memory
 mkdir -p ../obj/drivers/serial
 mkdir -p ../obj/drivers/video
 mkdir -p ../obj/libc
+mkdir -p ../obj/tests
 
 echo "compiling bootloader asm code"
 #as --32 -nostdlib boot/boot.s -o ../obj/boot/boot.o
@@ -30,6 +31,7 @@ gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/irq/idt_setup.c -o ../obj/dr
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/serial/serial.c -o ../obj/drivers/serial/serial.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/video/vga.c -o ../obj/drivers/video/vga.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c libc/stdlib.c -o ../obj/libc/stdlib.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c tests/interrupt_tests.c -o ../obj/tests/interrupt_tests.o -fno-pie
 
 # Link everything together
 # It is IMPORTANT that boot.o is first!!
@@ -43,6 +45,7 @@ gcc -T linker.ld -o ../bin/koizos-grub.bin -ffreestanding -nostdlib -m32 \
 ../obj/drivers/serial/serial.o \
 ../obj/drivers/video/vga.o \
 ../obj/libc/stdlib.o \
+../obj/tests/interrupt_tests.o \
 ../obj/kernel_main.o
 
 # Ensure that the final image is a grub multiboot file
