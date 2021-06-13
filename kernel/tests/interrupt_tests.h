@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * test_run_idt()   - Tests a few recoverable interrupts
+ * test_run_idt()    - Tests a few recoverable interrupts
  *                    to make sure the kernel doesn't panic
  */
 void test_run_idt(void);

@@ -10,7 +10,8 @@ fi
 
 # Build kernel
 cd kernel
-./build.sh
+make clean
+make
 if [ $? -ne 0 ]
 then
     echo "Kernel Build Failed! Terminating.."
