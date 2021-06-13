@@ -7,15 +7,19 @@
 #include "drivers/serial/serial.h"
 #include "drivers/irq/idt_setup.h"
 #include "drivers/irq/pic.h"
+#include "drivers/memory/pmem.h"
 
 /* Include our standard library */
 #include "libc/stdlib.h"
+#include "libc/multiboot.h"
 
 /* Include tests */
 #include "tests/interrupt_tests.h"
+#include "tests/pmem_tests.h"
 
-void kernel_init(void)
+void kernel_init()
 {
+
     /* Initialize the serial connection right away */
     /* We use this for logging messagse in stdlib.h */
     uint8_t serial_started = serial_init(PORT_COM1);
@@ -36,7 +40,11 @@ void kernel_init(void)
     pic_remap();
     pic_set_interrupt_masks();
 
+    /* Start our physical memory allocator */
+    pmem_initialize();
+    pmem_run_tests();
 
+    
 }
 
 void kernel_update(void)
@@ -44,9 +52,21 @@ void kernel_update(void)
 
 }
 
+
 /* Check if the compiler thinks you are targeting the wrong operating system. */
-void kernel_main(void) 
+void kernel_main(multiboot_info_t* mbd, uint32_t magic, uint32_t kernel_memory_end) 
 {
+    printf("kernel memory end is: %x\n", kernel_memory_end);
+
+    /* Make sure the magic number matches for memory mapping*/
+    if(magic != MULTIBOOT_BOOTLOADER_MAGIC) {
+        printf("magic number is %x", magic);
+        panic("invalid magic number!");
+    }
+    
+    /* Sets multiboot info to drivers that need it */
+    pmem_set_mbd(mbd, kernel_memory_end);
+
     kernel_init();
 
     printf("Refactored Koiz-OS!");

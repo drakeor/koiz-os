@@ -82,6 +82,7 @@ section '.bss' align 16
     CODE_SEG equ gdt_code - gdt_start
     DATA_SEG equ gdt_data - gdt_start
 
+
 section '.text'
     public _init_gdt
     _init_gdt:

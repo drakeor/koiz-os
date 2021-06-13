@@ -51,8 +51,8 @@ void pic_send_eoi(uint8_t irq)
 void pic_remap()
 {
     /* We save the makes so we can restore them at the end of the function */
-    uint8_t pic1_mask = io_byte_in(PIC1_DATA);
-    uint8_t pic2_mask = io_byte_in(PIC2_DATA);
+    //uint8_t pic1_mask = io_byte_in(PIC1_DATA);
+    //uint8_t pic2_mask = io_byte_in(PIC2_DATA);
 
     /* 
      * Starts initialization in cascade mode

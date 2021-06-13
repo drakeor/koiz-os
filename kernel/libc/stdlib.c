@@ -99,7 +99,6 @@ void panic(char *message)
 void printf(char *format, ...)
 {
     va_list arg;
-    int length;
 
     va_start(arg, format);
     /*printf_impl(format, arg);*/

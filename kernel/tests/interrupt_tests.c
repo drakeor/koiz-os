@@ -7,8 +7,8 @@
  * */
 void test_run_idt(void)
 {
-    printf("Self-testing Interrupts\n");
+    printf("Testing Interrupts\n");
     asm("INT $1");
     asm("INT $3");
-    printf("Self-test Complete\n");
+    printf("Test Complete\n");
 }

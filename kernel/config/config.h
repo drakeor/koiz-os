@@ -4,4 +4,10 @@
 /* Display debug messages from the interrupt handler */
 #define DEBUG_MSG_INTERRUPTS
 
+/* Show debug messages for memory maps */
+#define DEBUG_MSG_MEMORYMAP
+
+/* Show debug messages for physical memory */
+/* #define DEBUG_MSG_PMEM */
+
 #endif

@@ -1,4 +1,4 @@
 target remote localhost:1234
-file bin/koizos-grub.bin
+file bin/koizos.bin
 y
 c

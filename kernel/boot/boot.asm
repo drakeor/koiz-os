@@ -45,6 +45,8 @@ section '.bss' align 16
 section '.text'
     extrn kernel_main
     extrn _init_gdt
+    extrn kernel_memory_end
+
     public _start
     _start:
         ; At this point, the bootloader has us in 32-bit protected mode
@@ -55,10 +57,17 @@ section '.text'
         ; The first thing we want to do is set up the stack.
         mov [stack_top], esp
 
+        ; Store the EAX, EBX onto the stack.
+        ; They contain the multiboot info and magic number correspondingly
+        push kernel_memory_end
+        push eax
+        push ebx
+
         ; Initialize gdt
         call _init_gdt
 
         ; Finally, enter the high-level kernel
+        ; The stack should only contain EAX and EBX from the start now
         call kernel_main
 
         ; Put the system into an infinite loop
