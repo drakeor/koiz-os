@@ -54,18 +54,19 @@ section '.text' executable
     public load_and_enable_interrupts
     public common_interrupt_handler
 
+    ; Standard Lib Functions
     extrn printf
-    extrn interrupt_handler
     extrn _setup_idt
     extrn panic
+    
+    ; Specific Interrupt Functions
+    extrn keyboard_interrupt_handler
 
-    ;extrn keyboard_int_handler
-
-    ; load_and_enable_interrupts() - Loads the IDT and enables interrupts
-    ; 
-    ; Note that at this point the stack should contain 
-    ; [esp + 4] -> first entry in EDT
-    ; [esp]     -> the return address    
+    ;; load_and_enable_interrupts() - Loads the IDT and enables interrupts
+    ;; 
+    ;; Note that at this point the stack should contain 
+    ;; [esp + 4] -> first entry in EDT
+    ;; [esp]     -> the return address    
     load_and_enable_interrupts:
         PUSHAD
 
@@ -78,9 +79,9 @@ section '.text' executable
         POPAD
         ret
 
-    ; common_interrupt_handler() - This is called for every interrupt
-    ; 
-    ; This function then delegates the interrupt to the appropiate handler
+    ;; common_interrupt_handler() - This is called for every interrupt
+    ;; 
+    ;; This function then delegates the interrupt to the appropiate handler
     common_interrupt_handler:
 
         ; Disable interrupts
@@ -136,8 +137,9 @@ section '.text' executable
         mov ebx, 0         ; Don't print
         je .call_keyboard_handler
 
-        ; Otherwise panic! (We don't know how to handle this interrupt)
-        ; This function should NEVER return!
+        ; We don't know how to handle this interrupt
+        ; So initiate a kernel panic!
+        ; This function should NEVER return (so HLT)
         ccall printf, msg, [edi], [ecx]
         ccall panic, panicmsg
         HLT 
@@ -145,12 +147,12 @@ section '.text' executable
     ; Handle keyboard interrupts
     .call_keyboard_handler:
         push ebx
-        ;ccall keyboard_int_handler
+        ccall keyboard_interrupt_handler
         pop ebx
         jmp .resume
 
     ; Handle page fault interrupts
-    ; Not finished yet so halt
+    ; This is not finished yet so just print a message and HLT
     .call_pagefault_handler:
         push ebx
         mov ebx, cr2
@@ -159,14 +161,15 @@ section '.text' executable
         HLT
         jmp .resume
 
-    ; Continue processing and print the message
+    ; Continue processing and print the message (if EBX is set to 1)
     ; Falls through to clean-up
     .resume:
         cmp ebx, 1
-        jne .do_not_print
+        jne .interrupt_cleanup
         ccall printf, msg, [edi], [ecx]
+
     ; Clean up after interrupt
-    .do_not_print:
+    .interrupt_cleanup:
         ; Restore registers
         popd ebp
         popd edi
@@ -186,7 +189,9 @@ section '.text' executable
         ; since we're in an interrupt
         iret
 
-    ; Once I figure out FASMs macro system for loops I'll change this
+    ; Set up the individual methods for each interrupt
+    ; These addresses are then taken by C to populate the IDT
+    ;
     no_error_code_interrupt_handler 0   ; Divide by 0 error
     no_error_code_interrupt_handler 1   ; Debug exception
     no_error_code_interrupt_handler 2   ; Non-maskable interrup
@@ -240,12 +245,13 @@ section '.text' executable
     no_error_code_interrupt_handler 50
     
 
-
-
 section '.bss'
     msg db "Handling Interrupt %x. Error code: %x",0xA,0
     pagefault_msg db "Page fault address: %x",0xA,0
     panicmsg db "Interrupt is non-recoverable!",0xA,0
+
+    ; Memory area to store the IDT
+    ; This is populated by idt_setup.c
     public idt_info
     public idt_start
     idt_start:

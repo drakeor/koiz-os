@@ -11,6 +11,11 @@ fi
 # Build kernel
 cd kernel
 ./build.sh
+if [ $? -ne 0 ]
+then
+    echo "Kernel Build Failed! Terminating.."
+    exit 1 
+fi
 cd ..
 
 # Add log director

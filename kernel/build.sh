@@ -5,6 +5,7 @@ mkdir -p ../bin
 mkdir -p ../obj
 mkdir -p ../obj/drivers
 mkdir -p ../obj/drivers/io
+mkdir -p ../obj/drivers/input
 mkdir -p ../obj/drivers/irq
 mkdir -p ../obj/drivers/memory
 mkdir -p ../obj/drivers/serial
@@ -26,8 +27,10 @@ fasm.x64 drivers/irq/interrupt_handler.asm ../obj/drivers/irq/interrupt_handler.
 # Compile the kernel
 echo "compiling 32-bit kernel c code"
 gcc -g -m32 -ffreestanding -mno-red-zone -c kernel_main.c -o ../obj/kernel_main.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/input/keyboard.c -o ../obj/drivers/input/keyboard.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/io/basic_io.c -o ../obj/drivers/io/basic_io.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/irq/idt_setup.c -o ../obj/drivers/irq/idt_setup.o -fno-pie
+gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/irq/pic.c -o ../obj/drivers/irq/pic.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/serial/serial.c -o ../obj/drivers/serial/serial.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c drivers/video/vga.c -o ../obj/drivers/video/vga.o -fno-pie
 gcc -g -m32 -ffreestanding -mno-red-zone -c libc/stdlib.c -o ../obj/libc/stdlib.o -fno-pie
@@ -39,9 +42,11 @@ echo "linking 32-bit kernel"
 gcc -T linker.ld -o ../bin/koizos-grub.bin -ffreestanding -nostdlib -m32 \
 ../obj/boot/boot.o \
 ../obj/boot/gdt.o \
+../obj/drivers/input/keyboard.o \
 ../obj/drivers/io/basic_io.o \
 ../obj/drivers/irq/idt_setup.o \
 ../obj/drivers/irq/interrupt_handler.o \
+../obj/drivers/irq/pic.o \
 ../obj/drivers/serial/serial.o \
 ../obj/drivers/video/vga.o \
 ../obj/libc/stdlib.o \

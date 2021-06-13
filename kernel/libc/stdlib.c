@@ -112,6 +112,9 @@ void printf(char *format, ...)
             } else if(*(format + 1) == 's') {
                 char* subString = va_arg(arg, char*);
                 std_print(subString);
+            } else if(*(format + 1) == 'c') {
+                char character_arg = va_arg(arg, int);
+                std_print_char(character_arg);
             } else if(*(format + 1) == 'd') {
                 unsigned int num = va_arg(arg, uint32_t);
                 print_uint_to_string(num, 10);

@@ -6,6 +6,7 @@
 /* Include for PORT_COM1 stuff */ 
 #include "drivers/serial/serial.h"
 #include "drivers/irq/idt_setup.h"
+#include "drivers/irq/pic.h"
 
 /* Include our standard library */
 #include "libc/stdlib.h"
@@ -30,6 +31,12 @@ void kernel_init(void)
 
     /* Test our IDT after loading it */
     test_run_idt();
+
+    /* Load PIC stuff */
+    pic_remap();
+    pic_set_interrupt_masks();
+
+
 }
 
 void kernel_update(void)
