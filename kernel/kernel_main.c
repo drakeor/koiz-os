@@ -9,6 +9,7 @@
 #include "drivers/irq/pic.h"
 #include "drivers/memory/pmem.h"
 #include "drivers/memory/vmem.h"
+#include "drivers/ramdisk/ramdisk.h"
 
 /* Include our standard library */
 #include "libc/stdlib.h"
@@ -17,6 +18,8 @@
 /* Include tests */
 #include "tests/interrupt_tests.h"
 #include "tests/pmem_tests.h"
+#include "tests/vmem_tests.h"
+#include "tests/ramdisk_tests.h"
 
 void kernel_init()
 {
@@ -47,6 +50,12 @@ void kernel_init()
 
     /* Enable paging and virtual memory */
     vmem_init();
+    vmem_run_tests();
+
+    /* Run the tests BEFORE initializing the ramdisk! */
+    ramdisk_run_tests();
+    /* initialize the ramdisk */
+    ramdisk_init(PHYS_BLOCK_SIZE * 10);
 }
 
 void kernel_update(void)

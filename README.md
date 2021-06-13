@@ -38,7 +38,7 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 # In Progress Features
 
-- Huge refactor for Kernel / GRUB
+- Huge refactor for Kernel organization + GRUB
 
 - Make GRUB compatiable
 
