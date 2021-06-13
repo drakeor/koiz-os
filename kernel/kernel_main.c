@@ -8,6 +8,7 @@
 #include "drivers/irq/idt_setup.h"
 #include "drivers/irq/pic.h"
 #include "drivers/memory/pmem.h"
+#include "drivers/memory/vmem.h"
 
 /* Include our standard library */
 #include "libc/stdlib.h"
@@ -44,7 +45,8 @@ void kernel_init()
     pmem_initialize();
     pmem_run_tests();
 
-    
+    /* Enable paging and virtual memory */
+    vmem_init();
 }
 
 void kernel_update(void)

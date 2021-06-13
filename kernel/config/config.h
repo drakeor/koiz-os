@@ -10,4 +10,7 @@
 /* Show debug messages for physical memory */
 /* #define DEBUG_MSG_PMEM */
 
+/* Show debug messages for virtual memory */
+#define DEBUG_MSG_VMEM
+
 #endif
