@@ -9,14 +9,12 @@
  */
 
 /*
- * Physical memory allocation happens on the largest section of detected free memory
- * It's allocated in 4096 byte chunks using simple flat list allocation
- * Probably switch to buddy allocation or something later...
+ * Physical memory allocation happens on the largest section of 
+ * detected free memory. It's allocated in 4096 byte chunks using 
+ * simple flat list allocation. I should probably switch to 
+ * buddy allocation or something later...
  */
 
-/* This is where our bootloader stores the memory map location */
-#define BIOS_MEMORY_MAP_SIZE_LOC 0x8000
-#define BIOS_MEMORY_MAP_LOC 0x8004
 
 /* Reserved section of memory */
 #define MEM_RESERVED_SECTION_MIN 0x100000
@@ -48,16 +46,6 @@ void pmem_set_mbd(multiboot_info_t* mbd, uint32_t kernel_reserved_end_addr)
     pmem_kernel_reserved_end_addr = kernel_reserved_end_addr;
 }
 
-/* TODO: Remove this later? */
-void pmem_tests(void);
-
-
-/*
- * The BIOS populates the memory map at 0x8000
- * We scan this list for the largest free block
- * We allocate the start of this block for the memory manager
- * The rest of it is free for allocation
- */
 void pmem_initialize(void)
 {
     /* Sanity checks */
@@ -117,7 +105,7 @@ void pmem_initialize(void)
     if((uint32_t)pmem_main_memory_start < pmem_kernel_reserved_end_addr)
     {
         uint32_t space_to_alloc = 
-            (pmem_kernel_reserved_end_addr - (uint32_t)pmem_main_memory_start );
+            (pmem_kernel_reserved_end_addr - (uint32_t)pmem_main_memory_start);
 
         /* Make sure we have enough space */
         if(space_to_alloc > pmem_main_memory_length)
@@ -186,7 +174,11 @@ void pmem_initialize(void)
 
 }
 
-/* Helper function to grab record from ptr */
+/**
+ * pmem_ptr_to_entry() - Converts a pointer to pmem entry
+ * 
+ * @ptr: Pointer to physical memory
+ */
 uint32_t pmem_ptr_to_entry(void* ptr)
 {
     if((uint32_t)pmem_alloc_start > (uint32_t)ptr)
@@ -203,7 +195,11 @@ uint32_t pmem_ptr_to_entry(void* ptr)
     return working_ptr;
 }
 
-/* Helper function to grab ptr from record */
+/**
+ * pmem_ptr_to_entry() - Converts a pmem entry to a pointer
+ * 
+ * @entry: Entry number to convert to a pointer
+ */
 void* pmem_entry_to_ptr(uint32_t entry)
 {
     if(entry > pmem_mgr_reserved_size)
@@ -217,6 +213,8 @@ void* pmem_entry_to_ptr(uint32_t entry)
 
 void* pmem_alloc()
 {
+    /* Keep track of the start record so we know if we looped
+       around the list */
     uint32_t start_record = pmem_curr_alloc_record;
 
     ++pmem_curr_alloc_record;
@@ -226,7 +224,8 @@ void* pmem_alloc()
     /* If we loop all the way around, we're out of memory */
     while(start_record != pmem_curr_alloc_record)
     {
-        uint8_t* record_ptr = ((uint8_t*)pmem_main_memory_start) + pmem_curr_alloc_record;
+        uint8_t* record_ptr = ((uint8_t*)pmem_main_memory_start) + 
+            pmem_curr_alloc_record;
 
         /* Allocate free page if available */
         if(*record_ptr == 0x00)
@@ -234,7 +233,8 @@ void* pmem_alloc()
             *record_ptr = 0x1;
             void* pmem_addr = pmem_entry_to_ptr(pmem_curr_alloc_record);
 #ifdef DEBUG_MSG_PMEM
-            printf("pmem: allocating record %d at record addr %x which points to %x\n", start_record, record_ptr, pmem_addr);
+            printf("pmem: allocating record %d at addr %x for %x\n", 
+                start_record, record_ptr, pmem_addr);
 #endif
             return pmem_addr;
         }
@@ -263,7 +263,8 @@ int pmem_free(void* ptr)
     /* Mark record as free */
     *record_ptr = 0x0;
 #ifdef DEBUG_MSG_PMEM
-            printf("pmem: freeing record %d at record addr %x which points to %x\n", record, record_ptr, ptr);
+    printf("pmem: freeing record %d at  addr %x for %x\n", 
+        record, record_ptr, ptr);
 #endif
 
     return 0;
