@@ -8,9 +8,9 @@
 #define PHYS_BLOCK_SIZE 4096
 
 /* NOTE that the memory block returned is NOT guaranteed to be zero'd out! */
-uint32_t* pmem_alloc();
+void* pmem_alloc();
 
-int pmem_free(uint32_t* ptr);
+int pmem_free(void* ptr);
 
 void pmem_initialize(void);
 

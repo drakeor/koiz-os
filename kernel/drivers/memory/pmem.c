@@ -24,14 +24,14 @@
 
 
 /* This is where our main memory is stored */
-uint32_t* pmem_main_memory_start;
+void* pmem_main_memory_start;
 uint32_t pmem_main_memory_length;
 
 /*
  * Since the memory allocation blocks take up the first few MBs, 
  * this is where we'll malloc from
  */
-uint32_t* pmem_alloc_start;
+void* pmem_alloc_start;
 uint32_t pmem_mgr_reserved_size;
 
 /* This points to the next physical spot on the list */
@@ -100,7 +100,7 @@ void pmem_initialize(void)
         /* Grab the largest region */
         if(cs->type == MULTIBOOT_MEMORY_AVAILABLE &&
             cs->len_low > pmem_main_memory_length) {
-            pmem_main_memory_start = (uint32_t*)cs->addr_low;
+            pmem_main_memory_start = (void*)cs->addr_low;
             pmem_main_memory_length = cs->len_low;
         }
     }
@@ -133,8 +133,11 @@ void pmem_initialize(void)
     }
 
     /* Immediately allocate storage for our physical memory manager */
+    uint32_t end_addr = (uint32_t)pmem_main_memory_start 
+        + pmem_main_memory_length;
     pmem_mgr_reserved_size = (pmem_main_memory_length / PHYS_BLOCK_SIZE);
-    /* Zero out the memory there */
+
+    /* Zero out the memory */
     for(i = 0; i < pmem_mgr_reserved_size; i++) {
         uint8_t* record_ptr = (uint8_t*)(pmem_main_memory_start) + i;
         (*record_ptr) = 0x00;
@@ -149,7 +152,12 @@ void pmem_initialize(void)
 
     /* Start of actual allocation is aligned by PHYS_BLOCK_SIZE bytes. */
     start_addr_alloc &= ~(PHYS_BLOCK_SIZE - 1);
-    pmem_alloc_start = (uint32_t*)start_addr_alloc;
+    pmem_alloc_start = (void*)start_addr_alloc;
+
+    /* Subtract from our length and redo the mgr_reserved_size */
+    pmem_main_memory_length = (end_addr - start_addr_alloc);
+    pmem_mgr_reserved_size = (pmem_main_memory_length / PHYS_BLOCK_SIZE);
+
 
     /* Print our memory info */
     printf("Alloc Start: %x | Length: %x | # of Blocks: %d \n",
@@ -179,29 +187,35 @@ void pmem_initialize(void)
 }
 
 /* Helper function to grab record from ptr */
-uint32_t pmem_ptr_to_entry(uint32_t* ptr)
+uint32_t pmem_ptr_to_entry(void* ptr)
 {
-    if(pmem_alloc_start > ptr)
+    if((uint32_t)pmem_alloc_start > (uint32_t)ptr)
         panic("pmem_ptr_to_entry: underflow error!");
-    if(pmem_main_memory_start + pmem_main_memory_length < ptr)
-        panic("pmem_ptr_to_entry: overflow error!");
+    if((uint32_t)pmem_alloc_start + pmem_main_memory_length <
+        (uint32_t)ptr) {
+            panic("pmem_ptr_to_entry: overflow error!");
+        }
+
     uint32_t working_ptr = (uint32_t) ptr;
     working_ptr -= (uint32_t) pmem_alloc_start;
     working_ptr /= PHYS_BLOCK_SIZE;
+
     return working_ptr;
 }
 
 /* Helper function to grab ptr from record */
-uint32_t* pmem_entry_to_ptr(uint32_t entry)
+void* pmem_entry_to_ptr(uint32_t entry)
 {
     if(entry > pmem_mgr_reserved_size)
         panic("pmem_entry_to_ptr: entry out of bounds!");
+
     uint32_t working_ptr = PHYS_BLOCK_SIZE * entry;
     working_ptr += (uint32_t) pmem_alloc_start;
-    return (uint32_t*) working_ptr;
+
+    return (void*) working_ptr;
 }
 
-uint32_t* pmem_alloc()
+void* pmem_alloc()
 {
     uint32_t start_record = pmem_curr_alloc_record;
 
@@ -212,13 +226,13 @@ uint32_t* pmem_alloc()
     /* If we loop all the way around, we're out of memory */
     while(start_record != pmem_curr_alloc_record)
     {
-        uint8_t* record_ptr = (uint8_t*)pmem_main_memory_start + pmem_curr_alloc_record;
+        uint8_t* record_ptr = ((uint8_t*)pmem_main_memory_start) + pmem_curr_alloc_record;
 
         /* Allocate free page if available */
         if(*record_ptr == 0x00)
         {
             *record_ptr = 0x1;
-            uint32_t* pmem_addr = pmem_entry_to_ptr(pmem_curr_alloc_record);
+            void* pmem_addr = pmem_entry_to_ptr(pmem_curr_alloc_record);
 #ifdef DEBUG_MSG_PMEM
             printf("pmem: allocating record %d at record addr %x which points to %x\n", start_record, record_ptr, pmem_addr);
 #endif
@@ -235,7 +249,7 @@ uint32_t* pmem_alloc()
     return 0;
 }
 
-int pmem_free(uint32_t* ptr)
+int pmem_free(void* ptr)
 {
     uint32_t record = pmem_ptr_to_entry(ptr);
     uint8_t* record_ptr = (uint8_t*)pmem_main_memory_start + record;
