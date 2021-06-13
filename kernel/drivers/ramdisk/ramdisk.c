@@ -9,11 +9,6 @@ uint32_t ramdisk_block_size = 0;
    of where they are */
 void** ramdisk_block_pointers = 0; 
 
-/* Size variables (in bytes) */
-const uint32_t sector_size = 512;
-
-/* Sectors per cluster */
-const uint32_t sectors_per_cluster = 8;
 
 void ramdisk_init(uint32_t size_in_bytes)
 {
@@ -28,12 +23,6 @@ void ramdisk_init(uint32_t size_in_bytes)
         panic("init_disk_ramdisk: ramdisk_block_pointers already set!");
     if(sizeof(void*) != 4)
         panic("init_disk_ramdisk: init_disk_ramdisk only works in 32-bit!");
-
-
-    /* Currently, we only support cluster sizes being the same size as
-       the block sizes */
-    if(sector_size * sectors_per_cluster != PHYS_BLOCK_SIZE)
-        panic("init_disk_ramdisk: cluster size must be PHYS_BLOCK_SIZE ");
 
     /* Convert to block size */
     ramdisk_block_size = size_in_bytes / PHYS_BLOCK_SIZE;

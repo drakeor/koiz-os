@@ -36,13 +36,15 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Ramdisk for virtual hard drive (DONE)
 
+- Huge refactor for Kernel organization + GRUB (DONE)
+
+- Make GRUB compatiable (DONE)
+
 # In Progress Features
 
-- Huge refactor for Kernel organization + GRUB
-
-- Make GRUB compatiable
-
 - FAT32 filesystem on ramdisk
+
+- Add more stuff to stdlib.c
 
 - File management
 
