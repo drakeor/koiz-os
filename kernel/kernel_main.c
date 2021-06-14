@@ -3,13 +3,16 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* Include for PORT_COM1 stuff */ 
+/* Include our drivers */ 
 #include "drivers/serial/serial.h"
 #include "drivers/irq/idt_setup.h"
 #include "drivers/irq/pic.h"
 #include "drivers/memory/pmem.h"
 #include "drivers/memory/vmem.h"
 #include "drivers/ramdisk/ramdisk.h"
+
+/* Include our filesystem stuff */
+#include "fs/ramdisk_fat16.h"
 
 /* Include our standard library */
 #include "libc/stdlib.h"
@@ -54,8 +57,9 @@ void kernel_init()
 
     /* Run the tests BEFORE initializing the ramdisk! */
     ramdisk_run_tests();
-    /* initialize the ramdisk */
-    ramdisk_init(PHYS_BLOCK_SIZE * 10);
+
+    /* initialize our temp filesystem */
+    ramdisk_fat16_init();
 }
 
 void kernel_update(void)

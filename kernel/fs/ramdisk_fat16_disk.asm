@@ -48,7 +48,8 @@ section '.bss'
         ;           This is the number of sectors per cluster in powers of two.
         ;           Old MS-DOS supported a max cluster size of 4KB while modern
         ;           OS's can support up to 128KB clusters with 512 bytes/sector
-        ;           We're setting ours to 1 for minimum size clusters.
+        ;           We're setting ours to 1 to use minimum size clusters.
+        ;           as we need to fit this into our ramdisk
         db 0x01
 
         ; Offset 0xE - 2 bytes
@@ -60,6 +61,7 @@ section '.bss'
         db 0x00
 
         ; Offset 0x10 - 1 byte
+        ;           Number of file allocation tables (FAT)
         ;           This is apparently almost always 2 so that's what we'll
         ;           use
         db 0x02

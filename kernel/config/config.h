@@ -13,4 +13,7 @@
 /* Show debug messages for virtual memory */
 #define DEBUG_MSG_VMEM
 
+/* Show debug messages for the ramdisk FAT16 filesystem */
+#define DEBUG_MSG_RAMDISK_FAT16
+
 #endif

@@ -9,7 +9,7 @@
  * Note that this currently this is hardcoded to only read from our ramdisk at
  * the moment. Note this also auto-initializes ramdisk_init()
  */
-int ramdisk_fat16_init();
+void ramdisk_fat16_init(void);
 
 /**
  * ramdisk_fat16_format() - Formats the ramdisk to fat16.
@@ -17,6 +17,6 @@ int ramdisk_fat16_init();
  * Note that this currently is hardcoded to only format the ramdisk at the 
  * moment
  */
-int ramdisk_fat16_format();
+void ramdisk_fat16_format(void);
 
 #endif
