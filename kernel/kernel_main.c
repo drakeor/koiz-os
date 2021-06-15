@@ -67,9 +67,9 @@ void kernel_update(void)
 
 }
 
-
-/* Check if the compiler thinks you are targeting the wrong operating system. */
-void kernel_main(multiboot_info_t* mbd, uint32_t magic, uint32_t kernel_memory_end) 
+/* Main kernel entry point */
+void kernel_main(multiboot_info_t* mbd, uint32_t magic, 
+    uint32_t kernel_memory_end) 
 {
     printf("kernel memory end is: %x\n", kernel_memory_end);
 
@@ -84,7 +84,7 @@ void kernel_main(multiboot_info_t* mbd, uint32_t magic, uint32_t kernel_memory_e
 
     kernel_init();
 
-    printf("Refactored Koiz-OS!");
+    printf("Welcome to Koiz-OS!");
 
     while(1) {
         kernel_update();

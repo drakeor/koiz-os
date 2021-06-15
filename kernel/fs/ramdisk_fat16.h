@@ -11,12 +11,5 @@
  */
 void ramdisk_fat16_init(void);
 
-/**
- * ramdisk_fat16_format() - Formats the ramdisk to fat16.
- * 
- * Note that this currently is hardcoded to only format the ramdisk at the 
- * moment
- */
-void ramdisk_fat16_format(void);
 
 #endif

@@ -42,7 +42,7 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 # In Progress Features
 
-- FAT32 filesystem on ramdisk
+- FAT16 filesystem on ramdisk
 
 - Add more stuff to stdlib.c
 
@@ -53,6 +53,10 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 - Malloc 
 
 # Planned Features (in order of development)
+
+- Read from an actual disk drive
+
+- Read a FAT32 system from an actual disk drive
 
 - Network Driver
 

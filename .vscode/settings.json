@@ -3,6 +3,7 @@
         "stdint.h": "c",
         "idt_setup.h": "c",
         "config.h": "c",
-        "pmem_tests.h": "c"
+        "pmem_tests.h": "c",
+        "ramdisk.h": "c"
     }
 }

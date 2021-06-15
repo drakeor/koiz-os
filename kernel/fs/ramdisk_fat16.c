@@ -5,6 +5,74 @@
 
 #include "../libc/stdlib.h"
 
+/* Structure for a FAT16 entry */
+struct ramdisk_fat16_entry {
+
+    /* Name is 8 characters, extension is 3 characters */
+    uint8_t entry_name[11];
+
+    /* 
+     * File attributes
+     * 0x01 - READ_ONLY
+     * 0x02 - HIDDEN
+     * 0x04 - SYSTEM
+     * 0x08 - VOLUME_ID
+     * 0x10 - DIRECTORY
+     * 0x20 - ARCHIVE
+     * 0x0F - Handle LFN
+     */
+    uint8_t entry_attrib;
+
+    /* Reserved by Windows NT */
+    uint8_t entry_reserved;
+
+    /* Creation time in tenths of a second */
+    uint8_t entry_creation_time_tenth_secs;
+
+    /*
+     * Time that the file was created.
+     * 5 bits - Hour
+     * 6 bits - Minutes
+     * 5 bits - Seconds (Multiply seconds by 2)
+     */
+    uint16_t entry_creation_time;
+
+    /*
+     * Date that the file was created
+     * 7 bits - Year
+     * 4 bits - Month
+     * 5 bits - Day
+     */
+    uint16_t entry_creation_date;
+
+    /* Last access date. Same format as creation date */
+    uint16_t last_accessed_date;
+
+    /* 
+     * High 16 bits of the entry's first cluster number.
+     * For FAT 16, this is always zero
+     */
+    uint16_t entry_high_cluster_number;
+
+    /* Last modification time. Same format as creation time */
+    uint16_t last_mod_time;
+
+    /* Last modification date. Same format as creation date */
+    uint16_t last_mod_date;
+
+    /* 
+     * Low 16 bits of the entry's first cluster number
+     * Use number to find the first cluster for the entry
+     */
+    uint16_t entry_low_cluster_number;
+
+    /*
+     * Size of the file in bytes
+     */
+    uint32_t file_size;
+};
+typedef struct ramdisk_fat16_entry ramdisk_fat16_entry_t;
+
 /* 
  * A lot of this is hard-coded into ramdisk_fat16.asm
  * So if we want to change anything, we'd have to change it 
@@ -21,14 +89,25 @@
     https://github.com/rweichler/FAT16/blob/master/spec/FATLayout.pdf */
 
 /* FAT16 Related Constants from ramdisk_fat16.asm */
-#define FAT16_RESERVED_SECTOR_COUNT       0x1
-#define FAT16_NUMBER_FATS                 0x2
-#define FAT16_SECTORS_PER_FAT             0x20
-#define FAT16_ROOT_ENTRY_COUNT            0x0200
-#define FAT16_TOTAL_SECTORS               0x0200
-#define FAT16_SECTORS_PER_CLUSTER         0x1
+#define FAT16_BOOTLOADER_SIZE 512
+
+#define FAT16_BYTES_PER_SECTOR            512
+#define FAT16_SECTORS_PER_CLUSTER         1
+#define FAT16_TOTAL_SECTORS               512
+
+#define FAT16_RESERVED_SECTOR_COUNT       1
+
+#define FAT16_ROOT_ENTRY_COUNT            512
+
+#define FAT16_NUMBER_FATS                 2
+#define FAT16_SECTORS_PER_FAT             32
+
 
 /* Helpful constants */
+#define FIRST_FAT_TABLE_SECTOR   FAT16_RESERVED_SECTOR_COUNT
+#define SECOND_FAT_TABLE_SECTOR  FAT16_RESERVED_SECTOR_COUNT + \
+                                    FAT16_SECTORS_PER_FAT
+
 #define FIRST_ROOT_SECTOR (FAT16_RESERVED_SECTOR_COUNT + \
                             (FAT16_NUMBER_FATS * FAT16_SECTORS_PER_FAT))
 
@@ -38,10 +117,53 @@
 
 #define CLUSTER_COUNT (FAT16_TOTAL_SECTORS - FIRST_DATA_SECTOR) / \
                         FAT16_SECTORS_PER_CLUSTER
+
 /*
  * Grab the hard-coded bootrecord from ramdisk_fat16.asm
  */
-extern uint8_t ramdisk_fat16_bootrecord[512];
+extern uint8_t ramdisk_fat16_bootrecord[FAT16_BOOTLOADER_SIZE];
+
+/* helper function to convert sectors to addr on the ramdisk */
+/* data needs to be size of bytes per sector */
+int ramdisk_write_sector(uint32_t start_sec, uint8_t* data)
+{
+    return ramdisk_write(start_sec * FAT16_BYTES_PER_SECTOR, data,
+        FAT16_BYTES_PER_SECTOR);
+}
+
+/**
+ * ramdisk_fat16_format() - Formats the ramdisk to fat16.
+ * 
+ * Note that this currently is hardcoded to only format the ramdisk at the 
+ * moment
+ */
+void ramdisk_fat16_format()
+{
+    uint8_t zero_sector[FAT16_BYTES_PER_SECTOR] = { 0x00 };
+    int i;
+
+    /* Write the bootloader */
+    ramdisk_write(0x00, ramdisk_fat16_bootrecord, FAT16_BOOTLOADER_SIZE);
+
+    /* zero out the FAT tables */
+    for(i = 0; i < FAT16_SECTORS_PER_FAT; i++) {
+        ramdisk_write_sector(FIRST_FAT_TABLE_SECTOR + i, zero_sector);
+        ramdisk_write_sector(SECOND_FAT_TABLE_SECTOR + i, zero_sector);
+    }
+
+    /* zero out the root entries */
+    for(i = 0; i < ROOT_DIRECTORY_SECTORS; i++) {
+        ramdisk_write_sector(FIRST_ROOT_SECTOR + i, zero_sector);
+    }
+
+    /* Write the first cluster as 0xFFF8 */
+    /* Write the second cluster as 0xFFFF */
+    /* Remember this is stored in little-endian though! */
+    uint8_t starting_sectors[4] = { 0xF8, 0xFF, 0xFF, 0xFF };
+    ramdisk_write_sector(FIRST_FAT_TABLE_SECTOR, starting_sectors);
+    ramdisk_write_sector(SECOND_FAT_TABLE_SECTOR, starting_sectors);
+
+}
 
 void ramdisk_fat16_init()
 {
@@ -64,11 +186,16 @@ void ramdisk_fat16_init()
     /* Initialize the ramdisk right away */
     ramdisk_init(RAMDISK_FAT16_SIZE);
 
-    /* Show success */
+    /*Format the ramdisk with a new FAT16 partition */
+    ramdisk_fat16_format();
+
+    /* Show the first clusters */
+#ifdef DEBUG_MSG_RAMDISK_FAT16
+    uint8_t firstCluster[2]; 
+    ramdisk_read(FAT16_BOOTLOADER_SIZE, firstCluster, 2);
+    printf("ramdisk_fat16_init: First Cluster Values: %x \n",
+        firstCluster[1] << 8 | firstCluster[0] );
+#endif
 
 }
 
-void ramdisk_fat16_format()
-{
-
-}
