@@ -125,7 +125,7 @@ extern uint8_t ramdisk_fat16_bootrecord[FAT16_BOOTLOADER_SIZE];
 
 /* helper function to convert sectors to addr on the ramdisk */
 /* data needs to be size of bytes per sector */
-int ramdisk_write_sector(uint32_t start_sec, uint8_t* data)
+int ramdisk_fat16_write_sector(uint32_t start_sec, uint8_t* data)
 {
     return ramdisk_write(start_sec * FAT16_BYTES_PER_SECTOR, data,
         FAT16_BYTES_PER_SECTOR);
@@ -147,23 +147,88 @@ void ramdisk_fat16_format()
 
     /* zero out the FAT tables */
     for(i = 0; i < FAT16_SECTORS_PER_FAT; i++) {
-        ramdisk_write_sector(FIRST_FAT_TABLE_SECTOR + i, zero_sector);
-        ramdisk_write_sector(SECOND_FAT_TABLE_SECTOR + i, zero_sector);
+        ramdisk_fat16_write_sector(FIRST_FAT_TABLE_SECTOR + i, zero_sector);
+        ramdisk_fat16_write_sector(SECOND_FAT_TABLE_SECTOR + i, zero_sector);
     }
 
     /* zero out the root entries */
     for(i = 0; i < ROOT_DIRECTORY_SECTORS; i++) {
-        ramdisk_write_sector(FIRST_ROOT_SECTOR + i, zero_sector);
+        ramdisk_fat16_write_sector(FIRST_ROOT_SECTOR + i, zero_sector);
     }
 
     /* Write the first cluster as 0xFFF8 */
     /* Write the second cluster as 0xFFFF */
     /* Remember this is stored in little-endian though! */
     uint8_t starting_sectors[4] = { 0xF8, 0xFF, 0xFF, 0xFF };
-    ramdisk_write_sector(FIRST_FAT_TABLE_SECTOR, starting_sectors);
-    ramdisk_write_sector(SECOND_FAT_TABLE_SECTOR, starting_sectors);
+    ramdisk_fat16_write_sector(FIRST_FAT_TABLE_SECTOR, starting_sectors);
+    ramdisk_fat16_write_sector(SECOND_FAT_TABLE_SECTOR, starting_sectors);
+}
+
+#define FAT16_RAMDISK_ERROR_INVALID_FILENAME
+
+/* writes a file to the fat device */
+int ramdisk_fat16_file_write(uint8_t* file_name, void* data, uint32_t data_size)
+{
+
+    /* Set up the buffers to the file name */
+    uint8_t file_name_buffer[8] = 
+        {0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20};
+    uint8_t file_name_ext[3] = {0x20, 0x20, 0x20};
+
+    /* Format the file name given to FAT16 */
+    int proc_file_name = 1;
+    int i = 0;
+    int j = 0;
+
+    /* Loop through the file name */
+    while(file_name[i] != '\0') {
+
+        /* Handle file name */
+        if(proc_file_name) {
+
+            /* Switch to processing file extension */
+            if(file_name[i] == '.') {
+                proc_file_name = 0;
+                j = 0;
+                ++i;
+                continue;
+            }
+
+            /* Add to filename buffer if we have room */
+            if(j < 8) {
+                file_name_buffer[j] = file_name[i];
+                j++;
+            }
+
+        } 
+        /* Handle file extension */
+        else {
+            /* Add to file extension buffer if we have room */
+            if(j < 3) {
+                file_name_ext[j] = file_name[i];
+                j++;
+            }
+        }
+        ++i;
+    }
+
+    /* Create a new struct for our file */
+    ramdisk_fat16_entry_t new_entry;
+    new_entry.entry_attrib = 0x00;
+    new_entry.entry_reserved = 0x00;
+    new_entry.file_size = data_size;
+    
+    /* TODO: Scan for free sector */
+    /* TODO: Populate the following below with the correct free sector */
+    new_entry.entry_low_cluster_number = 0x0002;
+    
+    /* TODO: Write data to sectors */
+    /* TODO: Mark sectors as used */
+    /* TODO: Make sure the file doesn't already exist! */
+
 
 }
+
 
 void ramdisk_fat16_init()
 {
@@ -186,7 +251,7 @@ void ramdisk_fat16_init()
     /* Initialize the ramdisk right away */
     ramdisk_init(RAMDISK_FAT16_SIZE);
 
-    /*Format the ramdisk with a new FAT16 partition */
+    /* Format the ramdisk with a new FAT16 partition */
     ramdisk_fat16_format();
 
     /* Show the first clusters */
