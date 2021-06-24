@@ -11,7 +11,7 @@
  * 
  * @str:    string to get the length of
  */
-uint32_t strlen(const char* str);
+uint32_t strlen(const uint8_t* str);
 
 /**
  * memcpy() - Copies memory from one area to another

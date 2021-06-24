@@ -16,6 +16,11 @@
 
 #include <stdint.h>
 
+/* Results enums */
+#define FAT16_RAMDISK_SUCCESS                   0
+#define FAT16_RAMDISK_ERROR_INVALID_FILENAME    1
+#define FAT16_RAMDISK_ERROR_NO_FREE_SPACE       2
+
 /**
  * ramdisk_fat16_init() - Initializes a fat16 system against our ramdisk
  * 
@@ -24,11 +29,15 @@
  */
 void ramdisk_fat16_init(void);
 
+/* destroys the current temp ramdisk */
+void ramdisk_fat16_destroy(void);
+
 /* lists all files from the ramdisk_fat16 system along with information
     about the filesystem. useful for debugging **/
 void ramdisk_fat16_list_info(void);
 
-/* destroys the current temp ramdisk */
-void ramdisk_fat16_destroy(void);
+/* write a file with a certain amount of data. returns zero on success */
+int ramdisk_fat16_file_write(uint8_t* file_name, 
+    void* data, uint32_t data_size);
 
 #endif

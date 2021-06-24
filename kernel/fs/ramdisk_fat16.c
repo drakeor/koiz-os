@@ -157,23 +157,42 @@ static inline uint32_t addr_to_sec_offset(uint32_t addr)
 uint16_t find_next_free_cluster()
 {
     uint16_t i = 0;
+    uint16_t current_cluster = 0;
     for (i = 0; i < CLUSTER_COUNT; i++)
     {
-        panic("need to ACTUALLY search for next free cluster");
-        return i;
+        /* read the current cluster from the ramdisk */
+        /* only using the first FAT table */
+        ramdisk_read(
+            (FIRST_FAT_TABLE_SECTOR * FAT16_BYTES_PER_SECTOR) +
+                (i * sizeof(uint16_t)),
+            (uint8_t*) &current_cluster,
+            sizeof(uint16_t));
+        
+        /* cluster marked as 0x0000 is free */
+        if(current_cluster == 0x0000)
+            return i;
     }
     return 0;
 }
 
 /* helper function to find the new free root entry */
 /* returns zero if there's no free root entries */
+/* first entry is skipped */
 uint32_t find_next_free_root_entry()
 {
-    uint32_t i = 0;
-    for (i = 0; i < CLUSTER_COUNT; i++)
+    uint32_t i;
+    ramdisk_fat16_entry_t cur_root_entry;
+    for (i = 1; i < ROOT_DIRECTORY_SECTORS; i++)
     {
-        panic("need to ACTUALLY search for next free root entry");
-        return i;
+        ramdisk_read(
+            (FIRST_ROOT_SECTOR * FAT16_BYTES_PER_SECTOR) +
+                (i * sizeof(ramdisk_fat16_entry_t)),
+            (uint8_t*) &cur_root_entry,
+            sizeof(ramdisk_fat16_entry_t));
+        
+        /* If the initial character is 0, the entry is availiable */
+        if(cur_root_entry.entry_name[0] == 0x00)
+            return i;
     }
     return 0;
 }
@@ -212,9 +231,6 @@ void ramdisk_fat16_format()
     write_sector(SECOND_FAT_TABLE_SECTOR, starting_sectors);
 }
 
-#define FAT16_RAMDISK_SUCCESS                   0
-#define FAT16_RAMDISK_ERROR_INVALID_FILENAME    1
-#define FAT16_RAMDISK_ERROR_NO_FREE_SPACE       2
 
 /* reads a sector of a file from the fat device */
 void* ramdisk_fat16_file_sec_read(
@@ -226,13 +242,15 @@ void* ramdisk_fat16_file_sec_read(
     /* iterate thru clusters until we find the one the user wants */
     /* populate sector_buffer with data sector data */
     /* returns pointer to sector_buffer */
+    return sector_buffer;
 }
 
 /* writes a file to the fat device */
 int ramdisk_fat16_file_write(uint8_t* file_name, void* data, uint32_t data_size)
 {
 
-    /* Set up the buffers to the file name */
+    /* Set up the buffers to the file name 
+       Add in blanks by default */
     uint8_t file_name_buffer[8];
     memset(file_name_buffer, 0x20, 8);
     uint8_t file_name_ext[3];
@@ -281,6 +299,8 @@ int ramdisk_fat16_file_write(uint8_t* file_name, void* data, uint32_t data_size)
 
     /* Create a new struct for our file */
     ramdisk_fat16_entry_t new_entry;
+    memcpy(new_entry.entry_name, file_name_buffer, 8);
+    memcpy((uint8_t*)(new_entry.entry_name) + 8, file_name_ext, 3);
     new_entry.entry_attrib = 0x00;
     new_entry.entry_reserved = 0x00;
     new_entry.file_size = data_size;
@@ -356,6 +376,10 @@ int ramdisk_fat16_file_write(uint8_t* file_name, void* data, uint32_t data_size)
         earlier before we get to this point... or we'll write the data
         and not actually have room to write the entry! */
     uint16_t new_root_entry = find_next_free_root_entry();
+#ifdef DEBUG_MSG_RAMDISK_FAT16
+    printf("ramdisk_fat16_file_write: writing %s to root entry number %d\n",
+        new_entry.entry_name, new_root_entry);
+#endif 
     ramdisk_write(
         (FIRST_ROOT_SECTOR * FAT16_BYTES_PER_SECTOR) + 
             (new_root_entry * sizeof(ramdisk_fat16_entry_t)), 
@@ -368,10 +392,39 @@ int ramdisk_fat16_file_write(uint8_t* file_name, void* data, uint32_t data_size)
 
 void ramdisk_fat16_list_info()
 {
-    /* list size of filesystem */
+    /* list information about the filesystem */
+    printf("Filesize of FAT16 Ramdisk: %d MB\n", 
+        RAMDISK_FAT16_SIZE / 1024 / 1024);
+
+    printf("Total Sectors: %d | Bytes per Cluster: %d\n", 
+        FAT16_TOTAL_SECTORS,
+        FAT16_BYTES_PER_SECTOR);
+
+    printf("FAT Sectors: %d | Root Sectors: %d | Data Clusters: %d\n", 
+        FAT16_RESERVED_SECTOR_COUNT,
+        ROOT_DIRECTORY_SECTORS,
+        CLUSTER_COUNT);
 
     /* list file count */
-    
+    int i;
+    ramdisk_fat16_entry_t cur_root_entry;
+
+    for(i = 0; i < ROOT_DIRECTORY_SECTORS; i++)
+    {
+        ramdisk_read(
+            (FIRST_ROOT_SECTOR * FAT16_BYTES_PER_SECTOR) +
+                (i * sizeof(ramdisk_fat16_entry_t)),
+            (uint8_t*) &cur_root_entry,
+            sizeof(ramdisk_fat16_entry_t));
+        if(cur_root_entry.entry_name[0] != 0x00) {
+            printf("File %d: %s | Size: %d bytes | Cluster: %d\n", 
+                i, 
+                cur_root_entry.entry_name,
+                cur_root_entry.file_size,
+                cur_root_entry.entry_low_cluster_number);
+        }
+    }
+        
     /* list free / taken up clusters */
 
     /* list all files */
