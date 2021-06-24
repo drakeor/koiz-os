@@ -142,3 +142,17 @@ void printf(char *format, ...)
     }
     va_end(arg);
 }
+
+
+uint16_t eswap_uint16(uint16_t value)
+{
+    return (value << 8) | (value >> 8 );
+}
+
+uint32_t eswap_uint32(uint32_t value)
+{
+    return ((value<<24)&0xff000000) | 
+            ((value<<8)&0xff0000) | 
+            ((value>>8)&0xff00) | 
+            ((value>>24)&0xff);
+}

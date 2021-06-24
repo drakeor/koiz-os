@@ -23,6 +23,7 @@
 #include "tests/pmem_tests.h"
 #include "tests/vmem_tests.h"
 #include "tests/ramdisk_tests.h"
+#include "tests/ramdisk_fat16_tests.h"
 
 void kernel_init()
 {
@@ -57,6 +58,9 @@ void kernel_init()
 
     /* Run the tests BEFORE initializing the ramdisk! */
     ramdisk_run_tests();
+
+    /* Run the tests for the temp filesystem BEFORE initializing it! */
+    ramdisk_fat16_run_tests();
 
     /* initialize our temp filesystem */
     ramdisk_fat16_init();

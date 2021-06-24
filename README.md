@@ -56,7 +56,7 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Read from an actual disk drive
 
-- Read a FAT32 system from an actual disk drive
+- Read a FAT32 system from an actual disk drive (or emulated)
 
 - Network Driver
 

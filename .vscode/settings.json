@@ -4,6 +4,8 @@
         "idt_setup.h": "c",
         "config.h": "c",
         "pmem_tests.h": "c",
-        "ramdisk.h": "c"
+        "ramdisk.h": "c",
+        "string.h": "c",
+        "stdlib.h": "c"
     }
 }
