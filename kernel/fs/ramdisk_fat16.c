@@ -322,9 +322,9 @@ int ramdisk_fat16_file_write(uint8_t* file_name, void* data, uint32_t data_size)
         /* Write current sector to FAT */
         uint16_t swapped_csec = eswap_uint16(current_sector);
         ramdisk_write((FIRST_FAT_TABLE_SECTOR * FAT16_BYTES_PER_SECTOR) + 
-            (last_sector * 2), &swapped_csec, 2);
+            (last_sector * 2), (uint8_t*)&swapped_csec, 2);
         ramdisk_write((SECOND_FAT_TABLE_SECTOR * FAT16_BYTES_PER_SECTOR) + 
-            (last_sector * 2), &swapped_csec, 2);
+            (last_sector * 2), (uint8_t*)&swapped_csec, 2);
         
         current_data_pointer += FAT16_BYTES_PER_CLUSTER;
         bytes_left_to_write -= FAT16_BYTES_PER_CLUSTER;
@@ -337,16 +337,16 @@ int ramdisk_fat16_file_write(uint8_t* file_name, void* data, uint32_t data_size)
             bytes_left_to_write, current_sector);
 #endif
         write_sector_partial(FIRST_DATA_SECTOR + current_sector, 
-            (uint8_t*)data + current_data_pointer,
+            ((uint8_t*)data) + current_data_pointer,
             bytes_left_to_write);
     }
 
     /* Regardless, mark our current sector as the last sector in the chain */
     uint16_t swapped_c_end_value = eswap_uint16(0xFFF8);
     ramdisk_write((FIRST_FAT_TABLE_SECTOR * FAT16_BYTES_PER_SECTOR) + 
-            (current_sector * 2), &swapped_c_end_value, 2);
+            (current_sector * 2), (uint8_t*) &swapped_c_end_value, 2);
     ramdisk_write((SECOND_FAT_TABLE_SECTOR * FAT16_BYTES_PER_SECTOR) + 
-            (current_sector * 2), &swapped_c_end_value, 2);
+            (current_sector * 2), (uint8_t*) &swapped_c_end_value, 2);
 
     /* Populate the entry with the head to our sector */
     new_entry.entry_low_cluster_number = head_sector;
@@ -359,7 +359,7 @@ int ramdisk_fat16_file_write(uint8_t* file_name, void* data, uint32_t data_size)
     ramdisk_write(
         (FIRST_ROOT_SECTOR * FAT16_BYTES_PER_SECTOR) + 
             (new_root_entry * sizeof(ramdisk_fat16_entry_t)), 
-        &new_entry, 
+        (uint8_t*) &new_entry, 
         sizeof(ramdisk_fat16_entry_t));
 
     /* return success */
