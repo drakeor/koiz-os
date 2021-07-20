@@ -32,6 +32,19 @@ void* memcpy(void* dst, void* src, uint32_t data_size);
  * 
  * Returns @ptr regardless
  */
-void* memset(void* ptr, uint8_t value, uint32_t len);
+void* memset(void* ptr, uint8_t value, uint32_t data_size);
+
+/**
+ * memcmp() - Compares two strings
+ * 
+ * @ptr_a:      First memory address to compare
+ * @ptr_b:      Second memory address to compare
+ * @data_size:  Size of the data to compare
+ * 
+ * Returns -1 if ptr_a < ptr_b
+ * Returns 0 if ptr_a = ptr_b
+ * Returns 1 if ptr_a > ptr_b
+ */
+int32_t memcmp(const void* ptr_a, const void* ptr_b, uint32_t data_size);
 
 #endif

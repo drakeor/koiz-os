@@ -232,31 +232,24 @@ void ramdisk_fat16_format()
 }
 
 
-/* reads a sector of a file from the fat device */
-void* ramdisk_fat16_file_sec_read(
-    uint8_t* file_name, void* sector_buffer, uint16_t sector)
+/**
+ * ramdisk_fat16_filename_to_native() - converts a filename to natively
+ *                                        stored filename in FAT16
+ * 
+ * @file_name:      filename to convert.
+ * @file_name_buf:  filename buffer (NEEDS to be length 8)
+ * @file_ext_buf:   file extension buffer (NEEDS to be length 3)
+ * 
+ * the filename can be any length as it will be truncated down to size
+ */
+void ramdisk_fat16_filename_to_native(
+    uint8_t* file_name, uint8_t* file_name_buf, uint8_t* file_ext_buf) 
 {
-    /* check if file exists in root directory */
-    /* grab file record */
-    /* grab first cluster */
-    /* iterate thru clusters until we find the one the user wants */
-    /* populate sector_buffer with data sector data */
-    /* returns pointer to sector_buffer */
-    return sector_buffer;
-}
+    /* Fill buffers with blanks by default */
+    memset(file_name_buf, 0x20, 8);
+    memset(file_ext_buf, 0x20, 3);
 
-/* writes a file to the fat device */
-int ramdisk_fat16_file_write(uint8_t* file_name, void* data, uint32_t data_size)
-{
-
-    /* Set up the buffers to the file name 
-       Add in blanks by default */
-    uint8_t file_name_buffer[8];
-    memset(file_name_buffer, 0x20, 8);
-    uint8_t file_name_ext[3];
-    memset(file_name_ext, 0x20, 3);
-
-    /* Format the file name given to FAT16 */
+     /* Format the file name given to FAT16 */
     int proc_file_name = 1;
     int i = 0;
     int j = 0;
@@ -279,7 +272,7 @@ int ramdisk_fat16_file_write(uint8_t* file_name, void* data, uint32_t data_size)
 
             /* Add to filename buffer if we have room */
             if(j < 8) {
-                file_name_buffer[j] = file_name[i];
+                file_name_buf[j] = file_name[i];
                 j++;
             }
 
@@ -288,12 +281,81 @@ int ramdisk_fat16_file_write(uint8_t* file_name, void* data, uint32_t data_size)
         else {
             /* Add to file extension buffer if we have room */
             if(j < 3) {
-                file_name_ext[j] = file_name[i];
+                file_ext_buf[j] = file_name[i];
                 j++;
             }
         }
         ++i;
     }
+}
+
+/**
+ * ramdisk_fat16_filename_from_native() - converts natively FAT-16 stored
+ *                                          filename to string
+ * 
+ * @file_name_buf:  filename buffer (should be length 8)
+ * @file_ext_buf:   file extension buffer (should be length 3)
+ * @file_name:      buffer to hold filename (NEEDS to be length 11)
+ * 
+ * file_name should be at least length 11 to avoid overflows
+ */
+void ramdisk_fat16_filename_from_native(
+    uint8_t* file_name_buf, uint8_t* file_ext_buf, uint8_t* file_name) 
+{
+    
+}
+
+
+/* should probably return the sector that the file_name exists at... */
+int ramdisk_fat16_file_exists(uint8_t* file_name)
+{
+    uint32_t i;
+    ramdisk_fat16_entry_t cur_root_entry;
+    for (i = 1; i < ROOT_DIRECTORY_SECTORS; i++)
+    {
+        ramdisk_read(
+            (FIRST_ROOT_SECTOR * FAT16_BYTES_PER_SECTOR) +
+                (i * sizeof(ramdisk_fat16_entry_t)),
+            (uint8_t*) &cur_root_entry,
+            sizeof(ramdisk_fat16_entry_t));
+        
+        /* If the initial character is not 0, we can scan the sector */
+        if(cur_root_entry.entry_name[0] != 0x00)
+        {
+            /* Check if the file exists */
+            uint8_t file_name_buf[8];
+            uint8_t file_ext_buf[3];
+            
+            ramdisk_fat16_filename_to_native(file_name, 
+                file_name_buf, file_ext_buf);
+        }
+    }
+}
+
+/* reads a sector of a file from the fat device */
+void* ramdisk_fat16_file_sec_read(
+    uint8_t* file_name, void* sector_buffer, uint16_t sector)
+{
+    /* check if file exists in root directory */
+    /* grab file record */
+    /* grab first cluster */
+    /* iterate thru clusters until we find the one the user wants */
+    /* populate sector_buffer with data sector data */
+    /* returns pointer to sector_buffer */
+    return sector_buffer;
+}
+
+
+/* writes a file to the fat device */
+int ramdisk_fat16_file_write(uint8_t* file_name, void* data, uint32_t data_size)
+{
+
+    /* Set up the buffers to the file name */
+    uint8_t file_name_buffer[8];
+    uint8_t file_name_ext[3];
+
+    /* convert the filename to the name and extension used by FAT16 */
+    ramdisk_fat16_filename_to_native(file_name, file_name_buffer, file_name_ext);
 
     /* TODO: Make sure the file doesn't already exist! */
 
@@ -405,10 +467,33 @@ void ramdisk_fat16_list_info()
         ROOT_DIRECTORY_SECTORS,
         CLUSTER_COUNT);
 
-    /* list file count */
-    int i;
-    ramdisk_fat16_entry_t cur_root_entry;
+    /* list free / taken up clusters */
+    uint16_t current_cluster = 0;
+    uint16_t free_clusters = 0;
 
+    /* Go through the count the number of free clusters */
+    int i;
+    for(i = 0; i < CLUSTER_COUNT; i++)
+    {
+        /* read the current cluster from the ramdisk */
+        /* only using the first FAT table */
+        ramdisk_read(
+            (FIRST_FAT_TABLE_SECTOR * FAT16_BYTES_PER_SECTOR) +
+                (i * sizeof(uint16_t)),
+            (uint8_t*) &current_cluster,
+            sizeof(uint16_t));
+        
+        /* cluster marked as 0x0000 is free */
+        if(current_cluster == 0x0000)
+            ++free_clusters;
+    }
+
+    printf("Used Clusters : %d | Free Clusters %d\n",
+        CLUSTER_COUNT - free_clusters, free_clusters);
+
+    /* list all files in the root directory sector */
+    printf("\n===File List===\n");
+    ramdisk_fat16_entry_t cur_root_entry;
     for(i = 0; i < ROOT_DIRECTORY_SECTORS; i++)
     {
         ramdisk_read(
@@ -416,20 +501,21 @@ void ramdisk_fat16_list_info()
                 (i * sizeof(ramdisk_fat16_entry_t)),
             (uint8_t*) &cur_root_entry,
             sizeof(ramdisk_fat16_entry_t));
+
+        /* We know the sector is free since the first character of the name
+           isn't the null character */
         if(cur_root_entry.entry_name[0] != 0x00) {
+            uint16_t cluster_number = cur_root_entry.entry_low_cluster_number;
             printf("File %d: %s | Size: %d bytes | Cluster: %d\n", 
                 i, 
                 cur_root_entry.entry_name,
                 cur_root_entry.file_size,
-                cur_root_entry.entry_low_cluster_number);
+                cluster_number);
         }
     }
-        
-    /* list free / taken up clusters */
+    printf("\n");
 
-    /* list all files */
-
-    /* list orphaned clusters */
+    /* TODO: list orphaned clusters */
 }
 
 void ramdisk_fat16_init()

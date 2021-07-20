@@ -40,4 +40,7 @@ void ramdisk_fat16_list_info(void);
 int ramdisk_fat16_file_write(uint8_t* file_name, 
     void* data, uint32_t data_size);
 
+/* returns 1 if the file exists and 0 if the file does not exist */
+int ramdisk_fat16_file_exists(uint8_t* file_name);
+
 #endif
