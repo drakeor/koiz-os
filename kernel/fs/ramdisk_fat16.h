@@ -16,10 +16,16 @@
 
 #include <stdint.h>
 
+/* Important enum for getting the right buffer size in OS */
+#define FAT16_BYTES_PER_SECTOR            512
+
 /* Results enums */
-#define FAT16_RAMDISK_SUCCESS                   0
-#define FAT16_RAMDISK_ERROR_INVALID_FILENAME    1
-#define FAT16_RAMDISK_ERROR_NO_FREE_SPACE       2
+#define FAT16_RAMDISK_SUCCESS                       0
+#define FAT16_RAMDISK_ERROR_INVALID_FILENAME        1
+#define FAT16_RAMDISK_ERROR_NO_FREE_SPACE           2
+#define FAT16_RAMDISK_ERROR_FILE_DOESNT_EXIST       3
+#define FAT16_RAMDISK_ERROR_FILE_EXISTS             4
+#define FAT16_RAMDISK_DOESNT_SUPPORT_MULTICLUSTER   5
 
 /**
  * ramdisk_fat16_init() - Initializes a fat16 system against our ramdisk
@@ -40,7 +46,16 @@ void ramdisk_fat16_list_info(void);
 int ramdisk_fat16_file_write(uint8_t* file_name, 
     void* data, uint32_t data_size);
 
-/* returns 1 if the file exists and 0 if the file does not exist */
-int ramdisk_fat16_file_exists(uint8_t* file_name);
+/* returns sector number if file exists and 0 if the file does not exist */
+uint32_t ramdisk_fat16_file_exists(uint8_t* file_name);
+
+/* reads a sector of a file from the fat device */
+/* sector_index refers to the INDEX of the sector and not the PHYSICAL sector
+*/
+/* For our implementation, this will almost always be 0 */
+/* Make sure the sector is big enough as well (size of sector) */
+/* Returns FAT16_RAMDISK_SUCCESS on success or an error code on failure */
+int ramdisk_fat16_file_read(
+    uint8_t* file_name, void* sector_buffer, uint16_t sector_index);
 
 #endif

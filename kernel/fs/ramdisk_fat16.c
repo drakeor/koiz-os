@@ -83,7 +83,6 @@ typedef struct ramdisk_fat16_entry ramdisk_fat16_entry_t;
 /* FAT16 Related Constants from ramdisk_fat16.asm */
 #define FAT16_BOOTLOADER_SIZE 512
 
-#define FAT16_BYTES_PER_SECTOR            512
 #define FAT16_SECTORS_PER_CLUSTER         1
 #define FAT16_BYTES_PER_CLUSTER           FAT16_BYTES_PER_SECTOR * \
                                             FAT16_SECTORS_PER_CLUSTER
@@ -236,18 +235,22 @@ void ramdisk_fat16_format()
  * ramdisk_fat16_filename_to_native() - converts a filename to natively
  *                                        stored filename in FAT16
  * 
- * @file_name:      filename to convert.
- * @file_name_buf:  filename buffer (NEEDS to be length 8)
- * @file_ext_buf:   file extension buffer (NEEDS to be length 3)
+ * @file_name:      destination native file buffer (needs to be LENGTH 11)
+ * @raw_file_name:  raw filename to convert
  * 
- * the filename can be any length as it will be truncated down to size
+ * the raw_file_name can be any length as it will be truncated down to size
+ * returns file_name
  */
-void ramdisk_fat16_filename_to_native(
-    uint8_t* file_name, uint8_t* file_name_buf, uint8_t* file_ext_buf) 
+uint8_t* ramdisk_fat16_filename_to_native(
+    uint8_t* native_file_name, uint8_t* raw_file_name) 
 {
+    /* Set up the buffers to the file name */
+    uint8_t file_name_buffer[8];
+    uint8_t file_ext_buffer[3];
+
     /* Fill buffers with blanks by default */
-    memset(file_name_buf, 0x20, 8);
-    memset(file_ext_buf, 0x20, 3);
+    memset(file_name_buffer, 0x20, 8);
+    memset(file_ext_buffer, 0x20, 3);
 
      /* Format the file name given to FAT16 */
     int proc_file_name = 1;
@@ -255,7 +258,7 @@ void ramdisk_fat16_filename_to_native(
     int j = 0;
 
     /* Loop through the file name */
-    while(file_name[i] != '\0') {
+    while(raw_file_name[i] != '\0') {
 
         /* TODO: Check for valid filename */
 
@@ -263,7 +266,7 @@ void ramdisk_fat16_filename_to_native(
         if(proc_file_name) {
 
             /* Switch to processing file extension */
-            if(file_name[i] == '.') {
+            if(raw_file_name[i] == '.') {
                 proc_file_name = 0;
                 j = 0;
                 ++i;
@@ -272,7 +275,7 @@ void ramdisk_fat16_filename_to_native(
 
             /* Add to filename buffer if we have room */
             if(j < 8) {
-                file_name_buf[j] = file_name[i];
+                file_name_buffer[j] = raw_file_name[i];
                 j++;
             }
 
@@ -281,33 +284,23 @@ void ramdisk_fat16_filename_to_native(
         else {
             /* Add to file extension buffer if we have room */
             if(j < 3) {
-                file_ext_buf[j] = file_name[i];
+                file_ext_buffer[j] = raw_file_name[i];
                 j++;
             }
         }
         ++i;
     }
+
+    memcpy(native_file_name, file_name_buffer, 8);
+    memcpy(native_file_name + 8, file_ext_buffer, 3);
+
+    return native_file_name;
 }
 
-/**
- * ramdisk_fat16_filename_from_native() - converts natively FAT-16 stored
- *                                          filename to string
- * 
- * @file_name_buf:  filename buffer (should be length 8)
- * @file_ext_buf:   file extension buffer (should be length 3)
- * @file_name:      buffer to hold filename (NEEDS to be length 11)
- * 
- * file_name should be at least length 11 to avoid overflows
- */
-void ramdisk_fat16_filename_from_native(
-    uint8_t* file_name_buf, uint8_t* file_ext_buf, uint8_t* file_name) 
-{
-    
-}
-
-
-/* should probably return the sector that the file_name exists at... */
-int ramdisk_fat16_file_exists(uint8_t* file_name)
+/* should probably return the root entry num that the file_name exists at... */
+/* returns 0 if the file doesnt exist */
+/* return the root entry number if the file exists */
+uint32_t ramdisk_fat16_file_exists(uint8_t* file_name)
 {
     uint32_t i;
     ramdisk_fat16_entry_t cur_root_entry;
@@ -323,26 +316,56 @@ int ramdisk_fat16_file_exists(uint8_t* file_name)
         if(cur_root_entry.entry_name[0] != 0x00)
         {
             /* Check if the file exists */
-            uint8_t file_name_buf[8];
-            uint8_t file_ext_buf[3];
-            
-            ramdisk_fat16_filename_to_native(file_name, 
-                file_name_buf, file_ext_buf);
+            uint8_t native_file_name[11];
+            ramdisk_fat16_filename_to_native(native_file_name, file_name);
+            if(memcmp(native_file_name, cur_root_entry.entry_name, 11) == 0)
+            {
+                return i;
+            }
         }
     }
+
+    return 0;
 }
 
-/* reads a sector of a file from the fat device */
-void* ramdisk_fat16_file_sec_read(
-    uint8_t* file_name, void* sector_buffer, uint16_t sector)
+
+int ramdisk_fat16_file_read(
+    uint8_t* file_name, void* sector_buffer, uint16_t sector_index)
 {
     /* check if file exists in root directory */
+    uint32_t root_entry_num = ramdisk_fat16_file_exists(file_name);
+    if(root_entry_num == 0)
+        return FAT16_RAMDISK_ERROR_FILE_DOESNT_EXIST;
+    
     /* grab file record */
-    /* grab first cluster */
+    ramdisk_fat16_entry_t entry;
+    ramdisk_read(
+        (FIRST_ROOT_SECTOR * FAT16_BYTES_PER_SECTOR) + 
+            (root_entry_num * sizeof(ramdisk_fat16_entry_t)), 
+        (uint8_t*) &entry, 
+        sizeof(ramdisk_fat16_entry_t));
+
+#ifdef DEBUG_MSG_RAMDISK_FAT16
+        /* Note that native_file_name isn't null terminated so we'll
+           have garbage at the end */
+        printf("ramdisk_fat16_file_read: Reading file %s on cluster %x\n", 
+            entry.entry_name, entry.entry_low_cluster_number);
+#endif
+
+    /* grab first sector and populate buffer */
+    uint16_t current_sector = entry.entry_low_cluster_number;
+    read_sector(FIRST_DATA_SECTOR + current_sector, 
+            (uint8_t*)sector_buffer);
+
     /* iterate thru clusters until we find the one the user wants */
-    /* populate sector_buffer with data sector data */
+    /* TODO: Implement this */
+    /* We want to read the FAT table and iterate through clusters until we 
+    get the one we want */
+    if(sector_index != 0)
+        return FAT16_RAMDISK_DOESNT_SUPPORT_MULTICLUSTER;
+
     /* returns pointer to sector_buffer */
-    return sector_buffer;
+    return FAT16_RAMDISK_SUCCESS;
 }
 
 
@@ -350,19 +373,25 @@ void* ramdisk_fat16_file_sec_read(
 int ramdisk_fat16_file_write(uint8_t* file_name, void* data, uint32_t data_size)
 {
 
-    /* Set up the buffers to the file name */
-    uint8_t file_name_buffer[8];
-    uint8_t file_name_ext[3];
 
     /* convert the filename to the name and extension used by FAT16 */
-    ramdisk_fat16_filename_to_native(file_name, file_name_buffer, file_name_ext);
+    uint8_t native_file_name[11];
+    ramdisk_fat16_filename_to_native(native_file_name, file_name);
 
-    /* TODO: Make sure the file doesn't already exist! */
+#ifdef DEBUG_MSG_RAMDISK_FAT16
+        /* Note that native_file_name isn't null terminated so we'll
+           have garbage at the end */
+        printf("ramdisk_fat16_file_write: Writing file %s\n", 
+            native_file_name);
+#endif
 
+    /* Make sure the file doesn't already exist! */
+    if(ramdisk_fat16_file_exists(file_name) != 0)
+        return FAT16_RAMDISK_ERROR_FILE_EXISTS;
+        
     /* Create a new struct for our file */
     ramdisk_fat16_entry_t new_entry;
-    memcpy(new_entry.entry_name, file_name_buffer, 8);
-    memcpy((uint8_t*)(new_entry.entry_name) + 8, file_name_ext, 3);
+    memcpy(new_entry.entry_name, native_file_name, 11);
     new_entry.entry_attrib = 0x00;
     new_entry.entry_reserved = 0x00;
     new_entry.file_size = data_size;
