@@ -2,6 +2,7 @@
 
 #include <stdarg.h>
 
+#include "../drivers/memory/pmem.h"
 #include "../drivers/video/vga.h"
 #include "../drivers/serial/serial.h"
 
@@ -13,12 +14,71 @@
 /* Comment out to disable serial port logging */
 #define LOG_ALL_MESSAGES_TO_SERIAL
 
+/* Structure for our standard buffers. 
+   We're using gust a simple ring buffer. */
+struct stdio_buffer {
+    int is_init;
+    void* b_addr;
+    int head_ptr;
+    int tail_ptr;
+    int b_size;
+};
+typedef struct stdio_buffer stdio_buffer_t;
+
+/* Our global input, output, and error streams */
+stdio_buffer_t std_input_buf = {0};
+stdio_buffer_t std_error_buf = {0};
+stdio_buffer_t std_output_buf = {0};
+
+/* Helper function to initialize buffers */
+void io_buffer_place(stdio_buffer_t* in_buff, char* message) 
+{
+    /* Lazy initialize buffer */
+    if(!in_buff->is_init) {
+        in_buff->b_addr = pmem_alloc();
+        in_buff->b_size = PHYS_BLOCK_SIZE;
+        in_buff->is_init = 1;
+    }
+
+
+    /* Go through message and place in buffer */
+    int i = 0;
+    uint8_t* b_addr = in_buff->b_addr;
+    while(message[i] != '\0')
+    {
+        /* Copy character to buffer */
+        b_addr[in_buff->head_ptr] = message[i];
+        in_buff->head_ptr = (in_buff->head_ptr + 1) % in_buff->b_size;
+        i++;
+
+        /* If we hit our tail_ptr, we looped around and this
+           means we overflowed our buffer. For now, we'll throw an error. */
+        /* If this is in userspace from a function call, we'd likely switch
+           to another process and hopefully consume data */
+        /* Likely undo the write too (set head back one) */
+        if(in_buff->head_ptr == in_buff->tail_ptr)
+            panic("StdLib IO Buffer overflow!");
+    }
+}
+
+/* Returns 1 if the io_buffer is empty, or 0 if there's data to read */
+int io_buffer_empty(stdio_buffer_t* in_buff)
+{
+    return (in_buff->head_ptr == in_buff->tail_ptr);
+}
+
 void std_print(char *message)
 {
 #ifdef LOG_ALL_MESSAGES_TO_SERIAL
     serial_write_string(PORT_COM1, message);
 #endif 
+    /* If we have IOStreams, buffer the input. 
+        Otherwise print directly to screen */
+    if(pmem_isinit()) {
+        io_buffer_place(&std_output_buf, message);
+    } //else {
     vga_print_screen(message, DEFAULT_TEXT_COLOR);
+    //}
 }
 
 void std_print_char(char message)
@@ -80,14 +140,15 @@ void print_uint_to_string(unsigned int number, unsigned int base)
 
 
 /*
- * Panic function
+ * Panic function.
+ * Prints directly to the screen and avoids buffers
  */
 __attribute__((__noreturn__))
 void panic(char *message)
 {
-    std_error("\n");
-    std_error("KERNEL PANIC: ");
-    std_error(message);
+    vga_print_screen("\n", DEFAULT_ERROR_COLOR);
+    vga_print_screen("KERNEL PANIC: ", DEFAULT_ERROR_COLOR);
+    vga_print_screen(message, DEFAULT_ERROR_COLOR);
     while (1) { }
 	__builtin_unreachable();
 }
@@ -156,3 +217,4 @@ uint32_t eswap_uint32(uint32_t value)
             ((value>>8)&0xff00) | 
             ((value>>24)&0xff);
 }
+

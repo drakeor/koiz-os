@@ -20,30 +20,40 @@
 #define MEM_RESERVED_SECTION_MIN 0x100000
 #define MIN_MEM_SIZE 0xFFFF
 
+/* Flag to determine whether or not pmem is initialized yet */
+static int pmem_initialized = 0;
 
 /* This is where our main memory is stored */
-void* pmem_main_memory_start;
-uint32_t pmem_main_memory_length;
+static void* pmem_main_memory_start;
+static uint32_t pmem_main_memory_length;
 
 /*
  * Since the memory allocation blocks take up the first few MBs, 
  * this is where we'll malloc from
  */
-void* pmem_alloc_start;
+static void* pmem_alloc_start;
+
+/* Number of entries that will be availiable in pmem. This is 
+   also used in the test script, hence why it's global */
 uint32_t pmem_mgr_reserved_size;
 
 /* This points to the next physical spot on the list */
-uint32_t pmem_curr_alloc_record;
+static uint32_t pmem_curr_alloc_record;
 
 /* Global variables to hold the MBD information */
 /* This should never get clobbered */
-multiboot_info_t* pmem_mbd = 0;
-uint32_t pmem_kernel_reserved_end_addr = 0;
+static multiboot_info_t* pmem_mbd = 0;
+static uint32_t pmem_kernel_reserved_end_addr = 0;
 
 void pmem_set_mbd(multiboot_info_t* mbd, uint32_t kernel_reserved_end_addr)
 {
     pmem_mbd = mbd;
     pmem_kernel_reserved_end_addr = kernel_reserved_end_addr;
+}
+
+int pmem_isinit(void)
+{
+    return pmem_initialized;
 }
 
 void pmem_initialize(void)
@@ -172,12 +182,16 @@ void pmem_initialize(void)
     pmem_tests();
 #endif
 
+    /* We're now initialized */
+    pmem_initialized = 1;
 }
 
 /**
  * pmem_ptr_to_entry() - Converts a pointer to pmem entry
  * 
  * @ptr: Pointer to physical memory
+ * 
+ * We don't make this static as tests use it.
  */
 uint32_t pmem_ptr_to_entry(void* ptr)
 {
@@ -199,6 +213,8 @@ uint32_t pmem_ptr_to_entry(void* ptr)
  * pmem_ptr_to_entry() - Converts a pmem entry to a pointer
  * 
  * @entry: Entry number to convert to a pointer
+ * 
+ * We don't make this static as tests use it
  */
 void* pmem_entry_to_ptr(uint32_t entry)
 {

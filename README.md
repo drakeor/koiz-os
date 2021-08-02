@@ -40,19 +40,25 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Make GRUB compatiable (DONE)
 
+- FAT16 filesystem on ramdisk (DONE)
+
+- Add more standard lib stuff to stdlib.c, strings.c (DONE)
+
 # In Progress Features
 
-- FAT16 filesystem on ramdisk
+- Kernel Standard IO Streams 
 
-- Add more stuff to stdlib.c
+- Slab Allocator / KMalloc / KFree 
+
+# Planned Features (in order of development)
+
+- Add basic shell
 
 - File management
 
+- Add system calls
+
 - Userspace application in filesystem
-
-- Malloc 
-
-# Planned Features (in order of development)
 
 - Read from an actual disk drive
 
@@ -76,6 +82,7 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Multi-processor support
 
+- Implement FPU / SSE stuff
 
 # Requirements to build
 

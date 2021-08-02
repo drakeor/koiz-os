@@ -6,6 +6,7 @@
         "pmem_tests.h": "c",
         "ramdisk.h": "c",
         "string.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "kmalloc.h": "c"
     }
 }

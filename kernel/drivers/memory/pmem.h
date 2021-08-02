@@ -38,6 +38,14 @@ int pmem_free(void* ptr);
 void pmem_initialize(void);
 
 /**
+ * pmem_isinit() - Gets the initialization status of pmem
+ * 
+ * Returns 1 if the physical ram handler is initialized
+ * Returns 0 if the physical ram handler is not initialized
+ */
+int pmem_isinit(void);
+
+/**
  * pmem_set_mbd() - Sets the multiboot info and reserved kernel addr
  * 
  * @mbd: This is the address to the mbd as populated by GRUB
