@@ -34,4 +34,7 @@ uint16_t eswap_uint16(uint16_t value);
  */
 uint32_t eswap_uint32(uint32_t value);
 
+/* Deals with things like processing standard input/output streams */
+void stdlib_update(void);
+
 #endif

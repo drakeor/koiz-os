@@ -67,6 +67,21 @@ int io_buffer_empty(stdio_buffer_t* in_buff)
     return (in_buff->head_ptr == in_buff->tail_ptr);
 }
 
+/* Pops a character off the IO buffer */
+/* Returns 0 if there's nothing left to pop */
+uint8_t io_buffer_pop(stdio_buffer_t* in_buff)
+{
+    if(io_buffer_empty(in_buff))
+        return 0;
+
+    uint8_t* b_addr = in_buff->b_addr;
+    uint8_t popped_char =  b_addr[in_buff->tail_ptr];
+    in_buff->tail_ptr = (in_buff->tail_ptr + 1) % in_buff->b_size;
+
+    return popped_char;
+}
+
+
 void std_print(char *message)
 {
 #ifdef LOG_ALL_MESSAGES_TO_SERIAL
@@ -76,9 +91,21 @@ void std_print(char *message)
         Otherwise print directly to screen */
     if(pmem_isinit()) {
         io_buffer_place(&std_output_buf, message);
-    } //else {
-    vga_print_screen(message, DEFAULT_TEXT_COLOR);
-    //}
+    } else {
+        vga_print_screen(message, DEFAULT_TEXT_COLOR);
+    }
+}
+
+void stdlib_update(void)
+{
+    /* Print everything that is in the buffer */
+    uint8_t next_char = io_buffer_pop(&std_output_buf);
+    while(next_char != '\0')
+    {
+        vga_print_screen_char(next_char, DEFAULT_TEXT_COLOR);
+        next_char = io_buffer_pop(&std_output_buf);
+    }
+
 }
 
 void std_print_char(char message)
@@ -86,9 +113,17 @@ void std_print_char(char message)
 #ifdef LOG_ALL_MESSAGES_TO_SERIAL
     serial_write(PORT_COM1, message);
 #endif 
-    vga_print_screen_char(message, DEFAULT_TEXT_COLOR);
+    /* If we have IOStreams, buffer the input. 
+        Otherwise print directly to screen */
+    if(pmem_isinit()) {
+        char msg_str[2] = { message, 0x0 };
+        io_buffer_place(&std_output_buf, msg_str);
+    } else {
+        vga_print_screen_char(message, DEFAULT_TEXT_COLOR);
+    }
 }
 
+/* Standard error bypasses the buffer and prints directly to screen */
 void std_error(char *message)
 {
 #ifdef LOG_ALL_MESSAGES_TO_SERIAL

@@ -68,7 +68,8 @@ void kernel_init()
 
 void kernel_update(void)
 {
-
+    /* standard lib processes tasks */
+    stdlib_update();
 }
 
 /* Main kernel entry point */
