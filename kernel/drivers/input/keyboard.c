@@ -68,8 +68,7 @@ void keyboard_interrupt_handler(void)
 
     uint8_t ascii_char = scan_to_ascii(scan_code);
 
-    /* Simply print the character to the screen for now */
-    /* TODO: Place in standard input */
+    /* Place the character in standard input for now */
     if(ascii_char != NULL)
-        printf("%c", ascii_char);
+        stdlib_put_stdio_input_char(ascii_char);
 }

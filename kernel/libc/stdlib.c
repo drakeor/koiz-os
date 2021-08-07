@@ -27,7 +27,7 @@ typedef struct stdio_buffer stdio_buffer_t;
 
 /* Our global input, output, and error streams */
 stdio_buffer_t std_input_buf = {0};
-stdio_buffer_t std_error_buf = {0};
+//stdio_buffer_t std_error_buf = {0};
 stdio_buffer_t std_output_buf = {0};
 
 /* Helper function to initialize buffers */
@@ -81,6 +81,15 @@ uint8_t io_buffer_pop(stdio_buffer_t* in_buff)
     return popped_char;
 }
 
+void stdlib_put_stdio_input_char(char character)
+{
+    /* Only add it in if we have IOStreams (pmem is avail) */
+    /* otherwise ignore it */
+    if(pmem_isinit()) {
+        char msg_str[2] = { character, 0x0 };
+        io_buffer_place(&std_input_buf, msg_str);
+    }
+}
 
 void std_print(char *message)
 {
@@ -98,7 +107,7 @@ void std_print(char *message)
 
 void stdlib_update(void)
 {
-    /* Print everything that is in the buffer */
+    /* Print everything that is in the output buffer */
     uint8_t next_char = io_buffer_pop(&std_output_buf);
     while(next_char != '\0')
     {
@@ -106,6 +115,13 @@ void stdlib_update(void)
         next_char = io_buffer_pop(&std_output_buf);
     }
 
+    /* For the input buffer, we just print it for now */
+    next_char = io_buffer_pop(&std_input_buf);
+    while(next_char != '\0')
+    {
+        vga_print_screen_char(next_char, DEFAULT_TEXT_COLOR);
+        next_char = io_buffer_pop(&std_input_buf);
+    }
 }
 
 void std_print_char(char message)

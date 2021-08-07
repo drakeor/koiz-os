@@ -37,4 +37,9 @@ uint32_t eswap_uint32(uint32_t value);
 /* Deals with things like processing standard input/output streams */
 void stdlib_update(void);
 
+/* Puts a character into the stdio input buffer. Mainly used by the 
+keyboard driver. Iunno how to structure it more permanently atm.
+TODO: Think of a better architecture. */
+void stdlib_put_stdio_input_char(char character);
+
 #endif
