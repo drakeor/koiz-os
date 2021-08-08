@@ -42,4 +42,7 @@ keyboard driver. Iunno how to structure it more permanently atm.
 TODO: Think of a better architecture. */
 void stdlib_put_stdio_input_char(char character);
 
+/* grabs character off the standard input stream */
+char stdlib_pop_stdio_input_char(void);
+
 #endif

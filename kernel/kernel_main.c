@@ -25,6 +25,9 @@
 #include "tests/ramdisk_tests.h"
 #include "tests/ramdisk_fat16_tests.h"
 
+/* Include our shell */
+#include "shell/shell.h"
+
 void kernel_init()
 {
 
@@ -64,12 +67,19 @@ void kernel_init()
 
     /* initialize our temp filesystem */
     ramdisk_fat16_init();
+
+    
+    printf("kernel init complete\n");
+
 }
 
 void kernel_update(void)
 {
     /* standard lib processes tasks */
     stdlib_update();
+
+    /* shell process update */
+    shell_update();
 }
 
 /* Main kernel entry point */
@@ -88,8 +98,8 @@ void kernel_main(multiboot_info_t* mbd, uint32_t magic,
     pmem_set_mbd(mbd, kernel_memory_end);
 
     kernel_init();
-
-    printf("Welcome to Koiz-OS!");
+    
+    shell_init();
 
     while(1) {
         kernel_update();

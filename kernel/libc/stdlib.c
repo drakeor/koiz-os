@@ -84,12 +84,23 @@ uint8_t io_buffer_pop(stdio_buffer_t* in_buff)
 void stdlib_put_stdio_input_char(char character)
 {
     /* Only add it in if we have IOStreams (pmem is avail) */
+    /* This lazy-initializes the stream if not exists */
     /* otherwise ignore it */
     if(pmem_isinit()) {
         char msg_str[2] = { character, 0x0 };
         io_buffer_place(&std_input_buf, msg_str);
     }
 }
+
+char stdlib_pop_stdio_input_char()
+{
+    /* Only add it in if we have IOStreams (pmem is avail) */
+    /* otherwise ignore it */
+    if(pmem_isinit() && std_input_buf.is_init) {
+        return io_buffer_pop(&std_input_buf);
+    }
+}
+
 
 void std_print(char *message)
 {
@@ -116,12 +127,12 @@ void stdlib_update(void)
     }
 
     /* For the input buffer, we just print it for now */
-    next_char = io_buffer_pop(&std_input_buf);
+    /*next_char = io_buffer_pop(&std_input_buf);
     while(next_char != '\0')
     {
         vga_print_screen_char(next_char, DEFAULT_TEXT_COLOR);
         next_char = io_buffer_pop(&std_input_buf);
-    }
+    }*/
 }
 
 void std_print_char(char message)

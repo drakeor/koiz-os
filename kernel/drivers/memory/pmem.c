@@ -229,6 +229,10 @@ void* pmem_entry_to_ptr(uint32_t entry)
 
 void* pmem_alloc()
 {
+    /* Error checking */
+    if(!pmem_initialized)
+        panic("Call to pmem_alloc before initialized!");
+        
     /* Keep track of the start record so we know if we looped
        around the list */
     uint32_t start_record = pmem_curr_alloc_record;
