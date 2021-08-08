@@ -7,6 +7,7 @@
         "ramdisk.h": "c",
         "string.h": "c",
         "stdlib.h": "c",
-        "kmalloc.h": "c"
+        "kmalloc.h": "c",
+        "vga.h": "c"
     }
 }

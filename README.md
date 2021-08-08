@@ -44,13 +44,14 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Add more standard lib stuff to stdlib.c, strings.c (DONE)
 
+- Add basic shell connected to input (DONE)
+
 # In Progress Features
 
 - Kernel Standard IO Streams 
 
 - Slab Allocator / KMalloc / KFree 
 
-- Add basic shell
 
 # Planned Features (in order of development)
 

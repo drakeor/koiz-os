@@ -34,15 +34,32 @@ uint16_t eswap_uint16(uint16_t value);
  */
 uint32_t eswap_uint32(uint32_t value);
 
-/* Deals with things like processing standard input/output streams */
+/**
+ * stdlib_update() - Deals with processing each frame
+ * 
+ * This handles things like processing the stdio streams
+ */
 void stdlib_update(void);
 
-/* Puts a character into the stdio input buffer. Mainly used by the 
-keyboard driver. Iunno how to structure it more permanently atm.
-TODO: Think of a better architecture. */
+/**
+ * stdlib_put_stdio_input_char() - Puts a character into the input buffer
+ * 
+ * @character:  Character to put in buffer
+ * 
+ * This is mainly used by the keyboard driver to insert characters
+ * into standard input. It's sorta hacky, but I don't know a better
+ * way to structure it right now.
+ * 
+ * TODO: Think of a better way to structure this.
+ */
 void stdlib_put_stdio_input_char(char character);
 
-/* grabs character off the standard input stream */
+/**
+ * stdlib_pop_stdio_input_char() - Pops a character off the input buffer
+ * 
+ * Returns 0 if there is nothing to pop off the standard input buffer
+ * TODO: Think of a better way to structure this.
+ */
 char stdlib_pop_stdio_input_char(void);
 
 #endif
