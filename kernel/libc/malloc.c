@@ -189,9 +189,9 @@ static void print_kmeminfo(kmemslab_t* slab, uint8_t* slab_name)
 
     printf("%s | Entries Used: %d/%d | Free: %d | Pages Used: %d/%d\n", 
         slab_name_padded, 
-        slab->current_entry,
+        slab->max_entries - slab->free_entries,
         slab->max_entries,
-        slab->max_entries - slab->current_entry,
+        slab->free_entries,
         slab->current_page,
         SLAB_MAX_PAGE_COUNT);
 }
@@ -200,7 +200,7 @@ void kmemlist()
 {
     printf("=====KMemList=====\n");
     print_kmeminfo(&slab128, (uint8_t*)"128b");
-    print_kmeminfo(&slab128, (uint8_t*)"256b");
-    print_kmeminfo(&slab128, (uint8_t*)"512b");
-    print_kmeminfo(&slab128, (uint8_t*)"1024b");
+    print_kmeminfo(&slab256, (uint8_t*)"256b");
+    print_kmeminfo(&slab512, (uint8_t*)"512b");
+    print_kmeminfo(&slab1024, (uint8_t*)"1024b");
 }
