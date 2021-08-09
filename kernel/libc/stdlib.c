@@ -37,6 +37,7 @@ char stdlib_pop_stdio_input_char()
     if(pmem_isinit() && std_input_buf.is_init) {
         return io_buffer_pop(&std_input_buf);
     }
+    return 0;
 }
 
 void stdlib_update(void)

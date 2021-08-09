@@ -57,6 +57,6 @@ int32_t memcmp(const void* ptr_a, const void* ptr_b, uint32_t data_size);
  * Please ensure that @str is at LEAST as large as length!
  * Note that the final character will be set as \0
  */
-void rpad(char* str, char pad_char, int length);
+void rpad(uint8_t* str, char pad_char, int length);
 
 #endif

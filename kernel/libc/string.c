@@ -43,7 +43,7 @@ int32_t memcmp(const void* ptr_a, const void* ptr_b, uint32_t data_size)
     return 0;
 }
 
-void rpad(char* str, char pad_char, int length)
+void rpad(uint8_t* str, char pad_char, int length)
 {
     int src_length = strlen(str);
     if(src_length >= length)

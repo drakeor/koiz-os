@@ -25,6 +25,7 @@
 #include "tests/vmem_tests.h"
 #include "tests/ramdisk_tests.h"
 #include "tests/ramdisk_fat16_tests.h"
+#include "tests/malloc_tests.h"
 
 /* Include our shell */
 #include "shell/shell.h"
@@ -68,6 +69,9 @@ void kernel_init()
 
     /* initialize our temp filesystem */
     ramdisk_fat16_init();
+
+    /* Run malloc tests */
+    malloc_run_tests();
 
     /* List malloc memory stuff */
     kmemlist();
