@@ -17,6 +17,7 @@
 /* Include our standard library */
 #include "libc/stdlib.h"
 #include "libc/multiboot.h"
+#include "libc/malloc.h"
 
 /* Include tests */
 #include "tests/interrupt_tests.h"
@@ -68,6 +69,8 @@ void kernel_init()
     /* initialize our temp filesystem */
     ramdisk_fat16_init();
 
+    /* List malloc memory stuff */
+    kmemlist();
     
     printf("kernel init complete\n");
 

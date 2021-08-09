@@ -46,12 +46,12 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Add basic shell connected to input (DONE)
 
+- Kernel Standard IO Streams (DONE)
+
 # In Progress Features
 
-- Kernel Standard IO Streams 
 
 - Slab Allocator / KMalloc / KFree 
-
 
 # Planned Features (in order of development)
 

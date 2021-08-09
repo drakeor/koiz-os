@@ -47,4 +47,16 @@ void* memset(void* ptr, uint8_t value, uint32_t data_size);
  */
 int32_t memcmp(const void* ptr_a, const void* ptr_b, uint32_t data_size);
 
+/**
+ * rpad() - Pads out a character to length with pad_char
+ * 
+ * @str:        Pointer to string buffer
+ * @pad_char:   Character to pad to
+ * @length:     Length to pad out too
+ * 
+ * Please ensure that @str is at LEAST as large as length!
+ * Note that the final character will be set as \0
+ */
+void rpad(char* str, char pad_char, int length);
+
 #endif
