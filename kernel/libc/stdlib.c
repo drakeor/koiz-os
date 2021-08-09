@@ -218,3 +218,10 @@ uint32_t eswap_uint32(uint32_t value)
             ((value>>24)&0xff);
 }
 
+static uint32_t random_seed = 0;
+uint32_t maxrand(int seed,int max)
+{
+	random_seed = random_seed + seed * 1103515245 + 12345;
+	uint32_t rand_num = (unsigned int)(random_seed / 65536) % (max+1);
+    return rand_num;
+}

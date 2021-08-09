@@ -9,6 +9,7 @@
         "stdlib.h": "c",
         "kmalloc.h": "c",
         "vga.h": "c",
-        "pmem.h": "c"
+        "pmem.h": "c",
+        "malloc_tests.h": "c"
     }
 }

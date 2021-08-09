@@ -102,22 +102,26 @@ void* malloc(uint32_t size)
     kmemslab_t* c_slab = NULL;
     int c_size = 0;
 
-    /* round up to nearest slab */
-    c_size = 128;
-    if(size < c_size) 
-        c_slab = &slab128;
-    
-    c_size = 256;
-    if(size < c_size)
-        c_slab = &slab256;
-    
-    c_size = 512;
-    if(size < c_size)
-        c_slab = &slab512;
-
-    c_size = 1024;
-    if(size < c_size)
+    /* fit in the smallest slab we can */
+    if(size <= 1024) {
+        c_size = 1024;
         c_slab = &slab1024;
+    }
+
+    if(size <= 512) {
+        c_size = 512;
+        c_slab = &slab512;
+    }
+
+    if(size <= 256) {
+        c_size = 256;
+        c_slab = &slab256;
+    }
+
+    if(size <= 128) {
+        c_size = 128;
+        c_slab = &slab128;
+    } 
 
     /* throw error if more than we can allocate */
     if(c_slab == NULL)
@@ -137,6 +141,7 @@ void* malloc(uint32_t size)
         /* Found an entry! Mark as used and return address */
         if(c_slab->entries[c_ptr].mem_free) {
             c_slab->entries[c_ptr].mem_free = 0;
+            c_slab->current_entry = c_ptr;
             --(c_slab->free_entries);
             return c_slab->entries[c_ptr].mem_addr;
         }
@@ -155,8 +160,11 @@ static int free_ptr_slab(kmemslab_t* slab, void* ptr)
     int i;
     for(i = (slab->max_entries - 1); i >= 0; i--)
     {
+        /* Free entry and set current pointer to the freed block so
+           it can be used by malloc() right away */
         if(slab->entries[i].mem_addr == ptr) {
             slab->entries[i].mem_free = 1;
+            slab->current_entry = i;
             ++(slab->free_entries);
             return 1;
         }

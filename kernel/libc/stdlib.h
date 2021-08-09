@@ -62,4 +62,14 @@ void stdlib_put_stdio_input_char(char character);
  */
 char stdlib_pop_stdio_input_char(void);
 
+/**
+ * rand() - Generates a random number between 0 and max based off of seed
+ * 
+ * @seed: Seed to use
+ * @max: max value in range
+ * 
+ * Note that this is the K&R implementation. It's quick and dirty
+ */
+uint32_t maxrand(int seed,int max);
+
 #endif
