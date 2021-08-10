@@ -2,10 +2,14 @@
 #include "string.h"
 #include "../drivers/memory/pmem.h"
 
-#define SLAB_ENTRY_COUNT 500
-#define SLAB_MAX_PAGE_COUNT 20
+/* Adjust these below as needed */
+#define SLAB_ENTRY_COUNT 1500
+#define SLAB_MAX_PAGE_COUNT 150
 
 #define SLAB_KMEMINFO_PAD_LENGTH 8
+
+/* Each slab is half the the preceeding. Starts at physical block size */
+#define SLAB_COUNT 7
 
 /* structure for memory slab entries */
 struct kmemslab_entry {
@@ -40,10 +44,11 @@ struct kmemslab {
 typedef struct kmemslab kmemslab_t;
 
 /* Store slab structures in static memory */
-static kmemslab_t slab128 = {0};
+/*static kmemslab_t slab128 = {0};
 static kmemslab_t slab256 = {0};
 static kmemslab_t slab512 = {0};
-static kmemslab_t slab1024 = {0};
+static kmemslab_t slab1024 = {0};*/
+static kmemslab_t slabs[SLAB_COUNT];
 
 static void alloc_new_page_if_needed(kmemslab_t* slab, uint32_t slab_size)
 {
@@ -101,31 +106,22 @@ void* malloc(uint32_t size)
 {
     kmemslab_t* c_slab = NULL;
     int c_size = 0;
-
+    
     /* fit in the smallest slab we can */
-    if(size <= 1024) {
-        c_size = 1024;
-        c_slab = &slab1024;
+    int current_size = PHYS_BLOCK_SIZE;
+    int i;
+    for(i = 0; i < SLAB_COUNT; i++)
+    {
+        if(size <= current_size) {
+            c_size = current_size;
+            c_slab = &(slabs[i]);
+        }
+        current_size /= 2;
     }
-
-    if(size <= 512) {
-        c_size = 512;
-        c_slab = &slab512;
-    }
-
-    if(size <= 256) {
-        c_size = 256;
-        c_slab = &slab256;
-    }
-
-    if(size <= 128) {
-        c_size = 128;
-        c_slab = &slab128;
-    } 
 
     /* throw error if more than we can allocate */
     if(c_slab == NULL)
-        panic("Cannot malloc an entry larger than 1024 bytes!");
+        panic("Cannot malloc an entry larger than 4096 bytes!");
 
     /* lazy-allocate a new page if needed */
     alloc_new_page_if_needed(c_slab, c_size);
@@ -177,6 +173,19 @@ void free(void* ptr)
     /* run through all slabs and all entries and set it to free */
     /* Obviously this is STUPIDLY expensive... */
     /* TODO: Optimize this */
+    
+    /* fit in the smallest slab we can */
+    int current_size = PHYS_BLOCK_SIZE;
+    int i;
+    for(i = 0; i < SLAB_COUNT; i++)
+    {
+        if(free_ptr_slab(&(slabs[i]), ptr))
+            return;
+
+        current_size /= 2;
+    }
+
+/*
     if(free_ptr_slab(&slab128, ptr))
         return;
     if(free_ptr_slab(&slab256, ptr))
@@ -185,18 +194,15 @@ void free(void* ptr)
         return;
     if(free_ptr_slab(&slab1024, ptr))
         return;
-    
+*/
+
     panic("failed to free address");
 }
 
-static void print_kmeminfo(kmemslab_t* slab, uint8_t* slab_name)
+static void print_kmeminfo(kmemslab_t* slab, uint32_t slab_size)
 {
-    char slab_name_padded[SLAB_KMEMINFO_PAD_LENGTH];
-    memcpy(slab_name_padded, slab_name, SLAB_KMEMINFO_PAD_LENGTH);
-    rpad((uint8_t*)slab_name_padded, ' ', SLAB_KMEMINFO_PAD_LENGTH);
-
-    printf("%s | Entries Used: %d/%d | Free: %d | Pages Used: %d/%d\n", 
-        slab_name_padded, 
+    printf("%db | Entries Used: %d/%d | Free: %d | Pages Used: %d/%d\n", 
+        slab_size, 
         slab->max_entries - slab->free_entries,
         slab->max_entries,
         slab->free_entries,
@@ -207,8 +213,17 @@ static void print_kmeminfo(kmemslab_t* slab, uint8_t* slab_name)
 void kmemlist()
 {
     printf("=====KMemList=====\n");
-    print_kmeminfo(&slab128, (uint8_t*)"128b");
+    /*print_kmeminfo(&slab128, (uint8_t*)"128b");
     print_kmeminfo(&slab256, (uint8_t*)"256b");
     print_kmeminfo(&slab512, (uint8_t*)"512b");
-    print_kmeminfo(&slab1024, (uint8_t*)"1024b");
+    print_kmeminfo(&slab1024, (uint8_t*)"1024b");*/
+    /* print each slab */
+    printf("Size of Slab Library: %d kb\n", sizeof(slabs) / 1024);
+    int current_size = PHYS_BLOCK_SIZE;
+    int i;
+    for(i = 0; i < SLAB_COUNT; i++)
+    {
+        print_kmeminfo(&(slabs[i]), current_size);
+        current_size /= 2;
+    }
 }
