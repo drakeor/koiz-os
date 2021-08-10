@@ -48,9 +48,9 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Kernel Standard IO Streams (DONE)
 
-# In Progress Features
+- Slab Allocator / KMalloc / KFree (DONE)
 
-- Slab Allocator / KMalloc / KFree 
+# In Progress Features
 
 - Add basic commands
 

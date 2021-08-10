@@ -2,60 +2,76 @@
 #include "string.h"
 #include "../drivers/memory/pmem.h"
 
-/* Adjust these below as needed */
-#define SLAB_ENTRY_COUNT 1500
-#define SLAB_MAX_PAGE_COUNT 150
+/* Adjust these below as needed if we need more entries/pages in the slabs */
+#define SLAB_ENTRY_COUNT 1000
+#define SLAB_MAX_PAGE_COUNT 100
 
-#define SLAB_KMEMINFO_PAD_LENGTH 8
-
-/* Each slab is half the the preceeding. Starts at physical block size */
+/* 
+ * Each slab is half of the preceeding slab. 
+ * The top-level slab starts at the physical block size 
+*/
 #define SLAB_COUNT 7
 
 /* structure for memory slab entries */
+
+/*
+ * This is the structure for an entry in the memory slab
+ * It simply holds an address and a free flag
+ */
 struct kmemslab_entry {
     uint32_t* mem_addr;
     uint8_t mem_free;
 };
 typedef struct kmemslab_entry kmemslab_entry_t;
 
-/* structure for a memory slab */
+/*
+ * This is the main structure for the slab
+ * It holds the entries and pages assigned to this slab
+ */
 struct kmemslab {
-    /* pointer to page frame that holds entries */
+
+    /* Holds the free and used entries in the slab */
     kmemslab_entry_t entries[SLAB_ENTRY_COUNT];
     
-    /* holds the number of free pages */
+    /* Holds the current number of free entries */
     uint32_t free_entries;
     
-    /* current entry we're pointing to. this is most likely
-       to be a free entry */
+    /*
+     * This is the current entry we're pointing to.
+     * This is only used as an optimization
+     */
     uint32_t current_entry;
 
-    /* current number of max entries (soft max).
-         will increase when more pages are allocated */
+    /*
+     * Current soft max number of entries.
+     * This will automatically increase up to  SLAB_ENTRY_COUNT
+     * as more pages are allocated on the fly
+     */
     uint32_t max_entries;
 
-    /* holds array of all pages currently in use */
+    /* Holds an array of all physical pages assigned to this slab */
     uint32_t* pages[SLAB_MAX_PAGE_COUNT];
 
-    /* current page count */
+    /* Holds the current number of pages assigned to this slab */
     uint32_t current_page;
 
 };
 typedef struct kmemslab kmemslab_t;
 
-/* Store slab structures in static memory */
-/*static kmemslab_t slab128 = {0};
-static kmemslab_t slab256 = {0};
-static kmemslab_t slab512 = {0};
-static kmemslab_t slab1024 = {0};*/
+/* We store all the slab info in static memory */
 static kmemslab_t slabs[SLAB_COUNT];
 
+/* 
+ * This function lazy-allocates more pages if we need them to fulfill 
+ * a malloc request
+ */
 static void alloc_new_page_if_needed(kmemslab_t* slab, uint32_t slab_size)
 {
     /* if we already have free entries, don't need to allocate more */
     if(slab->free_entries > 0)
         return;
 
+    /* Divide up the page into entries */
     int additional_entries = PHYS_BLOCK_SIZE / slab_size;
 
     /* Prevent overflows, restrict enties if needed */
@@ -107,7 +123,7 @@ void* malloc(uint32_t size)
     kmemslab_t* c_slab = NULL;
     int c_size = 0;
     
-    /* fit in the smallest slab we can */
+    /* We want to fit the requested size into the smallest slab we can */
     int current_size = PHYS_BLOCK_SIZE;
     int i;
     for(i = 0; i < SLAB_COUNT; i++)
@@ -119,19 +135,22 @@ void* malloc(uint32_t size)
         current_size /= 2;
     }
 
-    /* throw error if more than we can allocate */
+    /* throw error if the size is more than our biggest slab */
     if(c_slab == NULL)
         panic("Cannot malloc an entry larger than 4096 bytes!");
 
-    /* lazy-allocate a new page if needed */
+    /* Lazy-allocate a new page if needed */
     alloc_new_page_if_needed(c_slab, c_size);
 
     /* If we still don't have free slots, fatal error! */
     if(c_slab->free_entries <= 0)
         panic("malloc failed! no free memory exists!");
 
-    /* start with the current pointer */
-    /* iterate thru until we find a free entry */
+    /*
+     * We start with the current_entry pointer since that
+     * usually points to a free entry. If it's used, we'll
+     * iterate until we find one
+     */
     uint32_t c_ptr = c_slab->current_entry;
     do {
         /* Found an entry! Mark as used and return address */
@@ -141,23 +160,29 @@ void* malloc(uint32_t size)
             --(c_slab->free_entries);
             return c_slab->entries[c_ptr].mem_addr;
         }
+        /* Increment */
         c_ptr = (c_ptr + 1) % c_slab->max_entries;
     } 
+    /* We looped all the way around, we don't actually have a few entry */
     while(c_ptr != c_slab->current_entry);
 
-    /* if we got this far, we don't actually have a free entry */
+    /* We cannot fulfill the malloc request */
     panic("Cannot malloc! Out of memory!");
     return NULL;
 }
 
-/* returns 1 if something was freed. 0 if nothing was freed */
+/*
+ * Returns 1 if something was freed and 0 if nothing was freed
+ */
 static int free_ptr_slab(kmemslab_t* slab, void* ptr)
 {
     int i;
     for(i = (slab->max_entries - 1); i >= 0; i--)
     {
-        /* Free entry and set current pointer to the freed block so
-           it can be used by malloc() right away */
+        /* 
+         * Free entry and set current pointer to the freed block so
+         * it can be used by malloc() right away 
+         */
         if(slab->entries[i].mem_addr == ptr) {
             slab->entries[i].mem_free = 1;
             slab->current_entry = i;
@@ -170,11 +195,9 @@ static int free_ptr_slab(kmemslab_t* slab, void* ptr)
 
 void free(void* ptr)
 {
-    /* run through all slabs and all entries and set it to free */
-    /* Obviously this is STUPIDLY expensive... */
     /* TODO: Optimize this */
     
-    /* fit in the smallest slab we can */
+    /* Run thru each slab until we find the address and free it */
     int current_size = PHYS_BLOCK_SIZE;
     int i;
     for(i = 0; i < SLAB_COUNT; i++)
@@ -185,20 +208,10 @@ void free(void* ptr)
         current_size /= 2;
     }
 
-/*
-    if(free_ptr_slab(&slab128, ptr))
-        return;
-    if(free_ptr_slab(&slab256, ptr))
-        return;
-    if(free_ptr_slab(&slab512, ptr))
-        return;
-    if(free_ptr_slab(&slab1024, ptr))
-        return;
-*/
-
     panic("failed to free address");
 }
 
+/* Helper function to print info for each slab */
 static void print_kmeminfo(kmemslab_t* slab, uint32_t slab_size)
 {
     printf("%db | Entries Used: %d/%d | Free: %d | Pages Used: %d/%d\n", 
@@ -213,12 +226,11 @@ static void print_kmeminfo(kmemslab_t* slab, uint32_t slab_size)
 void kmemlist()
 {
     printf("=====KMemList=====\n");
-    /*print_kmeminfo(&slab128, (uint8_t*)"128b");
-    print_kmeminfo(&slab256, (uint8_t*)"256b");
-    print_kmeminfo(&slab512, (uint8_t*)"512b");
-    print_kmeminfo(&slab1024, (uint8_t*)"1024b");*/
-    /* print each slab */
+    
+    /* Helpful to know how much static storage we're using.. */
     printf("Size of Slab Library: %d kb\n", sizeof(slabs) / 1024);
+
+    /* Run thru each slab */
     int current_size = PHYS_BLOCK_SIZE;
     int i;
     for(i = 0; i < SLAB_COUNT; i++)

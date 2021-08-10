@@ -6,7 +6,7 @@
 #include "../libc/malloc.h"
 
 #define TEST_MALLOC_SEED 32892
-#define MEM_SLOT_COUNT 2000
+#define MEM_SLOT_COUNT 1000
 #define MALLOC_ITERATIONS 5
 #define MAX_MALLOC_SIZE 4096
 
@@ -14,13 +14,13 @@ void malloc_run_tests()
 {
     printf("malloc: running tests...\n");
 
-    /* Simple test */
+    /* Simple test to test maximum malloc bounds*/
     void* smallTest = malloc(MAX_MALLOC_SIZE);
     free(smallTest);
 
     printf("Address for maximum test is %x\n", smallTest);
 
-    /* more complicated iteration test for lower spaces */
+    /* A more complicated iteration test */
     int i = 0;
     void* slots[MEM_SLOT_COUNT] = {0};
 
@@ -31,8 +31,11 @@ void malloc_run_tests()
         /* Allocate memory to each slot */
         int j;
         for(j = 0; j < MEM_SLOT_COUNT; j++) {
-             /* since the bigger buckets are smaller, distribute more
-            mallocs towards the lower half */
+             
+             /*
+              * Since the bigger buckets are smaller, distribute more
+              * mallocs towards the lower half 
+              */
             int max_malloc_size = MAX_MALLOC_SIZE;
             int k;
             for(k = 0; k < 5; k++) {

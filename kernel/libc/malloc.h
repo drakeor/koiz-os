@@ -3,18 +3,32 @@
 
 #include <stdint.h>
 
-/* allocates dynamic memory on the heap */
-/* note that the kernel malloc is super crude and rounds up to the nearest
-   byte count. Therefore, all allocations should be as close as possible to
-   a power of two. */
-/* It will handle internal fragmentation but is super slow about it */
-/* Free is especially inefficient and slow */
+
+/**
+ * malloc() - Allocates dynamic memory on the heap
+ * 
+ * @size:   Size in bytes of memory to allocate.
+ * 
+ * Note that the kernel malloc function is a super crude slab allocator that
+ * rounds up to the nearest power of two. Also note that you can only allocate
+ * up to a maximum of a physical page size
+ */
 void* malloc(uint32_t size);
 
-/* frees memory related to the ptr. will auto-free underlying pages too */ 
+/**
+ * free() - Frees dynamic memory based on the pointer
+ * 
+ * This makes the block of memory availiable for use again. Note that
+ * this will not free the underlying page currently however. Also note
+ * that the underlying implementation is incredibly slow.
+ * 
+ * TODO: Add a lookup table or something to optimize this
+ */
 void free(void* ptr);
 
-/* lists current memory allocations */
+/**
+ * kmemlist() - Lists the current slabs in use by the dynamic memory allocator
+ */
 void kmemlist(void);
 
 #endif
