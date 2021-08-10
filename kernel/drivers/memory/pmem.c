@@ -289,3 +289,25 @@ int pmem_free(void* ptr)
 
     return 0;
 }
+
+void pmem_list_info(void)
+{
+    printf("Memory Start: %x \n", pmem_main_memory_start);
+    printf("Memory Size: %d mb\n", pmem_main_memory_length / 1024 / 1024);
+
+    /* Count up the number of pages in use */
+    uint32_t pages_in_use = 0;
+    int i;
+    for(i = 0; i < pmem_mgr_reserved_size; i++)
+    {
+        uint8_t* record_ptr = ((uint8_t*)pmem_main_memory_start) + i;
+        if(*record_ptr != 0x00)
+            ++pages_in_use;
+    }
+    printf("Pages in Use: %d / %d\n", pages_in_use, pmem_mgr_reserved_size);
+
+    /* Calculate memory in use */
+    printf("Memory In Use: %d mb / %d mb\n", 
+        (pages_in_use * PHYS_BLOCK_SIZE) / 1024 / 1024,
+        pmem_main_memory_length / 1024 / 1024);
+}

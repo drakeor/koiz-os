@@ -14,6 +14,16 @@
 uint32_t strlen(const uint8_t* str);
 
 /**
+ * strlen() - Compares two strings
+ * 
+ * @str_a: String a to compare
+ * @str_b: String b to compare
+ * 
+ * Behaves just like the standard strcmp function in C library
+ */
+int32_t strcmp(const char* str_a, const char* str_b);
+
+/**
  * memcpy() - Copies memory from one area to another
  * 
  * @dst:    Destination memory address

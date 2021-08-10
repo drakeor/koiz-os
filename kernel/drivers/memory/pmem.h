@@ -55,4 +55,9 @@ int pmem_isinit(void);
  */
 void pmem_set_mbd(multiboot_info_t* mbd, uint32_t kernel_reserved_end_addr);
 
+/**
+ * pmem_list_info() - Lists info for the physical memory
+ */
+void pmem_list_info(void);
+
 #endif

@@ -8,6 +8,16 @@ uint32_t strlen(const uint8_t* str)
     return len;
 }
 
+int32_t strcmp(const char* str_a, const char* str_b)
+{
+    while (*str_a && (*str_a == *str_b)) {
+        str_a++;
+        str_b++;
+    }
+    int32_t d = *(const unsigned char*)str_a - *(const unsigned char*)str_b;
+    return d;
+}
+
 void* memcpy(void* dst, void* src, uint32_t data_size)
 {
     int i;

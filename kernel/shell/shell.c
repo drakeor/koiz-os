@@ -2,8 +2,31 @@
 #include "../libc/stdlib.h"
 #include "../libc/string.h"
 
+/* Include all our commands here */
+#include "memory/sh_slabinfo.h"
+#include "memory/sh_free.h"
+
+/* Structure for each command */
+struct shell_cmd_entry {
+    char* shell_cmd_name;
+    int32_t (*shell_cmd_func)(int, char*[]);
+};
+typedef struct shell_cmd_entry shell_cmd_entry_t;
+
+/* Array that holds all the kernel shell commands */
+static shell_cmd_entry_t shell_cmds[] = {
+
+    /* Memory commands */
+    { "slabinfo",       sh_slabinfo },
+    { "free",           sh_free}
+};
+
+#define SHELL_CMDS_COUNT (sizeof(shell_cmds) / sizeof(shell_cmd_entry_t))
+
+/* Command buffer size */
 #define COMMAND_BUFFER_SIZE 1024
 
+/* Holds the command buffer */
 static char command_buffer[COMMAND_BUFFER_SIZE];
 static int command_buffer_ptr = 0;
 
@@ -15,8 +38,21 @@ static void shell_print_prefix(void)
 static void shell_execute_command(void)
 {
     printf("\n");
+    int i;
+    for(i = 0; i < SHELL_CMDS_COUNT; i++) {
+        if(strcmp(command_buffer, shell_cmds[i].shell_cmd_name) == 0) {
+            (*(shell_cmds[i].shell_cmd_func))(0, NULL);
+            goto exec_cmd_exit;
+        }
+    }
+
+    /* Unknown command */
     printf("unknown command: %s \n", command_buffer);
 
+/* Yeah goto is ugly but w/e. I'll fix it later. 
+    Maybe split to another function */
+exec_cmd_exit:
+    /* Reset command buffer */
     shell_print_prefix();
     command_buffer_ptr = 0;
 }
@@ -24,6 +60,7 @@ static void shell_execute_command(void)
 void shell_init(void)
 {
     printf("Koiz-OS v1.0 \n");
+    printf("Number of commands: %d\n", SHELL_CMDS_COUNT);
     shell_print_prefix();
 }
 
