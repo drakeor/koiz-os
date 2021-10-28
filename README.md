@@ -52,9 +52,10 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Add basic commands (DONE)
 
+- File management (DONE)
+
 # In Progress Features
 
-- File management
 
 # Planned Features (in order of development)
 
