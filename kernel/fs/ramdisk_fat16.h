@@ -20,6 +20,7 @@
 #define FAT16_BYTES_PER_SECTOR            512
 
 /* Results enums */
+/* TODO: Maybe move these to a generic message implementation file */
 #define FAT16_RAMDISK_SUCCESS                       0
 #define FAT16_RAMDISK_ERROR_INVALID_FILENAME        1
 #define FAT16_RAMDISK_ERROR_NO_FREE_SPACE           2

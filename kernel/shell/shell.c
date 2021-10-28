@@ -3,6 +3,8 @@
 #include "../libc/string.h"
 
 /* Include all our commands here */
+#include "filesystem/sh_ls.h"
+
 #include "memory/sh_slabinfo.h"
 #include "memory/sh_free.h"
 
@@ -15,6 +17,8 @@ typedef struct shell_cmd_entry shell_cmd_entry_t;
 
 /* Array that holds all the kernel shell commands */
 static shell_cmd_entry_t shell_cmds[] = {
+    /* Filesystem commands */
+    {"ls",              sh_ls},
 
     /* Memory commands */
     { "slabinfo",       sh_slabinfo },

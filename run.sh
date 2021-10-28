@@ -3,7 +3,7 @@ export LIBGL_ALWAYS_INDIRECT=Yes
 
 if [ -z "$DISPLAY" ]; then
 export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0
-#export DISPLAY=127.0.0.1:0.0
+export DISPLAY=127.0.0.1:0.0
 fi
 
 #export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0

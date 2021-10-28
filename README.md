@@ -50,9 +50,9 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Slab Allocator / KMalloc / KFree (DONE)
 
-# In Progress Features
+- Add basic commands (DONE)
 
-- Add basic commands
+# In Progress Features
 
 - File management
 
