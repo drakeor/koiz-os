@@ -52,6 +52,7 @@ uint32_t fs_file_exists(uint8_t* file_name);
  * @sector_index:       which sector index to read from the file
  * 
  * TODO: Needs to return generic message vs ramdisk_fat16 specific
+ * TODO: Add constant for the sector size
  */
 int fs_file_read(
     uint8_t* file_name, void* sector_buffer, uint16_t sector_index);

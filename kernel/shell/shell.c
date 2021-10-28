@@ -5,6 +5,7 @@
 /* Include all our commands here */
 #include "filesystem/sh_ls.h"
 #include "filesystem/sh_write.h"
+#include "filesystem/sh_read.h"
 
 #include "memory/sh_slabinfo.h"
 #include "memory/sh_free.h"
@@ -18,13 +19,16 @@ typedef struct shell_cmd_entry shell_cmd_entry_t;
 
 /* Array that holds all the kernel shell commands */
 static shell_cmd_entry_t shell_cmds[] = {
+
     /* Filesystem commands */
     {"ls",              sh_ls},
     {"write",           sh_write},
+    {"read",            sh_read},
 
     /* Memory commands */
     { "slabinfo",       sh_slabinfo },
     { "free",           sh_free}
+    
 };
 
 #define SHELL_CMDS_COUNT (sizeof(shell_cmds) / sizeof(shell_cmd_entry_t))
