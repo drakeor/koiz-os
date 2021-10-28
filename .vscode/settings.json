@@ -11,6 +11,8 @@
         "vga.h": "c",
         "pmem.h": "c",
         "malloc_tests.h": "c",
-        "sh_slabinfo.h": "c"
+        "sh_slabinfo.h": "c",
+        "sh_ls.h": "c",
+        "sh_write.h": "c"
     }
 }

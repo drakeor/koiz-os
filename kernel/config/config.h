@@ -16,4 +16,8 @@
 /* Show debug messages for the ramdisk FAT16 filesystem */
 #define DEBUG_MSG_RAMDISK_FAT16
 
+/* Show debug messages for shell */
+#define DEBUG_MSG_SHELL
+
+
 #endif

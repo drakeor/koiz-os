@@ -4,6 +4,7 @@
 
 /* Include all our commands here */
 #include "filesystem/sh_ls.h"
+#include "filesystem/sh_write.h"
 
 #include "memory/sh_slabinfo.h"
 #include "memory/sh_free.h"
@@ -19,6 +20,7 @@ typedef struct shell_cmd_entry shell_cmd_entry_t;
 static shell_cmd_entry_t shell_cmds[] = {
     /* Filesystem commands */
     {"ls",              sh_ls},
+    {"write",           sh_write},
 
     /* Memory commands */
     { "slabinfo",       sh_slabinfo },
@@ -27,11 +29,14 @@ static shell_cmd_entry_t shell_cmds[] = {
 
 #define SHELL_CMDS_COUNT (sizeof(shell_cmds) / sizeof(shell_cmd_entry_t))
 
+#define SHELL_MAX_ARGS 50
+
 /* Command buffer size */
 #define COMMAND_BUFFER_SIZE 1024
 
 /* Holds the command buffer */
 static char command_buffer[COMMAND_BUFFER_SIZE];
+static char working_buffer[COMMAND_BUFFER_SIZE];
 static int command_buffer_ptr = 0;
 
 static void shell_print_prefix(void)
@@ -41,11 +46,56 @@ static void shell_print_prefix(void)
 
 static void shell_execute_command(void)
 {
-    printf("\n");
+    /* For processing arguments */
+    int c_argc = 0;
     int i;
+    char* c_argv[SHELL_MAX_ARGS];
+
+    /* This is a really bad implementation. We need to create an FSM
+       to process this stuff correctly and keep it concise... */
+    int cstr_len = strlen((uint8_t*)command_buffer);
+    memcpy(working_buffer, command_buffer, COMMAND_BUFFER_SIZE);
+    c_argv[0] = &working_buffer[0];
+    c_argc = 1;
+
+    int insideDQuoteState = 0;
+    int newStringState = 0;
+    
+    /* Break up into an array of strings in the working buffer */
+    for(i = 0; i < cstr_len; i++)
+    {
+        if(working_buffer[i] == '\'') {
+            insideDQuoteState = !insideDQuoteState;
+            continue;
+        }
+        if(working_buffer[i] == ' ') {
+            if(!insideDQuoteState) {
+                working_buffer[i] = '\0';
+                newStringState = 1;
+            }
+            continue;
+        }
+        if(newStringState) {
+            c_argv[c_argc] = &working_buffer[i];
+            ++c_argc;
+            newStringState = 0;
+        }
+    }
+
+#ifdef DEBUG_MSG_SHELL
+    /* Print the arguments and argument positions in debug mode */
+    printf("\n");
+    for(i = 0; i < c_argc; i++)
+    {
+        printf("Arg %d: %s\n", i, c_argv[i]);
+    }
+#endif
+
+    /* Match the first argument to a shell command */
+    printf("\n");
     for(i = 0; i < SHELL_CMDS_COUNT; i++) {
-        if(strcmp(command_buffer, shell_cmds[i].shell_cmd_name) == 0) {
-            (*(shell_cmds[i].shell_cmd_func))(0, NULL);
+        if(strcmp(c_argv[0], shell_cmds[i].shell_cmd_name) == 0) {
+            (*(shell_cmds[i].shell_cmd_func))(c_argc, c_argv);
             goto exec_cmd_exit;
         }
     }
