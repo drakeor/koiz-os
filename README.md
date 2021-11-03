@@ -52,14 +52,17 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Add basic commands (DONE)
 
-- File management (DONE)
+- Simple File management / Reading and Writing Files (DONE)
 
 # In Progress Features
 
-- Add system calls
+- Implement TSS
+
+- Allow dropping to User Mode
 
 - Userspace application in filesystem
 
+- Add system calls
 
 # Planned Features (in order of development)
 

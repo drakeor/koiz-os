@@ -10,6 +10,7 @@
 #include "drivers/memory/pmem.h"
 #include "drivers/memory/vmem.h"
 #include "drivers/ramdisk/ramdisk.h"
+#include "drivers/tss/tss.h"
 
 /* Include our filesystem stuff */
 #include "fs/ramdisk_fat16.h"
@@ -76,6 +77,9 @@ void kernel_init()
     /* List malloc memory stuff */
     kmemlist();
     
+    /* Load up the TSS */
+    load_tss();
+
     printf("kernel init complete\n");
 
 }
@@ -107,7 +111,7 @@ void kernel_main(multiboot_info_t* mbd, uint32_t magic,
     pmem_set_mbd(mbd, kernel_memory_end);
 
     kernel_init();
-    
+
     _enter_usermode();
 
     shell_init();

@@ -5,6 +5,9 @@ use32
 ; Store the GDT here
 ; Align to 16 for no reason
 section '.bss' align 16
+    public gdt_code
+    public gdt_tss
+
     ; GDT
     ; Alright, time for some fun
     gdt_start:
@@ -40,7 +43,7 @@ section '.bss' align 16
         ; Empty bits        = 00b. Padding
         ; Limit bits        = 1111b. 
         db 11001111b
-        ; Base
+        ; Base (bits 24-31)
         db 0x0
 
     gdt_data:
@@ -65,7 +68,7 @@ section '.bss' align 16
         ; Empty bits        = 00b. Padding
         ; Limit bits        = 1111b. 
         db 11001111b
-        ; Base
+        ; Base (bits 24-31)
         db 0x0
 
     gdt_user_code:
@@ -90,7 +93,7 @@ section '.bss' align 16
         ; Empty bits        = 00b. Padding
         ; Limit bits        = 1111b. 
         db 11001111b
-        ; Base
+        ; Base (bits 24-31)
         db 0x0
 
     gdt_user_data:
@@ -115,7 +118,32 @@ section '.bss' align 16
         ; Empty bits        = 00b. Padding
         ; Limit bits        = 1111b. 
         db 11001111b
-        ; Base
+        ; Base (bits 24-31)
+        db 0x0
+
+    gdt_tss:
+        ; Limit (bits 0-15)
+        dw 0
+        ; Base (bits 0-15)
+        dw 0
+        ; Base (bits 16-23)
+        db 0x0
+        ; Access Byte
+        ; Present           = 1b. Set to 1 for valid selectors.
+        ; Priviledge        = 00b. Ring 0 thru 3.
+        ; Descriptor Type   = 0b. Should be set for code/data segments and cleared for system segments
+        ; Executable bit    = 1b. Is 1 if code in the segment can be executed
+        ; Direction bit     = 0b. Code in this segment can be executed from an equal or lower privledge
+        ; RW bit            = 0b. Whether read access is allowed for code or write access is allowed for data.
+        ; Accessed bit      = 1b. CPU sets to one when the segment is accessed.
+        db 10001001b
+        ; Flags and limit
+        ; Granularity bit   = 0b. 0 means byte granul, 1 means limit is 4 KiB blocks (page granul)
+        ; Size bit          = 1b. 0 means 16bit protected mode, 1 means 32 bit protected mode.
+        ; Empty bits        = 00b. Padding
+        ; Limit bits        = 0000b. 
+        db 01000000b
+        ; Base (bits 24-31)
         db 0x0
 
     ; Label at the end helps the assembler calculate the size of the GDT for the GDT descriptor
@@ -127,6 +155,7 @@ section '.bss' align 16
     gdt_descriptor:
         dw gdt_end - gdt_start - 1
         dd gdt_start
+    
 
     ; Constants to help us later if needed
     CODE_SEG equ gdt_code - gdt_start
