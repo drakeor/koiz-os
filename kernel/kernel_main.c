@@ -112,7 +112,7 @@ void kernel_main(multiboot_info_t* mbd, uint32_t magic,
 
     kernel_init();
 
-    _enter_usermode();
+    //_enter_usermode();
 
     shell_init();
 

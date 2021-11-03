@@ -59,5 +59,5 @@ void load_tss(void)
     /* Load the TSS segment */
     //uint16_t tssSegmentLoc = 8 * 5;
     //uint16_t tssSegmentLoc = 0x2B;
-    asm("ltr 0x2B");
+    asm("ltr 0x20");
 }

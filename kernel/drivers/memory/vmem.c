@@ -171,13 +171,17 @@ void vmem_init(void)
 
         /* Set kernel pagetable to present and read/write in the page directory */
         uint32_t* kernel_pt = vmem_ptable_new();
-        base_ptr[i] = ((uint32_t)kernel_pt) | 3;
+        //base_ptr[i] = ((uint32_t)kernel_pt) | 3;
+        // TODO: THIS ALLOWS USERS TO WRITE INTO KERNEL. CHANGE LATER.
+        base_ptr[i] = ((uint32_t)kernel_pt) | 7;
 
         /* Populate the pagetable with identity-map entries */
         uint32_t j;
         for(j = 0; j < 1024; j++) {
             uint32_t virt_addr_entry = ((i << 22) | (j << 12)) & ~0xFFF;
-            kernel_pt[j] = virt_addr_entry | 1;
+            //kernel_pt[j] = virt_addr_entry | 1;
+            // TODO: THIS ALLOWS USERS TO WRITE INTO KERNEL. CHANGE LATER.
+            kernel_pt[j] = virt_addr_entry | 7;
         }
 
     }
