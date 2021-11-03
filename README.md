@@ -54,9 +54,9 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Simple File management / Reading and Writing Files (DONE)
 
-# In Progress Features
+- Implement TSS (DONE)
 
-- Implement TSS
+# In Progress Features
 
 - Allow dropping to User Mode
 

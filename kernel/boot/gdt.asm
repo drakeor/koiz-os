@@ -171,7 +171,7 @@ section '.text'
     public _init_gdt
     public _enter_usermode
     public tss_flush
-    
+
     tss_flush:
         mov ax, 0x2B      ; Load the index of our TSS structure - The index is
                             ; 0x28, as it is the 5th selector and each is 8 bytes
@@ -183,12 +183,14 @@ section '.text'
     _enter_usermode:
         ; Clear interrupts
         cli
+
         ; user mode data selector is 0x20 (GDT entry 3). Also sets RPL to 3
         mov ax, 0x23
         mov ds, ax
         mov es, ax
         mov fs, ax
         mov gs, ax
+
         push 0x23		; SS, notice it uses same selector as above
 		push esp		; ESP
 		pushfd			; EFLAGS
@@ -200,6 +202,8 @@ section '.text'
 		iretd
 	a:
 		add esp, 4      ; fix stack
+        int 13
+        int 13
 
 
     _init_gdt:

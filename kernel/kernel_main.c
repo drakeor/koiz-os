@@ -112,9 +112,12 @@ void kernel_main(multiboot_info_t* mbd, uint32_t magic,
 
     kernel_init();
 
-    //_enter_usermode();
 
     shell_init();
+
+    _enter_usermode();
+
+    panic("HMM?");
 
     while(1) {
         kernel_update();
