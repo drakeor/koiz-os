@@ -7,6 +7,7 @@ use32
 section '.bss' align 16
     public gdt_code
     public gdt_tss
+    
 
     ; GDT
     ; Alright, time for some fun
@@ -163,9 +164,22 @@ section '.bss' align 16
     USER_CODE_SEG equ gdt_user_code - gdt_start
     USER_DATA_SEG equ gdt_user_data - gdt_start
 
+    public gdt_data
+    public gdt_start
+
 section '.text'
     public _init_gdt
     public _enter_usermode
+    public tss_flush
+    
+    tss_flush:
+        mov ax, 0x2B      ; Load the index of our TSS structure - The index is
+                            ; 0x28, as it is the 5th selector and each is 8 bytes
+                            ; long, but we set the bottom two bits (making 0x2B)
+                            ; so that it has an RPL of 3, not zero.
+        ltr ax            ; Load 0x2B into the task state register.
+        ret
+
     _enter_usermode:
         ; Clear interrupts
         cli

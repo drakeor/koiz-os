@@ -18,6 +18,8 @@ struct gdt_entry_tss {
 
 extern struct gdt_entry_tss gdt_tss;
 extern struct gdt_entry_tss gdt_start;
+extern struct gdt_entry_tss gdt_data;
+extern void tss_flush(void);
 
 void load_tss(void)
 {
@@ -32,9 +34,11 @@ void load_tss(void)
     printf("GDT TSS Entry Location: %x\n", &gdt_tss);
 
     /* Update the GDT Entry */
-    gdt_tss.base_0 = entryAddrBig & 0xFFFF;
     gdt_tss.limit = entrySize;
+    gdt_tss.base_0 = entryAddrBig & 0xFFFF;
     gdt_tss.base_16_23 = (entryAddrBig >> 16) & 0xFF;
+    gdt_tss.access_byte = 0x89;
+    gdt_tss.limit_and_flags = 0x40;
     gdt_tss.base_24_31 = (entryAddrBig >> 24) & 0xFF;
 
     /* Print out the new GDT TSS Values */
@@ -56,8 +60,11 @@ void load_tss(void)
 	TSS.fs   = 0x13;
 	TSS.gs   = 0x13;
 
+    /* giving this a try */
+    //_init_gdt();
+
     /* Load the TSS segment */
     //uint16_t tssSegmentLoc = 8 * 5;
     //uint16_t tssSegmentLoc = 0x2B;
-    asm("ltr 0x20");
+    tss_flush();
 }
