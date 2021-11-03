@@ -89,6 +89,8 @@ void kernel_update(void)
     shell_update();
 }
 
+extern void _enter_usermode(void);
+
 /* Main kernel entry point */
 void kernel_main(multiboot_info_t* mbd, uint32_t magic, 
     uint32_t kernel_memory_end) 
@@ -106,6 +108,8 @@ void kernel_main(multiboot_info_t* mbd, uint32_t magic,
 
     kernel_init();
     
+    _enter_usermode();
+
     shell_init();
 
     while(1) {

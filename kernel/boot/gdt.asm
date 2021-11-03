@@ -68,6 +68,56 @@ section '.bss' align 16
         ; Base
         db 0x0
 
+    gdt_user_code:
+        ; Limit (bits 0-15)
+        dw 0xFFFF
+        ; Base (bits 0-15)
+        dw 0x0
+        ; Base (bits 16-23)
+        db 0x0
+        ; Access Byte
+        ; Present           = 1b. Set to 1 for valid selectors.
+        ; Priviledge        = 11b. Ring 0 thru 3.
+        ; Descriptor Type   = 1b. Should be set for code/data segments and cleared for system segments
+        ; Executable bit    = 1b. Is 1 if code in the segment can be executed
+        ; Direction bit     = 0b. Code in this segment can be executed from an equal or lower privledge
+        ; RW bit            = 1b. Whether read access is allowed for code or write access is allowed for data.
+        ; Accessed bit      = 0b. CPU sets to one when the segment is accessed.
+        db 11111010b
+        ; Flags and limit
+        ; Granularity bit   = 1b. 0 means byte granul, 1 means limit is 4 KiB blocks (page granul)
+        ; Size bit          = 1b. 0 means 16bit protected mode, 1 means 32 bit protected mode.
+        ; Empty bits        = 00b. Padding
+        ; Limit bits        = 1111b. 
+        db 11001111b
+        ; Base
+        db 0x0
+
+    gdt_user_data:
+        ; Limit (bits 0-15)
+        dw 0xFFFF
+        ; Base (bits 0-15)
+        dw 0x0
+        ; Base (bits 16-23)
+        db 0x0
+        ; Access Byte
+        ; Present           = 1b. Set to 1 for valid selectors.
+        ; Priviledge        = 00b. Ring 0 thru 3.
+        ; Descriptor Type   = 1b. Should be set for code/data segments and cleared for system segments
+        ; Executable bit    = 0b. Is 1 if code in the segment can be executed
+        ; Direction bit     = 0b. Code in this segment can be executed from an equal or lower privledge
+        ; RW bit            = 1b. Whether read access is allowed for code or write access is allowed for data.
+        ; Accessed bit      = 0b. CPU sets to one when the segment is accessed.
+        db 11110010b
+        ; Flags and limit
+        ; Granularity bit   = 1b. 0 means byte granul, 1 means limit is 4 KiB blocks (page granul)
+        ; Size bit          = 1b. 0 means 16bit protected mode, 1 means 32 bit protected mode.
+        ; Empty bits        = 00b. Padding
+        ; Limit bits        = 1111b. 
+        db 11001111b
+        ; Base
+        db 0x0
+
     ; Label at the end helps the assembler calculate the size of the GDT for the GDT descriptor
     gdt_end:
 
@@ -81,10 +131,34 @@ section '.bss' align 16
     ; Constants to help us later if needed
     CODE_SEG equ gdt_code - gdt_start
     DATA_SEG equ gdt_data - gdt_start
-
+    USER_CODE_SEG equ gdt_user_code - gdt_start
+    USER_DATA_SEG equ gdt_user_data - gdt_start
 
 section '.text'
     public _init_gdt
+    public _enter_usermode
+    _enter_usermode:
+        ; Clear interrupts
+        cli
+        ; user mode data selector is 0x20 (GDT entry 3). Also sets RPL to 3
+        mov ax, 0x23
+        mov ds, ax
+        mov es, ax
+        mov fs, ax
+        mov gs, ax
+        push 0x23		; SS, notice it uses same selector as above
+		push esp		; ESP
+		pushfd			; EFLAGS
+		push 0x1b		; CS, user mode code selector is 0x18.
+                        ; With RPL 3 this is 0x1b
+		lea eax, [a]	; EIP first
+		push eax
+
+		iretd
+	a:
+		add esp, 4      ; fix stack
+
+
     _init_gdt:
         ; Here we initialize the GDT and paging
         lgdt [gdt_descriptor]

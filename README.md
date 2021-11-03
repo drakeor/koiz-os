@@ -56,16 +56,16 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 # In Progress Features
 
+- Add system calls
+
+- Userspace application in filesystem
+
 
 # Planned Features (in order of development)
 
 - Add math library functions
 
 - Add Gfx drawing for OS GUI
-
-- Add system calls
-
-- Userspace application in filesystem
 
 - Read from an actual disk drive
 
