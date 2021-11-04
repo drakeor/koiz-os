@@ -1,7 +1,8 @@
 format elf
 use32
 
-; This code is pretty brute-force, but readable..
+; This code is pretty brute-force and terrible..
+; I need to rewrite this entire thing some day
 
 ; This macro pushes 0 as the error code for interrupts
 ; that do not have an error code

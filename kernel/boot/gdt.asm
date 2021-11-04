@@ -202,8 +202,8 @@ section '.text'
 		iretd
 	a:
 		add esp, 4      ; fix stack
-        int 3
-        ;int 0x80
+        ;int 3
+        int 0x80
         ret
 
 

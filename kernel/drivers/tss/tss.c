@@ -61,7 +61,7 @@ void load_tss(void)
 	TSS.gs   = 0x13;
 
     /* giving this a try */
-    _init_gdt();
+    //_init_gdt();
 
     /* Load the TSS segment */
     //uint16_t tssSegmentLoc = 8 * 5;
