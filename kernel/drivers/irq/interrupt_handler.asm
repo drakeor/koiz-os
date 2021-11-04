@@ -43,7 +43,7 @@ macro irq_interrupt_entry entry_num* {
         dw 0xDEAD
         dw 0x0008
         db 0x00
-        db 10101110b
+        db 11101110b
         dw 0xDEAD
 }
 
@@ -140,8 +140,9 @@ section '.text' executable
         ; We don't know how to handle this interrupt
         ; So initiate a kernel panic!
         ; This function should NEVER return (so HLT)
-        ccall printf, msg, [edi], [ecx]
         ccall panic, panicmsg
+        ; We can't use printf since the buffer will never be cleared.
+        ;ccall printf, msg, [edi], [ecx]
         HLT 
 
     ; Handle keyboard interrupts
