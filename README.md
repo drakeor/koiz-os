@@ -8,7 +8,9 @@ It doesn't really serve any practical purpose outside that.
 
 NOTE: For WSL2, add an inbound rule for TCP 6000!
 
-# Completed Features
+# Completed Feature Milestones
+
+## 1. Bootloader and Starting Out
 
 - Custom bootloader image to load the kernel (DONE)
 
@@ -24,6 +26,8 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Basic Terminal Support (DONE)
 
+## 2. Physical and Virtual Memory Management
+
 - Memory Detection (DONE)
 
 - Physical Memory Management (DONE)
@@ -33,6 +37,8 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 - Virtual Memory Management (DONE)
 
 - Virtual to physical address translation functions (DONE)
+
+## 3. Simple Filesystem
 
 - Ramdisk for virtual hard drive (DONE)
 
@@ -44,55 +50,67 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Add more standard lib stuff to stdlib.c, strings.c (DONE)
 
+## 4. Standard IO Streams / Heap
+
 - Add basic shell connected to input (DONE)
 
 - Kernel Standard IO Streams (DONE)
 
 - Slab Allocator / KMalloc / KFree (DONE)
 
+## 5. User Shell Interaction
+
 - Add basic commands (DONE)
 
-- Simple File management / Reading and Writing Files (DONE)
+- Simple Reading and Writing File management commands (DONE)
+
+# In Progress Feature Milestones
+
+## 6. User Space
 
 - Implement TSS (DONE)
 
-# In Progress Features
-
-- Allow dropping to User Mode
-
-- Userspace application in filesystem
+- Allow dropping to User Mode (DONE)
 
 - Add system calls
 
-# Planned Features (in order of development)
+- Add process scheduler
+
+- Userspace application in filesystem
+
+# Planned Feature Milestones (in order of development)
+
+## 7. GUI
 
 - Add math library functions
+
+- Add VESA Graphics
 
 - Add Gfx drawing for OS GUI
 
 - Read from an actual disk drive
 
+## 8. Connectivity
+
 - Read a FAT32 system from an actual disk drive (or emulated)
+
+- TCP/IP
 
 - Network Driver
 
 - PCI scanning
 
-- Userspace application
+
+## 9. Enchanced Features
 
 - Handling userspace page faults
-
-- Processes
-
-- Backend Compiler for OS
-
-- TCP/IP
-
-- GUI
 
 - Multi-processor support
 
 - Implement FPU / SSE stuff
+
+- Backend Compiler for OS
+
 
 # Requirements to build
 
