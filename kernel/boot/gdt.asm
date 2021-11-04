@@ -173,7 +173,7 @@ section '.text'
     public tss_flush
 
     tss_flush:
-        mov ax, 0x2B      ; Load the index of our TSS structure - The index is
+        mov ax, 0x28      ; Load the index of our TSS structure - The index is
                             ; 0x28, as it is the 5th selector and each is 8 bytes
                             ; long, but we set the bottom two bits (making 0x2B)
                             ; so that it has an RPL of 3, not zero.
@@ -202,8 +202,9 @@ section '.text'
 		iretd
 	a:
 		add esp, 4      ; fix stack
-        int 13
-        int 13
+        ;int 3
+        int 0x80
+        ret
 
 
     _init_gdt:
