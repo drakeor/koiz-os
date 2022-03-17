@@ -61,7 +61,7 @@ void kernel_init()
     /* Enable paging and virtual memory */
     vmem_init();
     vmem_run_tests();
-
+    
     /* Run the tests BEFORE initializing the ramdisk! */
     ramdisk_run_tests();
 

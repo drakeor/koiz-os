@@ -24,7 +24,7 @@ void stdlib_put_stdio_input_char(char character)
     /* Only add it in if we have IOStreams (pmem is avail) */
     /* This lazy-initializes the stream if not exists */
     /* otherwise ignore it */
-    if(pmem_isinit()) {
+    if(pmem_isinit() && !std_output_buf.is_initializing) {
         char msg_str[2] = { character, 0x0 };
         io_buffer_place(&std_input_buf, msg_str);
     }
@@ -40,7 +40,7 @@ char stdlib_pop_stdio_input_char()
     return 0;
 }
 
-void stdlib_update(void)
+void stdlib_flushobuffer(void)
 {
     /* Print everything that is in the output buffer */
     uint8_t next_char = io_buffer_pop(&std_output_buf);
@@ -49,6 +49,11 @@ void stdlib_update(void)
         vga_print_screen_char(next_char, DEFAULT_TEXT_COLOR);
         next_char = io_buffer_pop(&std_output_buf);
     }
+}
+
+void stdlib_update(void)
+{
+    stdlib_flushobuffer();
 
     /* For the input buffer, we just print it for now */
     /*next_char = io_buffer_pop(&std_input_buf);
@@ -66,7 +71,7 @@ static void std_print(char *message)
 #endif 
     /* If we have IOStreams, buffer the input. 
         Otherwise print directly to screen */
-    if(pmem_isinit()) {
+    if(pmem_isinit() && !std_output_buf.is_initializing) {
         io_buffer_place(&std_output_buf, message);
     } else {
         vga_print_screen(message, DEFAULT_TEXT_COLOR);
@@ -80,7 +85,9 @@ static void std_print_char(char message)
 #endif 
     /* If we have IOStreams, buffer the input. 
         Otherwise print directly to screen */
-    if(pmem_isinit()) {
+    /* Don't print is the buffer is still initializing. This
+            will lead to an infinite loop */
+    if(pmem_isinit() && !std_output_buf.is_initializing) {
         char msg_str[2] = { message, 0x0 };
         io_buffer_place(&std_output_buf, msg_str);
     } else {

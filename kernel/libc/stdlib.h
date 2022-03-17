@@ -42,6 +42,13 @@ uint32_t eswap_uint32(uint32_t value);
 void stdlib_update(void);
 
 /**
+ * stdlib_update() - Deals with processing each frame
+ * 
+ * Flushes everything currently in the output buffer to screen.
+ */
+void stdlib_flushobuffer(void);
+
+/**
  * stdlib_put_stdio_input_char() - Puts a character into the input buffer
  * 
  * @character:  Character to put in buffer

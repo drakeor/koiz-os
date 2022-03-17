@@ -19,5 +19,7 @@
 /* Show debug messages for shell */
 #define DEBUG_MSG_SHELL
 
+/* Tests the allocations for physical memories */
+//#define DEBUG_SELF_TEST_PMEM
 
 #endif

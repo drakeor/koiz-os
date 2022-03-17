@@ -38,17 +38,27 @@ void pmem_run_tests(void)
     pmem_test_record(16);
     printf("pmem: Testing Record lookups Passed.\n");
 
+    /* Flush buffer at this point to prevent an overflow */
+    stdlib_flushobuffer();
+    
     /*
      * Test allocations and frees
      */
+#ifdef DEBUG_SELF_TEST_PMEM
     printf("pmem: Testing memory allocations...\n");
     int i = 0;
     for(i = 0; i < pmem_mgr_reserved_size * 2; i++)
     {
+        /* Allocate and immediately free the memory */
         uint32_t* mem_addr = pmem_alloc();
         int res = pmem_free(mem_addr);
         if(res != 0) 
             panic("error freeing memory!");
+        
+        /* Flush the output buffer to prevent an overflow */
+        stdlib_flushobuffer();
     }
     printf("pmem: Testing Memory Allocations Passed.\n");
+#endif 
+
 }
