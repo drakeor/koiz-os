@@ -8,7 +8,7 @@
 #define DEBUG_MSG_MEMORYMAP
 
 /* Show debug messages for physical memory */
-/* #define DEBUG_MSG_PMEM */
+#define DEBUG_MSG_PMEM 
 
 /* Show debug messages for virtual memory */
 #define DEBUG_MSG_VMEM

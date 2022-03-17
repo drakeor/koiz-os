@@ -4,6 +4,7 @@
 /* Structure for our standard buffers. 
    We're using just a simple ring buffer for standard streams. */
 struct stdio_buffer {
+    int is_initializing;
     int is_init;
     void* b_addr;
     int head_ptr;

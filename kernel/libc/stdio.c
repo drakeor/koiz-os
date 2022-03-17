@@ -12,9 +12,14 @@ void io_buffer_place(stdio_buffer_t* in_buff, char* message)
 {
     /* Lazy initialize buffer */
     if(!in_buff->is_init) {
+        if(in_buff->is_initializing) {
+            panic("io_buffer_place infinite loop detected!");
+        }
+        in_buff->is_initializing = 1;
         in_buff->b_addr = pmem_alloc();
         in_buff->b_size = PHYS_BLOCK_SIZE;
         in_buff->is_init = 1;
+        in_buff->is_initializing = 0;
     }
 
     /* Go through message and place in buffer */

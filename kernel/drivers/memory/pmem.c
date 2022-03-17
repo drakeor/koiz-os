@@ -175,13 +175,6 @@ void pmem_initialize(void)
     if(pmem_main_memory_length < MIN_MEM_SIZE)
         panic("not enough memory!");
 
-    /*
-     * Run pmem tests
-     */
-#ifdef SELF_TEST_PMEM
-    pmem_tests();
-#endif
-
     /* We're now initialized */
     pmem_initialized = 1;
 }
