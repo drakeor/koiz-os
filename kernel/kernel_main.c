@@ -112,7 +112,6 @@ void kernel_main(multiboot_info_t* mbd, uint32_t magic,
 
     kernel_init();
 
-
     shell_init();
 
     /*
