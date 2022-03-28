@@ -10,6 +10,7 @@ struct stdio_buffer {
     int head_ptr;
     int tail_ptr;
     int b_size;
+    int autoflush_to_screen;
 };
 typedef struct stdio_buffer stdio_buffer_t;
 
@@ -41,5 +42,12 @@ int io_buffer_empty(stdio_buffer_t* in_buff);
  * Returns 0 if there's nothing in the buffer
  */
 char io_buffer_pop(stdio_buffer_t* in_buff);
+
+/**
+ * io_buffer_flush_to_screen() - Flush everything in the buffer onto the screen
+ * 
+ * Flushes everything currently in the output buffer to screen.
+ */
+void io_buffer_flush_to_screen(stdio_buffer_t* in_buff);
 
 #endif

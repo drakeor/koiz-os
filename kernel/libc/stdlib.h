@@ -5,6 +5,10 @@
 
 #include <stdint.h>
 
+/* Constants to help us */
+#define PRINTF_BUFFER_SIZE 32
+#define DEFAULT_TEXT_COLOR 0x0F
+#define DEFAULT_ERROR_COLOR 0x05
 
 /**
  * panic() - Causes a kernel panic and immediately stops further processing
@@ -40,13 +44,6 @@ uint32_t eswap_uint32(uint32_t value);
  * This handles things like processing the stdio streams
  */
 void stdlib_update(void);
-
-/**
- * stdlib_update() - Deals with processing each frame
- * 
- * Flushes everything currently in the output buffer to screen.
- */
-void stdlib_flushobuffer(void);
 
 /**
  * stdlib_put_stdio_input_char() - Puts a character into the input buffer

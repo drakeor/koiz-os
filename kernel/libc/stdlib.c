@@ -7,17 +7,15 @@
 #include "../drivers/video/vga.h"
 #include "../drivers/serial/serial.h"
 
-/* Constants to help us */
-#define PRINTF_BUFFER_SIZE 32
-#define DEFAULT_TEXT_COLOR 0x0F
-#define DEFAULT_ERROR_COLOR 0x05
 
 /* Comment out to disable serial port logging */
 #define LOG_ALL_MESSAGES_TO_SERIAL
 
 /* Our global input and output streams */
 stdio_buffer_t std_input_buf = {0};
-stdio_buffer_t std_output_buf = {0};
+
+stdio_buffer_t std_output_buf = { .autoflush_to_screen = 1 };
+
 
 void stdlib_put_stdio_input_char(char character)
 {
@@ -40,20 +38,10 @@ char stdlib_pop_stdio_input_char()
     return 0;
 }
 
-void stdlib_flushobuffer(void)
-{
-    /* Print everything that is in the output buffer */
-    uint8_t next_char = io_buffer_pop(&std_output_buf);
-    while(next_char != '\0')
-    {
-        vga_print_screen_char(next_char, DEFAULT_TEXT_COLOR);
-        next_char = io_buffer_pop(&std_output_buf);
-    }
-}
-
 void stdlib_update(void)
 {
-    stdlib_flushobuffer();
+    /* Print everything that is in the output buffer */
+    io_buffer_flush_to_screen(&std_output_buf);
 
     /* For the input buffer, we just print it for now */
     /*next_char = io_buffer_pop(&std_input_buf);
