@@ -41,7 +41,8 @@ void pmem_run_tests(void)
     /*
      * Test allocations and frees
      */
-#ifdef DEBUG_SELF_TEST_PMEM
+     
+#ifdef DEBUG_SELF_TEST_PMEM_ALLOCATIONS
     printf("pmem: Testing memory allocations...\n");
     int i = 0;
     for(i = 0; i < pmem_mgr_reserved_size * 2; i++)

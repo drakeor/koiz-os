@@ -245,6 +245,8 @@ section '.text' executable
     no_error_code_interrupt_handler 48
     no_error_code_interrupt_handler 49
     no_error_code_interrupt_handler 50
+
+    no_error_code_interrupt_handler 51 ; System Call
     
 
 section '.bss'
@@ -308,6 +310,8 @@ section '.bss'
         irq_interrupt_entry 48
         irq_interrupt_entry 49
         irq_interrupt_entry 50
+
+        irq_interrupt_entry 51
     idt_end:
     idt_info:
         dw idt_end - idt_start - 1

@@ -81,7 +81,6 @@ void kernel_init()
     load_tss();
 
     printf("kernel init complete\n");
-
 }
 
 void kernel_update(void)
@@ -114,11 +113,13 @@ void kernel_main(multiboot_info_t* mbd, uint32_t magic,
 
     shell_init();
 
-    /*
+    /* Flush at this point */
+    stdlib_flushstdio();
+
     _enter_usermode();
 
     panic("HMM?");
-    */
+    
 
     while(1) {
         kernel_update();

@@ -38,10 +38,15 @@ char stdlib_pop_stdio_input_char()
     return 0;
 }
 
+void stdlib_flushstdio(void)
+{
+    io_buffer_flush_to_screen(&std_output_buf);
+}
+
 void stdlib_update(void)
 {
     /* Print everything that is in the output buffer */
-    io_buffer_flush_to_screen(&std_output_buf);
+    stdlib_flushstdio();
 
     /* For the input buffer, we just print it for now */
     /*next_char = io_buffer_pop(&std_input_buf);

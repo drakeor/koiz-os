@@ -8,7 +8,7 @@
 #define DEBUG_MSG_MEMORYMAP
 
 /* Show debug messages for physical memory */
-#define DEBUG_MSG_PMEM 
+//#define DEBUG_MSG_PMEM 
 
 /* Show debug messages for virtual memory */
 #define DEBUG_MSG_VMEM
@@ -20,6 +20,9 @@
 #define DEBUG_MSG_SHELL
 
 /* Tests the allocations for physical memories */
-//#define DEBUG_SELF_TEST_PMEM
+#define DEBUG_SELF_TEST_PMEM_ALLOCATIONS
+
+/* Tests heap allocations */
+//#define DEBUG_SELF_TEST_MALLOC_ALLOCATIONS
 
 #endif

@@ -38,6 +38,13 @@ uint16_t eswap_uint16(uint16_t value);
  */
 uint32_t eswap_uint32(uint32_t value);
 
+/*
+ * stdlib_flushstdio() - Flushes the output buffer
+ *
+ * This forces a flush of the output buffer
+ */
+ void stdlib_flushstdio(void);
+
 /**
  * stdlib_update() - Deals with processing each frame
  * 

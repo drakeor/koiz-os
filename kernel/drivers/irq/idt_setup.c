@@ -3,7 +3,7 @@
 
 #include "../../config/config.h"
 
-#define INTERRUPT_COUNT 50
+#define INTERRUPT_COUNT 52
 
 /* Represents an entry in the descriptor table */
 struct interrupt_descriptor_t {
@@ -73,6 +73,7 @@ extern uintptr_t isr_47;
 extern uintptr_t isr_48;
 extern uintptr_t isr_49;
 extern uintptr_t isr_50;
+extern uintptr_t isr_51;
 
 /*
  * This function populates the interrupt descriptor table
@@ -243,6 +244,9 @@ void _setup_idt(void)
           break;
         case 50:
           isr_addr = (uint32_t)&isr_50;
+          break;
+        case 51:
+          isr_addr = (uint32_t)&isr_51;
           break;
         default:
           panic("Improperly configured IDT Table!!");

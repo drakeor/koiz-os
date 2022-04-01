@@ -12,6 +12,7 @@
 
 void malloc_run_tests()
 {
+#ifdef DEBUG_SELF_TEST_MALLOC_ALLOCATIONS
     printf("malloc: running tests...\n");
 
     /* Simple test to test maximum malloc bounds*/
@@ -52,4 +53,6 @@ void malloc_run_tests()
     printf("Iterative tests passed.\n");
 
     printf("malloc: malloc tests passed...\n");
+#endif
+
 }

@@ -169,7 +169,6 @@ section '.bss' align 16
 
 section '.text'
     public _init_gdt
-    public _enter_usermode
     public tss_flush
 
     tss_flush:
@@ -179,33 +178,6 @@ section '.text'
                             ; so that it has an RPL of 3, not zero.
         ltr ax            ; Load 0x2B into the task state register.
         ret
-
-    _enter_usermode:
-        ; Clear interrupts
-        cli
-
-        ; user mode data selector is 0x20 (GDT entry 3). Also sets RPL to 3
-        mov ax, 0x23
-        mov ds, ax
-        mov es, ax
-        mov fs, ax
-        mov gs, ax
-
-        push 0x23		; SS, notice it uses same selector as above
-		push esp		; ESP
-		pushfd			; EFLAGS
-		push 0x1b		; CS, user mode code selector is 0x18.
-                        ; With RPL 3 this is 0x1b
-		lea eax, [a]	; EIP first
-		push eax
-
-		iretd
-	a:
-		add esp, 4      ; fix stack
-        ;int 3
-        int 0x80
-        ret
-
 
     _init_gdt:
         ; Here we initialize the GDT and paging
