@@ -126,6 +126,12 @@ section '.text' executable
         cmp [edi], ecx
         je .resume
 
+        ; Interrupt 0xD is general protection faults! For now, these are non-recoverable.
+        mov ecx, 0xD
+        cmp [edi], ecx
+        mov ebx, 0         ; Don't print
+        je .call_gpfault_handler
+
         ; Interrupt 0xE is page faults and handled by the page fault handler!
         mov ecx, 0xE
         cmp [edi], ecx
@@ -137,6 +143,12 @@ section '.text' executable
         cmp [edi], ecx
         mov ebx, 0         ; Don't print
         je .call_keyboard_handler
+
+        ; Interrupt 0x33 is a system call!
+        mov ecx, 0x33
+        cmp [edi], ecx
+        ;mov ebx, 0         ; Don't print
+        je .call_systemcall_handler
 
         ; We don't know how to handle this interrupt
         ; So initiate a kernel panic!
@@ -161,6 +173,22 @@ section '.text' executable
         ccall printf, pagefault_msg, ebx
         pop ebx
         HLT
+        jmp .resume
+
+    ; General Protection Fault
+    ; This would generally lead to killing the processor but for now,
+    ; we'll hang the kernel.
+    .call_gpfault_handler:
+        push ebx
+        ccall panic, gpfault_msg
+        pop ebx
+        jmp .resume
+
+    ; Handle system calls
+    ; This context switches from user mode.
+    .call_systemcall_handler:
+        push ebx
+        pop ebx
         jmp .resume
 
     ; Continue processing and print the message (if EBX is set to 1)
@@ -253,6 +281,7 @@ section '.bss'
     msg db "Handling Interrupt %x. Error code: %x",0xA,0
     pagefault_msg db "Page fault address: %x",0xA,0
     panicmsg db "Interrupt is non-recoverable!",0xA,0
+    gpfault_msg db "General Protection Fault!",0xA,0
 
     ; Memory area to store the IDT
     ; This is populated by idt_setup.c

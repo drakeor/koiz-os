@@ -68,3 +68,8 @@ void load_tss(void)
     //uint16_t tssSegmentLoc = 0x2B;
     tss_flush();
 }
+
+/* set the kernel stack when an interrupt occurs */
+void set_kernel_stack(uint32_t stack_addr) {
+	TSS.esp0 = stack_addr;
+}

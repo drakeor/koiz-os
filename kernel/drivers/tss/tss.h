@@ -3,4 +3,6 @@
 
 void load_tss(void);
 
+void set_kernel_stack(uint32_t stack_addr);
+
 #endif
