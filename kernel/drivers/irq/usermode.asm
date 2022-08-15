@@ -40,7 +40,13 @@ section '.text'
 		add esp, 4 
 
         ; TODO: Set stack to NOT the kernel stack and to the stack allocated to this user process!
-
+        
         ;int 3
         int 0x33
+        
+    ; infinite loop
+    .loop2:
+        int 0x33
+        jmp .loop2
+
         ret

@@ -59,7 +59,8 @@ section '.text' executable
     extrn printf
     extrn _setup_idt
     extrn panic
-    
+    extrn kernel_update
+
     ; Specific Interrupt Functions
     extrn keyboard_interrupt_handler
 
@@ -188,6 +189,8 @@ section '.text' executable
     ; This context switches from user mode.
     .call_systemcall_handler:
         push ebx
+        ccall printf, systemcall_msg
+        ccall kernel_update
         pop ebx
         jmp .resume
 
@@ -282,6 +285,7 @@ section '.bss'
     pagefault_msg db "Page fault address: %x",0xA,0
     panicmsg db "Interrupt is non-recoverable!",0xA,0
     gpfault_msg db "General Protection Fault!",0xA,0
+    systemcall_msg db "Handling System Call!",0xA,0
 
     ; Memory area to store the IDT
     ; This is populated by idt_setup.c

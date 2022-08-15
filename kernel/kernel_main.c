@@ -118,14 +118,9 @@ void kernel_main(multiboot_info_t* mbd, uint32_t magic,
 
     _enter_usermode();
 
-    _enter_usermode();
-
-    _enter_usermode();
-
-   // panic("HMM?");
+    panic("HMM?");
     
     while(1) {
-        
         kernel_update();
     }
 	__builtin_unreachable(); 
