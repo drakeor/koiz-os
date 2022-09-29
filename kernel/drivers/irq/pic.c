@@ -92,10 +92,15 @@ void pic_remap()
 
 void pic_set_interrupt_masks()
 {
-    /* Only listen to irqs 1 */
-    io_byte_out( PIC1_DATA, 0xfd ); /* master PIC */
-    io_byte_out( PIC2_DATA, 0xff ); /* slave PIC */
-    asm("sti"); /* enable interrupts */
+    /* Only listen to:
+        - irqs 0 (keyboard interrupt) 
+        - irqs 1 (PIT interrupt) 
+    */
+    io_byte_out( PIC1_DATA, 0b11111100 );
+    io_byte_out( PIC2_DATA, 0b11111111 );
+
+    /* Re-enable interrupts */
+    asm("sti");
 }
 /*
 uint8_t read_kb_scan_code(void)

@@ -115,6 +115,9 @@ section '.text' executable
         add ecx, 32
         mov ebx, 1 ; Set to 0 to disable printing interrupts
 
+        ; Okay, let's store the interrupt number as a string right away
+        call .store_interrupt_number
+
         ; Interrupt 1 is recoverable
         mov edi, esp
         add edi, 28
@@ -154,10 +157,59 @@ section '.text' executable
         ; We don't know how to handle this interrupt
         ; So initiate a kernel panic!
         ; This function should NEVER return (so HLT)
-        ccall panic, panicmsg
+        ; We'll modify the panic message to include the interrupt number..
+        push eax
+        mov al, [interrupt_num_as_str]
+        mov [panicmsg+10], al
+        mov al, [interrupt_num_as_str+1]
+        mov [panicmsg+11], al
+        mov al, [interrupt_num_as_str+2]
+        mov [panicmsg+12], al
+        pop eax
         ; We can't use printf since the buffer will never be cleared.
+        ccall panic, panicmsg
         ;ccall printf, msg, [edi], [ecx]
         HLT 
+
+    ; Helper function to store interrupt number
+    .store_interrupt_number:
+        push eax
+        push ebx
+        push ecx
+        push edx
+
+        mov ebx, [edi]
+
+        ; Divide by 100 for the interrupt number
+        mov eax, ebx     ; fill lower dividend
+        mov edx, 0       ; clear upper dividend
+        mov ecx, 0x64    ; divisor
+        div ecx          ; res stored in eax. remainder in edx
+        
+        ; Store in [panicmsg] as an ASCII char
+        add al, 0x30
+        mov [interrupt_num_as_str], al
+
+        ; Divide by 10 for the remainder
+        mov eax, edx    ; fill lower dividend
+        mov edx, 0      ; clear upper dividend
+        mov ecx, 0xA    ; divisor
+        div ecx
+
+        ; Store in [panicmsg+3] as an ASCII char
+        add al, 0x30
+        mov [interrupt_num_as_str+1], al
+
+        ; Store the remainder in [panicmsg+4]
+        mov eax, edx
+        add al, 0x30
+        mov [interrupt_num_as_str+2], al
+
+        pop edx
+        pop ecx
+        pop ebx
+        pop eax
+        ret
 
     ; Handle keyboard interrupts
     .call_keyboard_handler:
@@ -283,9 +335,11 @@ section '.text' executable
 section '.bss'
     msg db "Handling Interrupt %x. Error code: %x",0xA,0
     pagefault_msg db "Page fault address: %x",0xA,0
-    panicmsg db "Interrupt is non-recoverable!",0xA,0
+    panicmsg db "Interrupt ??? is non-recoverable!",0xA,0
     gpfault_msg db "General Protection Fault!",0xA,0
     systemcall_msg db "Handling System Call!",0xA,0
+
+    interrupt_num_as_str db "???",0
 
     ; Memory area to store the IDT
     ; This is populated by idt_setup.c
