@@ -64,23 +64,32 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Simple Reading and Writing File management commands (DONE)
 
-# In Progress Feature Milestones
-
 ## 6. User Space
 
 - Implement TSS (DONE)
 
 - Allow dropping to User Mode (DONE)
 
-- Add system calls
+- Add system calls (DONE)
 
-- Add process scheduler
+
+# In Progress Feature Milestones
+
+
+## 7. Processes
+
+- Add Timer interrupts (DONE)
 
 - Userspace application in filesystem
 
+- Add processes
+
+- Add process scheduler
+
+
 # Planned Feature Milestones (in order of development)
 
-## 7. GUI
+## 8. GUI
 
 - Add math library functions
 
@@ -90,7 +99,7 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Read from an actual disk drive
 
-## 8. Connectivity
+## 9. Connectivity
 
 - Read a FAT32 system from an actual disk drive (or emulated)
 
@@ -101,7 +110,7 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 - PCI scanning
 
 
-## 9. Enchanced Features
+## 10. Enhanced Features
 
 - Handling userspace page faults
 
