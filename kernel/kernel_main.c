@@ -7,6 +7,7 @@
 #include "drivers/serial/serial.h"
 #include "drivers/irq/idt_setup.h"
 #include "drivers/irq/pic.h"
+#include "drivers/irq/pit.h"
 #include "drivers/memory/pmem.h"
 #include "drivers/memory/vmem.h"
 #include "drivers/ramdisk/ramdisk.h"
@@ -53,6 +54,9 @@ void kernel_init()
     /* Load PIC stuff */
     pic_remap();
     pic_set_interrupt_masks();
+
+    /* Load PIT stuff */
+    pit_initialize();
 
     /* Start our physical memory allocator */
     pmem_initialize();

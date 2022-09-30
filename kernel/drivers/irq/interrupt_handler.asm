@@ -63,6 +63,7 @@ section '.text' executable
 
     ; Specific Interrupt Functions
     extrn keyboard_interrupt_handler
+    extrn pit_interrupt_handler
 
     ;; load_and_enable_interrupts() - Loads the IDT and enables interrupts
     ;; 
@@ -142,6 +143,12 @@ section '.text' executable
         mov ebx, 0         ; Don't print
         je .call_pagefault_handler
 
+        ; Interrupt 0x20 is a timer interrupt!
+        mov ecx, 0x20
+        cmp [edi], ecx
+        mov ebx, 0         ; Don't print
+        je .call_timer_handler
+
         ; Interrupt 0x21 is handled by the keyboard handler!
         mov ecx, 0x21
         cmp [edi], ecx
@@ -153,6 +160,7 @@ section '.text' executable
         cmp [edi], ecx
         ;mov ebx, 0         ; Don't print
         je .call_systemcall_handler
+
 
         ; We don't know how to handle this interrupt
         ; So initiate a kernel panic!
@@ -211,6 +219,16 @@ section '.text' executable
         pop eax
         ret
 
+
+    ; Handle timer interrupts from the PIT
+    .call_timer_handler:
+        push ebx
+        ccall pit_interrupt_handler
+        ccall printf, timercall_msg
+        ccall kernel_update
+        pop ebx
+        jmp .resume
+
     ; Handle keyboard interrupts
     .call_keyboard_handler:
         push ebx
@@ -237,11 +255,12 @@ section '.text' executable
         pop ebx
         jmp .resume
 
+
     ; Handle system calls
     ; This context switches from user mode.
     .call_systemcall_handler:
         push ebx
-        ccall printf, systemcall_msg
+        ;ccall printf, systemcall_msg
         ccall kernel_update
         pop ebx
         jmp .resume
@@ -327,7 +346,7 @@ section '.text' executable
     no_error_code_interrupt_handler 47
     no_error_code_interrupt_handler 48
     no_error_code_interrupt_handler 49
-    no_error_code_interrupt_handler 50
+    no_error_code_interrupt_handler 50 ; Timer Interrupt
 
     no_error_code_interrupt_handler 51 ; System Call
     
@@ -338,6 +357,7 @@ section '.bss'
     panicmsg db "Interrupt ??? is non-recoverable!",0xA,0
     gpfault_msg db "General Protection Fault!",0xA,0
     systemcall_msg db "Handling System Call!",0xA,0
+    timercall_msg db "Handling Timer Call!",0xA,0
 
     interrupt_num_as_str db "???",0
 
