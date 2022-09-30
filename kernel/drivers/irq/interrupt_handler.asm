@@ -233,6 +233,7 @@ section '.text' executable
     .call_keyboard_handler:
         push ebx
         ccall keyboard_interrupt_handler
+        ccall printf, keyboardcall_msg
         pop ebx
         jmp .resume
 
@@ -358,6 +359,7 @@ section '.bss'
     gpfault_msg db "General Protection Fault!",0xA,0
     systemcall_msg db "Handling System Call!",0xA,0
     timercall_msg db "Handling Timer Call!",0xA,0
+    keyboardcall_msg db "Handling Keyboard Call!",0xA,0
 
     interrupt_num_as_str db "???",0
 
