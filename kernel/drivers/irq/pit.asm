@@ -86,7 +86,7 @@ section '.text' executable
 
         ; Increment the interrupt count
         add [pit_interrupt_count], 1
-        
+
         ; Handle very-possible overflow situation.
         ; I simply fail-fast here
         jo .pit_overflow_interrupt_count
@@ -105,6 +105,8 @@ section '.text' executable
         hlt
 
 section '.bss'
+    public pit_interrupt_count
+    
     pit_success_msg     db "PIT Successfully initialized! Divisor: %x",0,0xA
     pit_panic_msg       db "Interrupt Count Overflow!",0,0xA
     pit_divisor         dw 0xFFFF

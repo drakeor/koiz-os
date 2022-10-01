@@ -23,6 +23,7 @@
 
 /* Include tests */
 #include "tests/interrupt_tests.h"
+#include "tests/pit_tests.h"
 #include "tests/pmem_tests.h"
 #include "tests/vmem_tests.h"
 #include "tests/ramdisk_tests.h"
@@ -57,6 +58,7 @@ void kernel_init()
 
     /* Load PIT stuff */
     pit_initialize();
+    pit_run_tests();
 
     /* Start our physical memory allocator */
     pmem_initialize();

@@ -14,6 +14,10 @@
         "sh_slabinfo.h": "c",
         "sh_ls.h": "c",
         "sh_write.h": "c",
-        "pic.h": "c"
+        "pic.h": "c",
+        "interrupt_tests.h": "c",
+        "pit_tests.h": "c",
+        "vmem_tests.h": "c",
+        "ramdisk_tests.h": "c"
     }
 }

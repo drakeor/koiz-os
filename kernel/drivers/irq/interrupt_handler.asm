@@ -180,6 +180,7 @@ section '.text' executable
         HLT 
 
     ; Helper function to store interrupt number
+    ; Am aware that I can optimize out the div instructions.
     .store_interrupt_number:
         push eax
         push ebx
@@ -249,8 +250,8 @@ section '.text' executable
         jmp .resume
 
     ; General Protection Fault
-    ; This would generally lead to killing the processor but for now,
-    ; we'll hang the kernel.
+    ; This would generally lead to killing the offending process 
+    ; but for now, we'll hang the kernel.
     .call_gpfault_handler:
         push ebx
         ccall panic, gpfault_msg
