@@ -40,6 +40,7 @@ pit_hz_signal           = 1193182
 
 section '.text' executable
 
+    ; public functions
     public pit_initialize
     public pit_interrupt_handler
 
@@ -85,6 +86,7 @@ section '.text' executable
 
         ; Increment the interrupt count
         add [pit_interrupt_count], 1
+        
         ; Handle very-possible overflow situation.
         ; I simply fail-fast here
         jo .pit_overflow_interrupt_count

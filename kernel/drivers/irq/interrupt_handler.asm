@@ -224,7 +224,7 @@ section '.text' executable
     .call_timer_handler:
         push ebx
         ccall pit_interrupt_handler
-        ccall printf, timercall_msg
+        ;ccall printf, timercall_msg
         ccall kernel_update
         pop ebx
         jmp .resume
@@ -233,7 +233,8 @@ section '.text' executable
     .call_keyboard_handler:
         push ebx
         ccall keyboard_interrupt_handler
-        ccall printf, keyboardcall_msg
+        ;ccall printf, keyboardcall_msg
+        ccall kernel_update
         pop ebx
         jmp .resume
 

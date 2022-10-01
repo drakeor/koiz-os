@@ -52,7 +52,6 @@ section '.text'
         
     ; infinite loop
     .loop2:
-        int 0x33
         jmp .loop2
 
         ret
