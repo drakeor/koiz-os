@@ -1,5 +1,22 @@
 #include "string.h"
 
+char* strcpy(char* dst, char* src, uint32_t dst_size)
+{
+    if(dst == 0)
+        return 0;
+    
+    int i;
+    for(i = 0; i < dst_size; i++)
+    {
+        if(src[i] == '\0')
+            break;
+        dst[i] = src[i];
+    }
+    dst[i] = '\0';
+
+    return dst;
+}
+
 uint32_t strlen(const uint8_t* str)
 {
     uint32_t len = 0;

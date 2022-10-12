@@ -23,7 +23,7 @@ void pit_run_tests()
     
     printf("Testing Timer Interrupt...\n");
 
-    /* Do a O(n^2) to busy the CPU */
+    /* Do a O(n^2) operation to busy the CPU */
     int i = 0;
     for(i = 0; i <= OPERATION_TEST_AMOUNT; i++) {
         factorial(i);

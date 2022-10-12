@@ -18,6 +18,8 @@
         "interrupt_tests.h": "c",
         "pit_tests.h": "c",
         "vmem_tests.h": "c",
-        "ramdisk_tests.h": "c"
+        "ramdisk_tests.h": "c",
+        "vmem.h": "c",
+        "process.h": "c"
     }
 }

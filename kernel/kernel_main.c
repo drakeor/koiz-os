@@ -10,6 +10,7 @@
 #include "drivers/irq/pit.h"
 #include "drivers/memory/pmem.h"
 #include "drivers/memory/vmem.h"
+#include "drivers/process/process.h"
 #include "drivers/ramdisk/ramdisk.h"
 #include "drivers/tss/tss.h"
 
@@ -85,6 +86,10 @@ void kernel_init()
     
     /* Load up the TSS */
     load_tss();
+
+    /* Load processes */
+    processes_init();
+    process_printlist();
 
     printf("kernel init complete\n");
 }

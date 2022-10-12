@@ -7,6 +7,18 @@
 #define NULL 0
 
 /**
+ * strcpy() - Copies string from src to dst safely, terminating
+ *            on \0. Will only partially copy if it starts to overflow
+ *            destination
+ * 
+ * @dst:        Destination string
+ * @src:        Source string
+ * @dst_size:   Max size of the destination string.    
+ */
+char* strcpy(char* dst, char* src, uint32_t dst_size);
+
+
+/**
  * strlen() - Gets the length of a string
  * 
  * @str:    string to get the length of
