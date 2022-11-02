@@ -37,9 +37,17 @@ struct process {
     enum process_state state;
     int killed;
     struct process_registers registers;
+
+    intptr_t* process_memory_start;
+    int32_t process_memory_size;
 };
 
-void processes_init();
+void process_init();
+
+int process_execve(const uint8_t* file_name, 
+    uint8_t *const argv[], uint8_t *const envp[]);
+
+int process_kill(int pid);
 
 void process_printlist();
 

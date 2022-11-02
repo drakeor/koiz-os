@@ -26,6 +26,7 @@
 #include "tests/interrupt_tests.h"
 #include "tests/pit_tests.h"
 #include "tests/pmem_tests.h"
+#include "tests/process_tests.h"
 #include "tests/vmem_tests.h"
 #include "tests/ramdisk_tests.h"
 #include "tests/ramdisk_fat16_tests.h"
@@ -88,8 +89,8 @@ void kernel_init()
     load_tss();
 
     /* Load processes */
-    processes_init();
-    process_printlist();
+    process_init();
+    process_run_tests();
 
     printf("kernel init complete\n");
 }
@@ -129,7 +130,7 @@ void kernel_main(multiboot_info_t* mbd, uint32_t magic,
 
     _enter_usermode();
 
-    panic("HMM?");
+    panic("shouldn't reach here?");
     
     while(1) {
         kernel_update();

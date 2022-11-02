@@ -1,10 +1,8 @@
 # KoiZ Operating System
 
-Built mostly as a pet project. It's an x86_64 based general operating system built in C and ASM.
+Built mostly as an educational pet project. It's an x86_64 based general operating system built in C and ASM. Most of the code and implementations inside are written by me. Code that is not mine is labeled as such. 
 
 It currently only runs in 32-bit since I don't have all the code setup for 64-bit. 
-
-It doesn't really serve any practical purpose outside that.
 
 NOTE: For WSL2, add an inbound rule for TCP 6000!
 
@@ -80,11 +78,12 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Add Timer interrupts (DONE)
 
-- Userspace application in filesystem
-
 - Add processes
 
 - Add process scheduler
+
+- Userspace application in filesystem
+
 
 
 # Planned Feature Milestones (in order of development)
