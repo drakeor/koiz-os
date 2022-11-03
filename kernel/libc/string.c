@@ -1,6 +1,6 @@
 #include "string.h"
 
-char* strcpy(char* dst, char* src, uint32_t dst_size)
+uint8_t* strcpy(uint8_t* dst, uint8_t* src, uint32_t dst_size)
 {
     if(dst == 0)
         return 0;

@@ -5,7 +5,7 @@ BINDIR = ../bin
 
 # GCC
 CC = gcc
-CFLAGS = -g -m32 -ffreestanding -mno-red-zone -Wall
+CFLAGS = -Werror -g -m32 -ffreestanding -mno-red-zone -Wall
 
 # FASM
 ASMC = fasm.x64

@@ -9,7 +9,7 @@
 struct process processes[MAX_PROCESSES] = {0};
 
 // helper function to blank out a process
-void process_init_process(char* process_name, int pid)
+void process_init_process(uint8_t* process_name, int pid)
 {
     strcpy(processes[0].name, process_name, PROCESS_NAME_SIZE);
 
@@ -36,32 +36,33 @@ void process_init()
     }
 
     /* First process is always the idle process */
-    process_init_process("Idle", 0);
+    uint8_t idle_process_name[] = "Idle";
+    process_init_process(idle_process_name, 0);
     processes[0].state = RUNNABLE;
 }
 
-const char* process_state_to_str(enum process_state state)
+uint8_t* process_state_to_str(enum process_state state)
 {
     switch(state)
     {
         case UNUSED:
-            return "Unused";
+            return (uint8_t*) "Unused";
         case RUNNABLE:
-            return "Runnable";
+            return (uint8_t*) "Runnable";
         case RUNNING:
-            return "Running";
+            return (uint8_t*) "Running";
         case INTERRRUPTABLE_SLEEP:
-            return "Interruptable Sleep";
+            return (uint8_t*) "Interruptable Sleep";
         case UNINTERRUPTABLE_SLEEP:
-            return "Uninterruptable Sleep";
+            return (uint8_t*) "Uninterruptable Sleep";
         case STOPPED:
-            return "Stopped";
+            return (uint8_t*) "Stopped";
         case ZOMBIE:
-            return "Zombie";
+            return (uint8_t*) "Zombie";
         default:
-            return "Unknown";
+            return (uint8_t*) "Unknown";
     }
-    return "Unknown";
+    return (uint8_t*) "Unknown";
 
 }
 
@@ -69,8 +70,8 @@ const char* process_state_to_str(enum process_state state)
 
 void process_printlist()
 {
-    char buf_name[PRINT_BUFFER_SIZE];
-    char buf_state[PRINT_BUFFER_SIZE];
+    uint8_t buf_name[PRINT_BUFFER_SIZE];
+    uint8_t buf_state[PRINT_BUFFER_SIZE];
 
     printf("PID | Process Name    | State       | Time  | Memory \n");
     uint32_t i = 0;
@@ -105,8 +106,8 @@ int process_get_next_free_pid()
     return -1;
 }
 
-int process_execve(const uint8_t* file_name, 
-    uint8_t *const argv[], uint8_t *const envp[])
+int process_execve(uint8_t* file_name, 
+    uint8_t *argv[], uint8_t *envp[])
 {
 
     // Check if the program exists first
@@ -141,4 +142,5 @@ int process_kill(int pid)
 {
     // For now, just mark the process as killed.
     processes[pid].killed = 1;
+    return 0;
 }

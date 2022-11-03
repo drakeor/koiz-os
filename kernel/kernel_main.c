@@ -16,6 +16,7 @@
 
 /* Include our filesystem stuff */
 #include "fs/ramdisk_fat16.h"
+#include "fs/fs.h"
 
 /* Include our standard library */
 #include "libc/stdlib.h"
@@ -78,6 +79,9 @@ void kernel_init()
 
     /* initialize our temp filesystem */
     ramdisk_fat16_init();
+
+    /* Load starting files */
+    fs_load_starting_files();
 
     /* Run malloc tests */
     malloc_run_tests();

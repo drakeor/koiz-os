@@ -15,7 +15,7 @@
  * @src:        Source string
  * @dst_size:   Max size of the destination string.    
  */
-char* strcpy(char* dst, char* src, uint32_t dst_size);
+uint8_t* strcpy(uint8_t* dst, uint8_t* src, uint32_t dst_size);
 
 
 /**

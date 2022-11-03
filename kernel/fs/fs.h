@@ -57,4 +57,6 @@ uint32_t fs_file_exists(uint8_t* file_name);
 int fs_file_read(
     uint8_t* file_name, void* sector_buffer, uint16_t sector_index);
 
+int fs_load_starting_files();
+
 #endif

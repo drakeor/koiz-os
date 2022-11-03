@@ -30,7 +30,7 @@ enum process_state {
 };
 
 struct process {
-    char name[PROCESS_NAME_SIZE];
+    uint8_t name[PROCESS_NAME_SIZE];
 
     uint32_t cpu_time_ms;
 
@@ -44,8 +44,10 @@ struct process {
 
 void process_init();
 
-int process_execve(const uint8_t* file_name, 
-    uint8_t *const argv[], uint8_t *const envp[]);
+int process_exec_test();
+
+int process_execve(uint8_t* file_name, 
+    uint8_t *argv[], uint8_t *envp[]);
 
 int process_kill(int pid);
 
