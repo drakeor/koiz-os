@@ -11,6 +11,7 @@
 #include "drivers/memory/pmem.h"
 #include "drivers/memory/vmem.h"
 #include "drivers/process/process.h"
+#include "drivers/process/sched.h"
 #include "drivers/ramdisk/ramdisk.h"
 #include "drivers/tss/tss.h"
 
@@ -96,6 +97,9 @@ void kernel_init()
     process_init();
     process_run_tests();
 
+    /* Load and run scheduler */
+    sched_init();
+
     printf("kernel init complete\n");
 }
 
@@ -106,6 +110,9 @@ void kernel_update(void)
 
     /* shell process update */
     shell_update();
+
+    /* process scheduler update */
+    sched_update();
 }
 
 extern void _enter_usermode(void);

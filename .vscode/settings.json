@@ -20,6 +20,7 @@
         "vmem_tests.h": "c",
         "ramdisk_tests.h": "c",
         "vmem.h": "c",
-        "process.h": "c"
+        "process.h": "c",
+        "tss.h": "c"
     }
 }

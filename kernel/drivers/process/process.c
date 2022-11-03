@@ -129,7 +129,29 @@ int process_execve(uint8_t* file_name,
     process_init_process(file_name, pid);
 
     // Load program into memory
+    // TODO: We need to correctly page the user process later
+    // TODO: We need to set memory permissions for it so it can't
+    //       access kernel memory
+    if(processes[pid].process_memory_start == 0)
+    {
+        printf("Memory not allocated for process. Stopping.");
+        processes[pid].state = UNUSED;
+        return 0;
+    }
 
+    int res = fs_file_read(file_name, 
+        processes[pid].process_memory_start, 0);
+    
+    if(res != 0)
+    {
+        printf("Failed to copy process to memory. Stopping");
+        processes[pid].state = UNUSED;
+    }
+
+#ifdef DEBUG_MSG_PROCESSES
+    printf("Loaded process %s to memory with pid %d\n",
+        file_name, pid);
+#endif
 
     // LASTLY mark as runnable. 
     // Otherwise the scheduler might pick it up before it's ready.
