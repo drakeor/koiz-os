@@ -8,8 +8,8 @@
 #include "../../libc/stdlib.h"
 
 #define MAX_PRIORITY_QUEUES 3
-#define STARTING_TICKETS 50000
-#define FULL_TIMESLICE_COST 5
+#define STARTING_TICKETS 2000
+#define FULL_TIMESLICE_COST 10
 
 struct mlfq_entry {
     struct process* ptr;
@@ -93,50 +93,107 @@ void sched_printinfo(void)
 void sched_update(void)
 {
 
-    /* Decrement the current process by number of tickets 
-       (if applicable).
-        TODO: If the process yielded it's time beforehand, 
-       take that into account */
-    if(current_process != NULL) {
-
-        /* Sanity check */
-        if(current_process->ptr == NULL) {
-            panic("There exists a null process in the scheduler!\n");
+    /* Scenerio 1: No current process exists. 
+        In this case, simply find one in the highest priority queue */
+    if(current_process == NULL) {
+        int i = 0;
+        for(i = 0; i < MAX_PRIORITY_QUEUES; i++) {
+            if(proc_priority_list[i] != NULL) {
+                current_process = proc_priority_list[i];
+                break;
+            }
         }
-        current_process->tickets_remaining -= FULL_TIMESLICE_COST;
-
-        /* Check if we need to bump the current process down
-             a priority queue */
-        /*if(current_process->tickets_remaining <= 0) {
-            (current_process->priority)++;
-            current_process->tickets_remaining = STARTING_TICKETS;
-            if(current_process->priority >= MAX_PRIORITY_QUEUES)
-                current_process->priority = MAX_PRIORITY_QUEUES-1;
-        }*/
-    }
-
-    /* Okay, now run through our priority queue in order to find
-        the next process to run*/
-    int i = 0;
-    for(i = 0; i < MAX_PRIORITY_QUEUES; i++) {
-
-    }
-
-    /* If the running process is marked as killed, 
-        switch to IDLE process and zombie it.*/
+        return;
+    } 
     
-    /* Update running process */
+    /* Sanity checks */
+    if(current_process == NULL) 
+        panic("Expected a current_process at this point!\n");
+    if(current_process->ptr == NULL) 
+        panic("There exists a null process in the scheduler!\n");
+        
+    /* Decrement the current process by number of tickets 
+    (if applicable).
+        TODO: If the process yielded it's time beforehand, 
+    take that into account */
+    current_process->tickets_remaining -= FULL_TIMESLICE_COST;
+    if(current_process->tickets_remaining < 0) {
+        current_process->tickets_remaining = 0;
 
-    /* Increment the CPU time from the 
-            last time with interrupt count */
+        /* Bump process down the queue if we can */
+        int cprior = current_process->priority;
+        if(cprior < MAX_PRIORITY_QUEUES-1) {
 
-    /* After a certain condition is met, 
-            flag to switch tasks */
+            /* Sanity check */
+            if(proc_priority_list[cprior] == NULL)
+                panic("Head of current priority list is empty!");
 
-    /* Loop thru the processes we have */
+            /* If it exists at the head, simply pop it off the head */
+            if(proc_priority_list[cprior] == current_process) {
+                proc_priority_list[cprior] = current_process->next_process;
+            } else {
+                /* We need to search for it */
+                struct mlfq_entry* curr = proc_priority_list[cprior];
+                struct mlfq_entry* next = current_process->next_process;
+                while(curr != NULL) {
+                    if(curr->next_process != NULL &&
+                        curr->next_process == current_process) {
+                            curr->next_process = next;
+                            break;
+                        }
+                    curr = curr->next_process;
+                }
+                if(curr == NULL) {
+                    panic("Cannot find current process in priority!");
+                }
+            }
 
-    /* If we find a runnable to switch to and flag is set,
-        then switch to that task*/
+            /* Decrement priority */
+            int newprior = current_process->priority + 1;
+            if(newprior >= MAX_PRIORITY_QUEUES)
+                panic("Moved to an out of bounds priority!");
+            
+            /* Add to lower priority queue */
+            current_process->priority = newprior;
+            current_process->tickets_remaining = STARTING_TICKETS;
+            current_process->next_process = proc_priority_list[newprior];
+            proc_priority_list[newprior] = current_process;
+        }
+    }
+    
+    /* Scenerio 2: Current process is NOT highest priority.
+        Switch to a higher priority process (if possible) */
+    if(current_process->priority != 0) {
+        struct mlfq_entry* new_process = current_process;
+        int i = 0;
+        for(i = 0; i < MAX_PRIORITY_QUEUES; i++) {
+            if(proc_priority_list[i] != NULL) {
+                new_process = proc_priority_list[i];
+                break;
+            }
+        }
 
-    /* Reap zombie processes at this point */
+        if(new_process->priority < current_process->priority) {
+            current_process = new_process;
+            return;
+        }
+    }
+
+    /* Scenerio 3: Current process is the highest priority.
+        Switch to the next process in line (if possible) */
+    int cpr = current_process->priority;
+    if(current_process->next_process != NULL) {
+        current_process = current_process->next_process;
+    } else if(proc_priority_list[cpr] != NULL) {
+        current_process = proc_priority_list[cpr];
+    }
+
+    /* Scenerio 4: We're the only highest priority process.
+        Continue as is! */
+
+
+    /* TODO: If the running process is marked as killed, 
+        switch to IDLE process and zombie it.*/
+
+    /* TODO: Reap zombie processes at this point */
 }
