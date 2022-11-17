@@ -1,4 +1,5 @@
 #include "process.h"
+#include "../../config/config.h"
 #include "../../libc/stdlib.h"
 #include "../../libc/string.h"
 #include "../../fs/fs.h"
@@ -11,19 +12,19 @@ struct process processes[MAX_PROCESSES] = {0};
 // helper function to blank out a process
 void process_init_process(uint8_t* process_name, int pid)
 {
-    strcpy(processes[0].name, process_name, PROCESS_NAME_SIZE);
+    strcpy(processes[pid].name, process_name, PROCESS_NAME_SIZE);
 
-    processes[0].cpu_time_ms = 0;
-    processes[0].killed = 0;
+    processes[pid].cpu_time_ms = 0;
+    processes[pid].killed = 0;
 
-    memset(&(processes[0].registers), 0, 
-        sizeof(processes[0].registers));
+    memset(&(processes[pid].registers), 0, 
+        sizeof(processes[pid].registers));
 
-    if(processes[0].process_memory_start != NULL)
+    if(processes[pid].process_memory_start != NULL)
         panic("Memory leak for process memory!");
 
-    processes[0].process_memory_start = pmem_alloc();
-    processes[0].process_memory_size = PHYS_BLOCK_SIZE;
+    processes[pid].process_memory_start = pmem_alloc();
+    processes[pid].process_memory_size = PHYS_BLOCK_SIZE;
 }
 
 void process_init()
@@ -33,9 +34,10 @@ void process_init()
     for(i = 0; i < MAX_PROCESSES; i++)
     {
         processes[i].state = UNUSED;
+        processes[i].process_memory_start = NULL;
     }
 
-    /* First process is always the idle process */
+    /* First process (PID 0) is always the idle process */
     uint8_t idle_process_name[] = "Idle";
     process_init_process(idle_process_name, 0);
     processes[0].state = RUNNABLE;
@@ -101,7 +103,7 @@ int process_get_next_free_pid()
 {
     int i = 1;
     for(i = 1; i < MAX_PROCESSES; i++)
-        if(processes[i].state != UNUSED)
+        if(processes[i].state == UNUSED)
             return i;
     return -1;
 }
@@ -109,6 +111,10 @@ int process_get_next_free_pid()
 int process_execve(uint8_t* file_name, 
     uint8_t *argv[], uint8_t *envp[])
 {
+
+#ifdef DEBUG_MSG_PROCESSES
+    printf("Loading process %s \n", file_name);
+#endif
 
     // Check if the program exists first
     if(!fs_file_exists(file_name))
@@ -164,5 +170,6 @@ int process_kill(int pid)
 {
     // For now, just mark the process as killed.
     processes[pid].killed = 1;
+    
     return 0;
 }
