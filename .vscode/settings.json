@@ -24,6 +24,7 @@
         "tss.h": "c",
         "malloc.h": "c",
         "sh_execbg.h": "c",
-        "sh_exec.h": "c"
+        "sh_exec.h": "c",
+        "sh_sched.h": "c"
     }
 }

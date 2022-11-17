@@ -1,11 +1,10 @@
 #include "process.h"
+#include "sched.h"
 #include "../../config/config.h"
 #include "../../libc/stdlib.h"
 #include "../../libc/string.h"
 #include "../../fs/fs.h"
 #include "../memory/pmem.h"
-
-#define MAX_PROCESSES 64
 
 struct process processes[MAX_PROCESSES] = {0};
 
@@ -14,6 +13,7 @@ void process_init_process(uint8_t* process_name, int pid)
 {
     strcpy(processes[pid].name, process_name, PROCESS_NAME_SIZE);
 
+    processes[pid].current_priority = 0;
     processes[pid].cpu_time_ms = 0;
     processes[pid].killed = 0;
 
@@ -27,12 +27,24 @@ void process_init_process(uint8_t* process_name, int pid)
     processes[pid].process_memory_size = PHYS_BLOCK_SIZE;
 }
 
+struct process* process_get(int pid)
+{
+    if(pid <= 0 || pid >= MAX_PROCESSES)
+        return 0;
+
+    if(processes[pid].state == UNUSED)
+        return 0;
+
+    return &(processes[pid]);
+}
+
 void process_init()
 {
     /* Zero out the process list */
     uint32_t i = 0;
     for(i = 0; i < MAX_PROCESSES; i++)
     {
+        processes[i].pid = i;
         processes[i].state = UNUSED;
         processes[i].process_memory_start = NULL;
     }
@@ -160,9 +172,9 @@ int process_execve(uint8_t* file_name,
 #endif
 
     // LASTLY mark as runnable. 
-    // Otherwise the scheduler might pick it up before it's ready.
     processes[pid].state = RUNNABLE;
-
+    sched_addpid(pid);
+    
     return 1;
 }
 

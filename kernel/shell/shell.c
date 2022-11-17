@@ -13,6 +13,7 @@
 #include "process/sh_ps.h"
 #include "process/sh_exec.h"
 #include "process/sh_execbg.h"
+#include "process/sh_sched.h"
 
 /* Structure for each command */
 struct shell_cmd_entry {
@@ -36,7 +37,8 @@ static shell_cmd_entry_t shell_cmds[] = {
     /* Process commands */
     {"ps",              sh_ps},
     {"exec",            sh_exec},
-    {"execbg",          sh_execbg}
+    {"execbg",          sh_execbg},
+    {"sched",           sh_sched}
     
 };
 

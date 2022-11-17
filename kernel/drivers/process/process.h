@@ -4,6 +4,7 @@
 #include "stdint.h"
 
 #define PROCESS_NAME_SIZE 16
+#define MAX_PROCESSES 64
 
 struct process_registers
 {
@@ -32,8 +33,12 @@ enum process_state {
 struct process {
     uint8_t name[PROCESS_NAME_SIZE];
 
+    int pid;
+    
     uint32_t cpu_time_ms;
 
+    uint32_t current_priority;
+    
     enum process_state state;
     int killed;
     struct process_registers registers;
@@ -52,5 +57,7 @@ int process_execve(uint8_t* file_name,
 int process_kill(int pid);
 
 void process_printlist();
+
+struct process* process_get(int pid);
 
 #endif

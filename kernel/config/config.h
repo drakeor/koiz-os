@@ -22,6 +22,9 @@
 /* Show debug messages for processes */
 #define DEBUG_MSG_PROCESSES
 
+/* Show debug messages for the scheduler */
+#define DEBUG_MSG_SCHEDULER
+
 /* Tests the allocations for physical memories */
 #define DEBUG_SELF_TEST_PMEM_ALLOCATIONS
 
