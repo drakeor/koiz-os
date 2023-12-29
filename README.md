@@ -1,3 +1,6 @@
+**Note that my initial goal was to get to userspace processes, which I accomplished in November 2022. I'm currently not planning any major features, though I may come back to document and clean up parts of this repository**
+
+
 # KoiZ Operating System
 
 Built mostly as an educational pet project. It's an x86_64 based general operating system built in C and ASM. Most of the code and implementations inside are written by me. Code that is not mine is labeled as such. 
@@ -5,6 +8,7 @@ Built mostly as an educational pet project. It's an x86_64 based general operati
 It currently only runs in 32-bit since I don't have all the code setup for 64-bit. 
 
 NOTE: For WSL2, add an inbound rule for TCP 6000!
+
 
 # Completed Feature Milestones
 
@@ -71,22 +75,30 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 - Add system calls (DONE)
 
 
-# In Progress Feature Milestones
-
-
 ## 7. Processes
 
 - Add Timer interrupts (DONE)
 
-- Add processes
+- Add processes  (DONE)
 
-- Add process scheduler
+- Add process scheduler  (DONE)
 
-- Userspace application in filesystem
+- Userspace application in filesystem  (DONE)
+
+
+# In Progress Feature Milestones
+
+- None planned
 
 
 
-# Planned Feature Milestones (in order of development)
+# Potential Future Work
+
+## 8. Robust Processes
+
+- Better support for userspace applications
+  
+- Handling userspace page faults
 
 ## 8. GUI
 
@@ -108,17 +120,13 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - PCI scanning
 
-
 ## 10. Enhanced Features
-
-- Handling userspace page faults
 
 - Multi-processor support
 
 - Implement FPU / SSE stuff
 
 - Backend Compiler for OS
-
 
 # Requirements to build
 
