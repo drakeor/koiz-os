@@ -55,7 +55,7 @@ section '.text'
         ; Processor state is multiboot standard
         
         ; The first thing we want to do is set up the stack.
-        mov [stack_top], esp
+        mov esp, stack_top
 
         ; Store the EAX, EBX onto the stack.
         ; They contain the multiboot info and magic number correspondingly
