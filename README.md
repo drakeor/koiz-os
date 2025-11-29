@@ -14,6 +14,8 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 ## 1. Bootloader and Starting Out
 
+![milestone1_image](https://drakeor.com/content/images/2022/04/standard_lib_vid.gif)
+
 - Custom bootloader image to load the kernel (DONE)
 
 - Prints stuff to the console in 32 bit mode (DONE)
@@ -30,6 +32,8 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 ## 2. Physical and Virtual Memory Management
 
+![milestone2_image](https://drakeor.com/content/images/2022/04/GIF-11-10-2021-12-47-40-AM--1-.gif)
+
 - Memory Detection (DONE)
 
 - Physical Memory Management (DONE)
@@ -40,7 +44,19 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Virtual to physical address translation functions (DONE)
 
-## 3. Simple Filesystem
+## 3. Standard IO Streams / Heap
+
+![milestone3_image](https://drakeor.com/content/images/2023/12/malloc.gif)
+
+- Add basic shell connected to input (DONE)
+
+- Kernel Standard IO Streams (DONE)
+
+- Slab Allocator / KMalloc / KFree (DONE)
+
+## 4. Simple Filesystem
+
+![milestone4_image](https://drakeor.com/content/images/2025/11/GIF-12-28-2023-10-20-27-PM.gif)
 
 - Ramdisk for virtual hard drive (DONE)
 
@@ -52,21 +68,13 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Add more standard lib stuff to stdlib.c, strings.c (DONE)
 
-## 4. Standard IO Streams / Heap
-
-- Add basic shell connected to input (DONE)
-
-- Kernel Standard IO Streams (DONE)
-
-- Slab Allocator / KMalloc / KFree (DONE)
-
-## 5. User Shell Interaction
-
 - Add basic commands (DONE)
 
 - Simple Reading and Writing File management commands (DONE)
 
-## 6. User Space
+## 5. User Space
+
+![milestone5_image](https://drakeor.com/content/images/2025/11/Screencast-from-2025-11-26-15-13-58-1.gif)
 
 - Implement TSS (DONE)
 
@@ -74,8 +82,9 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 
 - Add system calls (DONE)
 
+## 6. Processes
 
-## 7. Processes
+![milestone6_image](https://drakeor.com/content/images/2025/11/Screencastfrom2025-11-2700-15-59-ezgif.com-optimize-1.gif)
 
 - Add Timer interrupts (DONE)
 
@@ -84,12 +93,6 @@ NOTE: For WSL2, add an inbound rule for TCP 6000!
 - Add process scheduler  (DONE)
 
 - Userspace application in filesystem  (DONE)
-
-
-# In Progress Feature Milestones
-
-- None planned
-
 
 
 # Potential Future Work
